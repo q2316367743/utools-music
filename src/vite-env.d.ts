@@ -8,6 +8,41 @@ interface OpenFileOption {
   securityScopedBookmarks?: boolean
 }
 
+interface StatsBase<T> {
+  isFile(): boolean;
+
+  isDirectory(): boolean;
+
+  isBlockDevice(): boolean;
+
+  isCharacterDevice(): boolean;
+
+  isSymbolicLink(): boolean;
+
+  isFIFO(): boolean;
+
+  isSocket(): boolean;
+
+  dev: T;
+  ino: T;
+  mode: T;
+  nlink: T;
+  uid: T;
+  gid: T;
+  rdev: T;
+  size: T;
+  blksize: T;
+  blocks: T;
+  atimeMs: T;
+  mtimeMs: T;
+  ctimeMs: T;
+  birthtimeMs: T;
+  atime: Date;
+  mtime: Date;
+  ctime: Date;
+  birthtime: Date;
+}
+
 interface Window {
   preload: {
     /**
@@ -28,6 +63,15 @@ interface Window {
      * @param name 文件名
      * @return 文件保存的路径
      */
-    downloadFile(data: string | Blob | ArrayBuffer, name: string): Promise<string>
+    downloadFile(data: string | Blob | ArrayBuffer, name: string): Promise<string>,
+    fs: {
+      readdir(path: string, callback: (e: Error, names: Array<string>) => void): void;
+      statSync(path: string): StatsBase<number>;
+    },
+    path: {
+      join(...paths: Array<string>): string;
+      basename(path: string): string;
+      extname(path: string): string;
+    }
   }
 }

@@ -1,5 +1,5 @@
-const {readFile} = require('node:fs');
-const {basename} = require('node:path');
+const {readFile, readdir, statSync} = require('node:fs');
+const {join, basename, extname} = require('node:path');
 const {URL} = require("node:url");
 const https = require("node:https");
 const http = require("node:http");
@@ -124,5 +124,12 @@ async function downloadFile(data, name) {
 }
 
 window.preload = {
-    openFile, downloadFileFromUrl, downloadFile
+    openFile, downloadFileFromUrl, downloadFile,
+    fs: {
+        readdir,
+        statSync,
+    },
+    path: {
+        join, basename, extname
+    }
 }
