@@ -40,6 +40,7 @@ import {addRepository} from "@/pages/local/components/MusicScanner/MusicScannerE
 const visible = ref(false);
 const repositories = ref(new Array<Repository>());
 let rev: string | undefined = undefined
+// TODO: 只显示当前设备的文件夹
 
 function handleOpen() {
   visible.value = true;
