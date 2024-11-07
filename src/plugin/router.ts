@@ -1,4 +1,5 @@
 import {createRouter, createWebHashHistory} from 'vue-router';
+import {useUmami} from "@/plugin/umami";
 // 引入路由
 
 const router = createRouter({
@@ -25,5 +26,9 @@ const router = createRouter({
       component: () => import('@/pages/lately/index.vue')
     }]
 });
+
+router.beforeEach(to => {
+  useUmami.page(to.path, to.name as string)
+})
 
 export default router;

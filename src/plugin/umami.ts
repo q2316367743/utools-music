@@ -21,10 +21,10 @@ function buildPayload() {
     }
 }
 
-const buildPathPayload = (path: string, name: string) => ({
+const buildPathPayload = (path: string, name?: string) => ({
     ...buildBasePayload(),
     url: path,
-    title: name,
+    title: name || document.title,
 })
 
 function sendEvent(payload: Record<string, any>) {
@@ -60,7 +60,7 @@ export const useUmami = {
         sendEvent(payload)
     },
 
-    page(path: string, name: string): void {
+    page(path: string, name?: string): void {
         const payload = buildPathPayload(path, name);
         sendEvent(payload)
     }
