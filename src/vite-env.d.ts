@@ -65,8 +65,10 @@ interface Window {
      */
     downloadFile(data: string | Blob | ArrayBuffer, name: string): Promise<string>,
     fs: {
+      existsSync(path: string): boolean;
       readdir(path: string, callback: (e: Error, names: Array<string>) => void): void;
       statSync(path: string): StatsBase<number>;
+      readFile(path: string, callback: (e: Error, file: Uint8Array) => void): void;
     },
     path: {
       join(...paths: Array<string>): string;

@@ -62,6 +62,7 @@ utools.onPluginEnter(action => {
     left: 0;
     right: 0;
     bottom: 60px;
+    contain: strict;
 
     .main-side {
       position: absolute;

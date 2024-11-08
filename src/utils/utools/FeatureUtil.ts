@@ -1,4 +1,4 @@
-import Constant from "@/global/Constant";
+import {Constants} from "@/global/Constant";
 
 /**
  * 关键字
@@ -40,7 +40,7 @@ export type FeatureCmdFileType = 'file' | 'directory';
 export function setFeatureOneSimple(code: string, cmd: FeatureCmd | string): boolean {
     return utools.setFeature({
         code: code,
-        explain: Constant.name,
+        explain: Constants.name,
         icon: "public/logo.png",
         platform: [
             "win32",

@@ -1,5 +1,5 @@
 import router from "@/plugin/router";
-import Constant from "@/global/Constant";
+import {Constants} from "@/global/Constant";
 
 
 function buildBasePayload() {
@@ -8,7 +8,7 @@ function buildBasePayload() {
         language: navigator.language,
         referrer: "https://u.tools'",
         screen: `${window.screen.width}x${window.screen.height}`,
-        website: Constant.umami.id,
+        website: Constants.umami.id,
     }
 }
 
@@ -32,7 +32,7 @@ function sendEvent(payload: Record<string, any>) {
         console.log('Umami payload:', payload);
         return;
     }
-    fetch(`${Constant.umami.url}/api/send`, {
+    fetch(`${Constants.umami.url}/api/send`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

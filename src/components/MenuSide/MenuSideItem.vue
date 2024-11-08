@@ -4,16 +4,16 @@
   </div>
 </template>
 <script lang="ts" setup>
+const route = useRoute();
+const router = useRouter();
 
-const active = defineModel({
-  type: String
-})
+const active = computed(() => route.path);
 const props = defineProps({
   value: String,
 });
 
 function onClick() {
-  active.value = props.value;
+  router.push(props.value!);
 }
 </script>
 <style scoped lang="less">

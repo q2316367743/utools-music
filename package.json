@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@vueuse/core": "^10.11.1",
+    "@vueuse/integrations": "^11.2.0",
     "axios": "^1.7.7",
+    "fuse.js": "^7.0.0",
     "idb": "^8.0.0",
     "less": "^4.2.0",
     "less-loader": "^11.1.4",
+    "music-metadata": "^10.5.1",
     "pinia": "^2.2.6",
     "radash": "^12.1.0",
     "tdesign-vue-next": "^1.10.3",

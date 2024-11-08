@@ -1,4 +1,4 @@
-const {readFile, readdir, statSync} = require('node:fs');
+const {readFile, readdir, statSync, existsSync} = require('node:fs');
 const {join, basename, extname} = require('node:path');
 const {URL} = require("node:url");
 const https = require("node:https");
@@ -126,8 +126,10 @@ async function downloadFile(data, name) {
 window.preload = {
     openFile, downloadFileFromUrl, downloadFile,
     fs: {
+        existsSync,
         readdir,
         statSync,
+        readFile
     },
     path: {
         join, basename, extname

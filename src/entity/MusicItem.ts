@@ -3,8 +3,8 @@ export enum MusicItemSource {
   WEBDAV = 2,
 }
 
-export interface MusicItemBase {
-  id: number;
+export interface MusicItemMeta {
+
   /**
    * 音乐名称
    */
@@ -18,9 +18,13 @@ export interface MusicItemBase {
    */
   album: string;
   /**
-   * 时长
+   * 时长，单位s
    */
-  duration: string;
+  duration: number;
+}
+
+export interface MusicItemBase extends MusicItemMeta{
+  id: number;
 
 }
 
@@ -59,4 +63,10 @@ export interface MusicItemExtra {
  * `${nativeId}:${url}`是唯一值
  */
 export interface MusicItem extends MusicItemBase, MusicItemLink, MusicItemExtra {
+}
+
+
+export interface MusicItemView extends MusicItem {
+  repositoryId: number;
+  repositoryName: string;
 }
