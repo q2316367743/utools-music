@@ -9,6 +9,8 @@ import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import {copyProperties, parseMusicName} from "@/utils/lang/FieldUtil";
 import {KeyValue} from "@/types/KeyValue";
 
+const nativeId = utools.getNativeId();
+
 /**
  * 获取全部的仓库
  */
@@ -30,7 +32,6 @@ export function saveRepositories(val: Array<Repository>, rev?: string) {
  * @param repo 本地仓库
  */
 async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
-  const nativeId = utools.getNativeId();
   const files = await readFileList(repo.path);
   const musicItems = new Array<MusicItem>();
   // 文件分组，用于处理封面和歌词
@@ -63,7 +64,7 @@ async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
       }
     });
     if (isNotEmptyString(musicItem.url)) {
-      // TODO: 获取歌曲元信息
+      // 获取歌曲元信息
       const meta = await parseFileToMusic(musicItem.url);
       copyProperties(meta, musicItem);
       musicItems.push(musicItem);
@@ -77,7 +78,6 @@ async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
  */
 export async function scanRepository(): Promise<Array<KeyValue<Array<MusicItem> | null, number>>> {
   const {list} = await listRepositories();
-  const nativeId = utools.getNativeId();
   const items = new Array<KeyValue<Array<MusicItem> | null, number>>();
 
   for (let repository of list) {

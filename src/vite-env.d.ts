@@ -69,11 +69,15 @@ interface Window {
       readdir(path: string, callback: (e: Error, names: Array<string>) => void): void;
       statSync(path: string): StatsBase<number>;
       readFile(path: string, callback: (e: Error, file: Uint8Array) => void): void;
+      readFile(path: string, encode: 'utf8', callback: (e: Error, file: string) => void): void;
     },
     path: {
       join(...paths: Array<string>): string;
       basename(path: string): string;
       extname(path: string): string;
+    },
+    ipcRenderer: {
+      sendLyric(ids: Array<number>, text: string): void
     }
   }
 }

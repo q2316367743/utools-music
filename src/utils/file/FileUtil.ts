@@ -60,6 +60,17 @@ export async function readFile(path: string): Promise<Uint8Array> {
   })
 }
 
+export async function readFileAsString(path: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    window.preload.fs.readFile(path, 'utf8', (e, file) => {
+      if (e) {
+        return reject(e);
+      }
+      resolve(file);
+    })
+  })
+}
+
 /**
  * 解析文件为音乐
  * @param path 文件路径

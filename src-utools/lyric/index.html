@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>音乐播放器-歌词</title>
+  <style>
+      .container {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          color: #fff;
+          font-size: 36px;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          user-select: none;
+          -webkit-app-region: drag;
+          -webkit-user-select: none;
+      }
+  </style>
+</head>
+<body>
+<div class="container"></div>
+</body>
+<script>
+    window.preload.receiveMsg(msg => {
+        console.log('接收插件发送的消息：', msg);
+        // 发送消息到插件
+        document.querySelectorAll('.container')
+            .forEach(e => {
+                e.innerHTML = `${msg}`
+            })
+    })
+</script>
+</html>

@@ -3,6 +3,7 @@ const {join, basename, extname} = require('node:path');
 const {URL} = require("node:url");
 const https = require("node:https");
 const http = require("node:http");
+const {ipcRenderer} = require("electron")
 
 /**
  * 获取一个文件
@@ -123,6 +124,18 @@ async function downloadFile(data, name) {
     })
 }
 
+/**
+ * 发送歌词到歌词窗口
+ * @param ids {Array<number>} 接受者ID
+ * @param text {string} 歌词内容
+ */
+function sendLyric(ids, text) {
+    for (let id of ids) {
+        ipcRenderer.sendTo(id, 'lyric', text);
+    }
+}
+
+
 window.preload = {
     openFile, downloadFileFromUrl, downloadFile,
     fs: {
@@ -133,5 +146,8 @@ window.preload = {
     },
     path: {
         join, basename, extname
+    },
+    ipcRenderer: {
+        sendLyric
     }
 }

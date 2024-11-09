@@ -6,6 +6,7 @@
       </div>
       <menu-side class="main-side"></menu-side>
     </div>
+    <music-display />
     <div class="main-player">
       <music-player/>
     </div>
@@ -88,6 +89,8 @@ utools.onPluginEnter(action => {
     right: 0;
     bottom: 0;
     height: 60px;
+    background-color: var(--td-bg-color-container);
+    color: var(--td-text-color-primary);
   }
 }
 </style>

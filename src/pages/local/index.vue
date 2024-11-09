@@ -1,5 +1,5 @@
 <template>
-  <t-card class="local-music" title="本地音乐">
+  <t-card class="local-music" title="本地音乐" :bordered="false">
     <template #actions>
       <music-scanner/>
     </template>
