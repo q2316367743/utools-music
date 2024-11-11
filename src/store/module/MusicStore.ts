@@ -5,6 +5,7 @@ import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {listRepositories, scanRepository} from "@/store/module/RepositoryStore";
 import {map} from "@/utils/lang/ArrayUtil";
 import {isNotNull} from "@/utils/lang/FieldUtil";
+import MessageUtil from "@/utils/modal/MessageUtil";
 
 export const useMusicStore = defineStore('music', () => {
   const musics = ref(new Array<MusicItemView>());
@@ -40,6 +41,11 @@ export const useMusicStore = defineStore('music', () => {
     }
     musics.value = musicList;
   }
+
+
+  init()
+    .then(() => console.log("音乐初始化成功"))
+    .catch(err => MessageUtil.error('音乐初始化失败', err));
 
   /**
    * 重新扫描全部的音乐

@@ -1,8 +1,5 @@
 <template>
-  <t-card class="local-music" title="本地音乐" :bordered="false">
-    <template #actions>
-      <music-scanner/>
-    </template>
+  <div class="local-music">
     <div class="container">
       <div class="local-music__header">
         <t-input style="width: 200px" placeholder="搜索本地音乐" v-model="keyword" :clearable="true">
@@ -10,6 +7,7 @@
             <t-icon name="search"/>
           </template>
         </t-input>
+        <music-scanner/>
       </div>
       <t-base-table row-key="id" :data="data" :columns="columns" :bordered="false" :height="maxHeight"
                     :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }"
@@ -17,7 +15,7 @@
       </t-base-table>
     </div>
     <t-back-top container=".local-music .container .t-table__content"/>
-  </t-card>
+  </div>
 </template>
 <script lang="tsx" setup>
 import MusicScanner from "@/pages/local/components/MusicScanner/MusicScanner.vue";
@@ -30,12 +28,10 @@ import {useMusicPlay} from "@/global/Event";
 
 const size = useWindowSize();
 
-useMusicStore().init();
-
 const keyword = ref('');
 
 const musics = computed(() => useMusicStore().musics);
-const maxHeight = computed(() => size.height.value - 162);
+const maxHeight = computed(() => size.height.value - 106);
 
 const {results} = useFuse<MusicItemView>(keyword, musics, {
   matchAllWhenSearchEmpty: true,
@@ -102,11 +98,12 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
 
   .container {
     position: absolute;
-    top: 60px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     overflow: auto;
+    padding-top: 6px;
 
     .local-music__header {
       margin-bottom: 8px;
