@@ -24,6 +24,10 @@ const router = createRouter({
       name: "最近播放",
       path: '/lately',
       component: () => import('@/pages/lately/index.vue')
+    }, {
+      name: "音乐搜索",
+      path: '/search',
+      component: () => import('@/pages/search/index.vue')
     }]
 });
 

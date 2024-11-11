@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {PluginEntity, PluginEntityView} from "@/entity/PluginEntity";
-import {PluginInstance} from "@/entity/PluginInstance";
+import {PluginInstance} from "@/types/PluginInstance";
 import {listRecordByAsync, removeOneByAsync, saveOneByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {getPluginInstance} from "@/components/PluginManage/PluginFunc";

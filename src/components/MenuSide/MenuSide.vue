@@ -2,8 +2,9 @@
   <div class="menu-side">
     <div class="side-menu">
       <menu-side-item value="/local">本地音乐</menu-side-item>
-      <menu-side-item value="/download">下载管理</menu-side-item>
       <menu-side-item value="/plugin">插件管理</menu-side-item>
+      <menu-side-item value="/search">音乐搜索</menu-side-item>
+      <menu-side-item value="/download">下载管理</menu-side-item>
       <menu-side-item value="/lately">最近播放</menu-side-item>
     </div>
     <t-divider />

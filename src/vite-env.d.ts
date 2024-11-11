@@ -81,3 +81,7 @@ interface Window {
     }
   }
 }
+
+declare module 'crypto-js';
+declare module 'qs';
+declare module 'he'

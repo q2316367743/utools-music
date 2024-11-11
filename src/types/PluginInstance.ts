@@ -5,7 +5,7 @@ interface IMediaBase {
   id: string;
 }
 
-interface IMusicItem extends IMediaBase {
+export interface IMusicItem extends IMediaBase {
   // 媒体来源
   platform: string;
   // 媒体ID
