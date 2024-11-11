@@ -3,3 +3,8 @@ export interface LyricLine {
   end: number;
   text: string;
 }
+
+export interface LyricContent {
+  id: number;
+  lines: Array<LyricLine>
+}

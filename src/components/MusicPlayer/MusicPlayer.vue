@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="progress">
-      <t-progress :percentage :label="false"></t-progress>
+      <t-slider :max="duration" :min="0" :value="currentTime" :label="onLabel" @change-end="onChange"/>
     </div>
     <div class="controls">
       <t-button shape="circle" theme="primary" variant="text" size="large" :disabled @click="pre">
@@ -100,18 +100,12 @@ import {
   musics,
   next,
   onMusicPlay, played, pre,
-  removeIndex, switchDisplay,
+  removeIndex, switchCurrentTime, switchDisplay,
   switchIndex, switchList, switchLyric, volume
 } from "@/components/MusicPlayer/MusicPlayer";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {isNull} from "@/utils/lang/FieldUtil";
 
-const percentage = computed(() => {
-  if (duration.value === 0) {
-    return 0;
-  }
-  return currentTime.value / duration.value * 100;
-});
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');
 const artist = computed(() => music.value?.artist || '无演唱家');
@@ -126,6 +120,15 @@ const loopText = computed(() => {
     return '顺序循环'
   }
 });
+
+function onLabel(h: any, props: { value: number }) {
+  return `${prettyDateTime(props.value)} / ${prettyDateTime(duration.value)}`
+}
+
+function onChange(value: number | Array<number>) {
+  const val = Array.isArray(value) ? value[0] : value;
+  switchCurrentTime(val);
+}
 
 onMounted(() => {
   useMusicPlay.on(onMusicPlay);

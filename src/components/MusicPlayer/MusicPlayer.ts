@@ -1,12 +1,13 @@
 import {MusicPlayEvent} from "@/global/Event";
 import {MusicItemView} from "@/entity/MusicItem";
-import {getEffectiveNumber} from "@/utils/lang/FieldUtil";
+import {getEffectiveNumber, isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {random} from "radash";
-import {LyricLine} from "@/types/LyricLine";
+import {LyricContent, LyricLine} from "@/types/LyricLine";
 import {readFile, readFileAsString} from "@/utils/file/FileUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {parseBuffer} from "music-metadata";
+import {IAudioMetadata, parseBlob, parseBuffer} from "music-metadata";
 import {musicLyric} from "@/global/BeanFactory";
+import {isNotEmptyString} from "@/utils/lang/StringUtil";
 
 export const musics = ref(new Array<MusicItemView>());
 export const index = ref(0);
@@ -23,6 +24,7 @@ export const volume = ref(audio.volume * 100);
 export const listVisible = ref(false);
 export const displayVisible = ref(false);
 
+export const lyricGroups = ref(new Array<LyricContent>())
 export const lyrics = ref(new Array<LyricLine>());
 export const lyricIndex = ref(0);
 
@@ -118,10 +120,42 @@ function transferTextToLyric(text: string): Array<LyricLine> {
   return lyricLines;
 }
 
-export async function renderLyric(m: MusicItemView) {
+function renderLyricFromMeta(meta: IAudioMetadata): Array<Array<LyricLine>> {
+  const {common} = meta;
+  const res = new Array<Array<LyricLine>>();
+  const {lyrics: lyricsTag} = common;
+  if (lyricsTag) {
+    if (lyricsTag.length > 0) {
+      lyricsTag.forEach(t => {
+        const {text} = t;
+        if (text) {
+          res.push(transferTextToLyric(text));
+        }
+      })
+    }
+  }
+  return res;
+}
+
+function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItemView) {
+  if (isNotEmptyString(m.cover)) {
+    return;
+  }
+  const {common} = meta;
+  const {picture} = common;
+  if (isNotEmptyArray(picture)) {
+    const first = picture![0];
+    const blob = new Blob([first.data], {type: 'image/png'});
+    m.cover = URL.createObjectURL(blob);
+  }
+}
+
+async function renderMusicMeta(m: MusicItemView) {
   // 解析音乐，解析歌词
-  lyrics.value = [];
-  let lyricLines = new Array<LyricLine>();
+  let lyricContents = new Array<LyricContent>();
+  let index = 0;
+
+  // 本地歌词
   if (m.lyric) {
     // 读取歌词
     let lineStr: string
@@ -134,48 +168,75 @@ export async function renderLyric(m: MusicItemView) {
       // 读取文件
       lineStr = await readFileAsString(m.lyric);
     }
-    lyricLines = transferTextToLyric(lineStr);
+    lyricContents.push({
+      id: index++,
+      lines: transferTextToLyric(lineStr)
+    });
+    // 存在本地歌词，先设置一波
+    lyricGroups.value = lyricContents;
+    lyrics.value = lyricContents[0].lines;
+  }
+
+  // 尝试获取元数据
+  let tagsResult: IAudioMetadata;
+  if (m.url.startsWith('http')) {
+    const rsp = await fetch(new URL(m.url), {
+      method: 'GET'
+    });
+    const mc = await rsp.blob();
+    tagsResult = await parseBlob(mc);
   } else {
-    // 尝试获取文件
-    if (m.url.startsWith('http')) {
-      // TODO: 网络
-    } else {
-      // 本地
-      const ub = await readFile(m.url);
-      const {common} = await parseBuffer(ub);
-      // TODO: 封面
-      const {lyrics: lyricsTag} = common;
-      console.log(lyricsTag)
-      if (lyricsTag) {
-        if (lyricsTag.length > 0) {
-          const lt = lyricsTag[0]
-          const {text} = lt;
-          if (text) {
-            lyricLines = transferTextToLyric(text);
-          }
-        }
+    // 本地
+    const ub = await readFile(m.url);
+    tagsResult = await parseBuffer(ub);
+
+  }
+  // 渲染封面
+  renderCoverFromMeta(tagsResult, m);
+  // 渲染歌词
+  const res = renderLyricFromMeta(tagsResult)
+  if (res.length > 0) {
+    res.forEach(t => {
+      lyricContents.push({
+        id: index++,
+        lines: t
+      })
+    })
+  }
+
+
+  // 处理歌词
+  if (lyricContents.length > 0) {
+    // 处理每一个歌词的截止时间
+    for (let lyricContent of lyricContents) {
+      const {lines} = lyricContent;
+      for (let i = 0; i < lines.length; i++) {
+        lines[i].end = lines[i + 1]?.start || 9999999999;
       }
     }
-  }
-  if (lyricLines.length > 0) {
-    // 处理截止音乐时间
-    for (let i = 0; i < lyricLines.length; i++) {
-      lyricLines[i].end = lyricLines[i + 1]?.start || 9999999999;
-    }
-    lyrics.value = lyricLines;
+    lyricGroups.value = lyricContents;
+    lyrics.value = lyricContents[0].lines;
   }
 }
 
 export function play() {
+  if (music.value) {
+    // 销毁旧的封面
+    const {cover} = music.value;
+    if (cover.startsWith('blob')) {
+      URL.revokeObjectURL(cover);
+    }
+  }
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
   audio.src = music.value.url;
+  lyricGroups.value = []
   lyrics.value = [];
   lyricIndex.value = 0;
   audio.load();
   audio.play()
     .then(() => console.log('播放成功'))
     .catch(e => MessageUtil.error("播放失败", e));
-  renderLyric(music.value)
+  renderMusicMeta(music.value)
     .then(() => console.log('渲染歌词成功'))
     .catch(e => MessageUtil.error("渲染歌词失败", e));
 }
@@ -275,5 +336,8 @@ export function switchLyric() {
       }
     }
   });
+}
 
+export function switchCurrentTime(currentTime: number) {
+  audio.currentTime = currentTime;
 }

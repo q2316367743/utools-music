@@ -35,23 +35,46 @@
           {{ lyric.text }}
         </div>
       </div>
+      <!-- TODO: 存在多选时显示，那么是否可以额外搜索歌词并下载？ -->
+      <div class="setting" v-if="lyricGroups.length > 1">
+        <t-dropdown :options trigger="click" placement="top-right" @click="clickHandler">
+          <t-button theme="primary" variant="text" shape="circle">
+            <template #icon>
+              <t-icon name="adjustment"/>
+            </template>
+          </t-button>
+        </t-dropdown>
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import {
-  displayVisible, lyricIndex,
+  displayVisible, lyricGroups, lyricIndex,
   lyrics,
   music,
   musics,
   removeIndex,
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
+import {DropdownOption} from "tdesign-vue-next";
 
 
 const name = computed(() => music.value?.name || '无歌曲');
 const artist = computed(() => music.value?.artist || '无演唱家');
 const album = computed(() => music.value?.album || '');
+
+const options = computed<Array<DropdownOption>>(() => lyricGroups.value.map(e => ({
+  content: `歌词${e.id}`,
+  id: e.id,
+})));
+
+const clickHandler = (data: DropdownOption) => {
+  const idx = lyricGroups.value.findIndex(e => e.id === data.id);
+  if (idx > -1) {
+    lyrics.value = lyricGroups.value[idx].lines;
+  }
+};
 </script>
 <style scoped lang="less">
 .music-display {
@@ -160,6 +183,12 @@ const album = computed(() => music.value?.album || '');
         text-align: center;
         user-select: none;
       }
+    }
+
+    .setting {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
     }
   }
 

@@ -46,3 +46,18 @@ export function getEffectiveNumber(num: number, min: number, max: number): numbe
   }
   return num;
 }
+
+
+export function isEmptyArray(arr?: Array<any>): boolean {
+  if (!arr) {
+    return true;
+  }
+  if (!Array.isArray(arr)) {
+    return true;
+  }
+  return arr.length === 0;
+}
+
+export function isNotEmptyArray(arr?: Array<any>): boolean {
+  return !isEmptyArray(arr);
+}
