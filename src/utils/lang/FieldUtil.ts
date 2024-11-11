@@ -61,3 +61,22 @@ export function isEmptyArray(arr?: Array<any>): boolean {
 export function isNotEmptyArray(arr?: Array<any>): boolean {
   return !isEmptyArray(arr);
 }
+
+
+export function versionCompare(version1: string, version2: string): number {
+  const v1 = version1.split('.').map(Number);
+  const v2 = version2.split('.').map(Number);
+  for (let i = 0; i < v1.length; i++) {
+    if (v1[i] > v2[i]) {
+      return 1;
+    } else if (v1[i] < v2[i]) {
+      return -1;
+    }
+  }
+  return 0;
+}
+
+export function isVersionUpdate(newVersion: string, oldVersion: string, minVersion: string): boolean {
+  // 新版本必须大于等于最小版本，旧版本必须小于最小版本
+  return versionCompare(newVersion, minVersion) >= 0 && versionCompare(oldVersion, minVersion) < 0;
+}

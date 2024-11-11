@@ -24,6 +24,7 @@ import {BaseTableCol, Button, Popconfirm} from "tdesign-vue-next";
 import {installFromLocal, installFromUrl} from "@/pages/plugin/func";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
+import {isEmptyString} from "@/utils/lang/StringUtil";
 
 const size = useWindowSize();
 
@@ -52,7 +53,12 @@ const columns: Array<BaseTableCol> = [{
   width: 140,
   cell: (h, {row}) => {
     return h('div', {}, [
-      h(Button, {theme: 'primary', variant: 'text', loading: operatorLoading.value}, () => '更新'),
+      h(Button, {
+        theme: 'primary',
+        variant: 'text',
+        loading: operatorLoading.value,
+        disabled: isEmptyString(row.srcUrl)
+      }, () => '更新'),
       h(Popconfirm, {
         content: '是否卸载插件',
         onConfirm: () => {

@@ -6,6 +6,7 @@ import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {getPluginInstance} from "@/components/PluginManage/PluginFunc";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {isEmptyString} from "@/utils/lang/StringUtil";
+import {versionCompare} from "@/utils/lang/FieldUtil";
 
 export const usePluginStore = defineStore('plugin-store', () => {
   const plugins = ref(new Array<PluginEntityView>());
@@ -51,7 +52,6 @@ export const usePluginStore = defineStore('plugin-store', () => {
       srcUrl: instance.srcUrl || '',
       version: instance.version
     }
-    console.log(plugin, instance)
     // 校验必填项是否存在
     if (isEmptyString(plugin.name)) return Promise.reject(new Error("插件名称不存在"))
     if (isEmptyString(plugin.author)) return Promise.reject(new Error("插件作者不存在"))
@@ -82,10 +82,30 @@ export const usePluginStore = defineStore('plugin-store', () => {
     instanceMap.delete(id);
   }
 
+  async function updatePlugin(id: number) {
+    const idx = plugins.value.findIndex(e => e.id === id);
+    if (idx === -1) {
+      return Promise.reject(new Error(`插件[${id}]不存在`))
+    }
+    const old =  plugins.value[idx];
+    if (isEmptyString(old.srcUrl)) {
+      return Promise.reject(new Error(`插件[${old.id}]没有更新地址`));
+    }
+    const rsp = await fetch(old.srcUrl, {
+      method: 'GET'
+    });
+    const text = await rsp.text();
+    const newInstance = getPluginInstance(text);
+    if (versionCompare(newInstance.version, old.version)) {
+      // TODO：更新
+
+    }
+  }
+
 
   return {
     plugins,
-    init, getInstance, installPlugin, removePlugin
+    init, getInstance, installPlugin, removePlugin, updatePlugin
   }
 
 
