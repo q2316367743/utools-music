@@ -109,8 +109,16 @@ export const useDownloadStore = defineStore('download', () => {
       .catch(e => MessageUtil.error("下载失败", e));
   }
 
+  async function remove(id: number) {
+    const index = items.value.findIndex(e => e.id === id);
+    if (index > -1) {
+      items.value.splice(index, 1);
+      await updateList();
+    }
+  }
+
   return {
     items,
-    emit
+    emit,remove
   }
 })
