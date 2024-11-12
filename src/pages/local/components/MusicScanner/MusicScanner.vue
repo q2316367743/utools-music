@@ -1,6 +1,6 @@
 <template>
-  <t-button size="small" @click="handleOpen">自动扫描</t-button>
-  <t-dialog v-model:visible="visible" header="扫描音乐" top="10vh" dialog-class-name="music-scanner-dialog">
+  <t-button size="small" @click="handleOpen">扫描音乐</t-button>
+  <t-dialog v-model:visible="visible" header="扫描音乐" top="10vh" dialog-class-name="music-scanner-dialog" attach="body">
     <template #footer>
       <t-button theme="default" @click="handleClose" :loading>关闭</t-button>
       <t-button @click="handleScan" :loading>扫描</t-button>
