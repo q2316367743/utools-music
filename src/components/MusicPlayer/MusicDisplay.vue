@@ -23,7 +23,9 @@
     <div class="container">
       <div class="title">{{ name }}</div>
       <div class="subtitle">
-        {{ artist }} - {{ album }}
+        <t-tag theme="primary">{{ artist }}</t-tag>
+        <span> - </span>
+        <span>{{ album }}</span>
       </div>
       <div class="lyric">
         <div class="lyric-empty" v-if="lyrics.length === 0">

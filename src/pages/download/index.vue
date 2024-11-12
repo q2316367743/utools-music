@@ -6,7 +6,8 @@
 </template>
 <script lang="ts" setup>
 import {useDownloadStore} from "@/store/module/DownloadStore";
-import {BaseTableCol, Tag} from "tdesign-vue-next";
+import {BaseTableCol, Button, Popconfirm, Tag} from "tdesign-vue-next";
+import MessageUtil from "@/utils/modal/MessageUtil";
 
 const size = useWindowSize();
 
@@ -38,6 +39,21 @@ const columns: Array<BaseTableCol> = [{
       size: 'small',
       theme: theme
     }, () => text);
+  }
+}, {
+  colKey: 'operator',
+  title: '操作',
+  width: 140,
+  cell: (h, {row}) => {
+    return h(Popconfirm, {
+      content: '是否删除下载记录',
+      onConfirm: () => {
+        useDownloadStore()
+          .remove(row.id)
+          .then(() => MessageUtil.success("删除成功"))
+          .catch(e => MessageUtil.error("删除失败", e));
+      }
+    }, () => h(Button, {theme: 'danger', variant: 'text'}, () => '删除'))
   }
 }]
 </script>
