@@ -1,5 +1,10 @@
 export enum LocalNameEnum {
   /**
+   * 下载项
+   * @see DownloadItem
+   */
+  LIST_DOWNLOAD = '/list/download',
+  /**
    * 仓库列表
    * @see Repository
    */

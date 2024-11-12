@@ -58,7 +58,7 @@ export function downloadByUrl(url: string, fileName?: string) {
 
 
 export function downloadByBase64(base64: string, fileName?: string) {
-    let byteCharacters = atob(
+    let byteCharacters = btoa(
         base64.replace(/^data:image\/(png|jpeg|jpg);base64,/, "")
     );
     let byteNumbers = new Array(byteCharacters.length);

@@ -20,6 +20,9 @@ export const usePluginStore = defineStore('plugin-store', () => {
         _rev: record.rev,
         _id: record.id,
       });
+      // 创建实例
+      const {id, content} = record.record;
+      instanceMap.set(id, getPluginInstance(content));
     });
   }
 
@@ -56,15 +59,41 @@ export const usePluginStore = defineStore('plugin-store', () => {
     if (isEmptyString(plugin.name)) return Promise.reject(new Error("插件名称不存在"))
     if (isEmptyString(plugin.author)) return Promise.reject(new Error("插件作者不存在"))
     if (isEmptyString(plugin.version)) return Promise.reject(new Error("插件版本不存在"))
-    // TODO: 校验版本是否过高、判断升级1
-    const key = `${LocalNameEnum.ITEM_PLUGIN}/${plugin.id}`;
-    // 新增插件
-    let rev = await saveOneByAsync(key, plugin);
-    plugins.value.push({
-      ...plugin,
-      _id: key,
-      _rev: rev,
-    });
+    // 查询插件名称和作者是否存在
+    const oldIndex = plugins.value.findIndex(e =>
+      e.name === plugin.name && e.author === instance.author);
+
+    // 校验版本是否过高、判断升级1
+    if (oldIndex === -1) {
+      // 新的
+      const key = `${LocalNameEnum.ITEM_PLUGIN}/${plugin.id}`;
+      // 新增插件
+      let rev = await saveOneByAsync(key, plugin);
+      plugins.value.push({
+        ...plugin,
+        _id: key,
+        _rev: rev,
+      });
+    } else {
+      // 旧的，判断版本号
+      const old = plugins.value[oldIndex];
+      if (versionCompare(plugin.version, old.version) > 0) {
+        // 更新
+        plugin.id = old.id;
+        const key = `${LocalNameEnum.ITEM_PLUGIN}/${plugin.id}`;
+        const _rev = old._rev;
+        // 更新插件
+        let rev = await saveOneByAsync(key, plugin, _rev);
+        plugins.value[oldIndex] = {
+          ...plugin,
+          _id: key,
+          _rev: rev
+        };
+      } else {
+        return Promise.reject(new Error("插件已安装，请勿重复安装"))
+      }
+    }
+
     // 新增实例缓存
     instanceMap.set(plugin.id, instance);
   }
@@ -87,7 +116,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
     if (idx === -1) {
       return Promise.reject(new Error(`插件[${id}]不存在`))
     }
-    const old =  plugins.value[idx];
+    const old = plugins.value[idx];
     if (isEmptyString(old.srcUrl)) {
       return Promise.reject(new Error(`插件[${old.id}]没有更新地址`));
     }
@@ -95,16 +124,14 @@ export const usePluginStore = defineStore('plugin-store', () => {
       method: 'GET'
     });
     const text = await rsp.text();
-    const newInstance = getPluginInstance(text);
-    if (versionCompare(newInstance.version, old.version)) {
-      // TODO：更新
-
-    }
+    // 重新安装插件
+    await installPlugin(text);
   }
 
 
+
   return {
-    plugins,
+    plugins,instanceMap,
     init, getInstance, installPlugin, removePlugin, updatePlugin
   }
 

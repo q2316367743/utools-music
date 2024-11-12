@@ -1,3 +1,5 @@
+import cryptoJs from "crypto-js";
+
 /**
  * 读取文件内容
  * @param file 文件
@@ -105,4 +107,12 @@ export function blobToBase64(file: Blob): Promise<string> {
         reader.onerror = reject;
         reader.readAsDataURL(file);
     });
+}
+
+export function stringToBase64(str: string): string {
+  return cryptoJs.enc.Base64.stringify(cryptoJs.enc.Utf8.parse(str));
+}
+
+export function base64ToString(str: string): string {
+  return cryptoJs.enc.Utf8.stringify(cryptoJs.enc.Base64.parse(str));
 }

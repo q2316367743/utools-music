@@ -1,6 +1,10 @@
+import {IMusicItem} from "@/types/PluginInstance";
+import {stringToBase64} from "@/utils/file/CovertUtil";
+
 export enum MusicItemSource {
   LOCAL = 1,
   WEBDAV = 2,
+  WEB = 3
 }
 
 export interface MusicItemMeta {
@@ -23,7 +27,7 @@ export interface MusicItemMeta {
   duration: number;
 }
 
-export interface MusicItemBase extends MusicItemMeta{
+export interface MusicItemBase extends MusicItemMeta {
   id: number;
 
 }
@@ -69,4 +73,27 @@ export interface MusicItem extends MusicItemBase, MusicItemLink, MusicItemExtra 
 export interface MusicItemView extends MusicItem {
   repositoryId: number;
   repositoryName: string;
+}
+
+export function buildFromIMusicItem(item: IMusicItem, url: string): MusicItemView {
+  let lyric = '';
+  if (item.lrc) {
+    lyric = item.lrc;
+  } else if (item.rawLrc) {
+    lyric = `data:text/plain;base64:${stringToBase64(item.rawLrc)}`;
+  }
+  return {
+    id: Date.now(),
+    name: item.title || '',
+    artist: item.artist || '',
+    cover: item.artwork || '',
+    url,
+    duration: item.duration || 0,
+    album: item.album || '',
+    lyric,
+    source: MusicItemSource.WEB,
+    nativeId: utools.getNativeId(),
+    repositoryName: '',
+    repositoryId: 0
+  }
 }

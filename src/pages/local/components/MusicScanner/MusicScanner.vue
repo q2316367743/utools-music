@@ -20,7 +20,10 @@
               <span v-if="repo.type === RepositoryType.LOCAL">本地</span>
               <span v-else-if="repo.type === RepositoryType.WEBDAV">WebDAV</span>
             </t-tag>
-            <span class="ellipsis">{{ repo.name }}</span>
+            <t-tooltip v-if="repo.nativeId !== nativeId" content="非此设备">
+              <span class="ellipsis">{{ repo.name }}</span>
+            </t-tooltip>
+            <span v-else class="ellipsis">{{ repo.name }}</span>
           </t-space>
 
           <t-popconfirm content="确认删除吗" @confirm="handleDelete(repo)">

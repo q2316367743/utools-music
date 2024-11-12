@@ -8,6 +8,7 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {IAudioMetadata, parseBlob, parseBuffer} from "music-metadata";
 import {musicLyric} from "@/global/BeanFactory";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
+import {base64ToString} from "@/utils/file/CovertUtil";
 
 export const musics = ref(new Array<MusicItemView>());
 export const index = ref(0);
@@ -155,15 +156,18 @@ async function renderMusicMeta(m: MusicItemView) {
   let lyricContents = new Array<LyricContent>();
   let index = 0;
 
-  // 本地歌词
+  // 尝试读取自带的歌词
   if (m.lyric) {
     // 读取歌词
     let lineStr: string
-    if (m.lyric.startsWith("http")) {
+    if (/^https?:\/\//.test(m.lyric)) {
       const rsp = await fetch(m.lyric, {
         method: 'GET'
       });
       lineStr = await rsp.text();
+    } else if (/^data:(.*?);base64,/.test(m.lyric)) {
+      lineStr = m.lyric.substring(5)
+      lineStr = base64ToString(m.lyric.replace(/^data:(.*?);base64,/, ""));
     } else {
       // 读取文件
       lineStr = await readFileAsString(m.lyric);
@@ -238,7 +242,7 @@ export function play() {
     .catch(e => MessageUtil.error("播放失败", e));
   renderMusicMeta(music.value)
     .then(() => console.log('渲染歌词成功'))
-    .catch(e => MessageUtil.error("渲染歌词失败", e));
+    .catch(e => console.error("渲染歌词失败", e));
 }
 
 export function pre() {

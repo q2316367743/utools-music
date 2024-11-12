@@ -1,9 +1,11 @@
-const {readFile, readdir, statSync, existsSync} = require('node:fs');
+const {readFile, readdir, statSync, writeFile
+    , existsSync, createWriteStream} = require('node:fs');
 const {join, basename, extname} = require('node:path');
 const {URL} = require("node:url");
 const https = require("node:https");
 const http = require("node:http");
-const {ipcRenderer} = require("electron")
+const {atob} = require('node:buffer')
+const {ipcRenderer} = require("electron");
 
 /**
  * 获取一个文件
@@ -42,7 +44,7 @@ function openFile(options) {
  * @return {Promise<void>}
  */
 function downloadFileFromUrl(url, path) {
-    const file = fs.createWriteStream(path);
+    const file = createWriteStream(path);
     const link = new URL(url);
 
     return new Promise((resolve, reject) => {
@@ -67,21 +69,27 @@ function downloadFileFromUrl(url, path) {
  * 下载一个文件
  * @param data {string | Blob | ArrayBuffer} 文件内容，可以使blob(file)或ArrayBuffer或者链接或者DATA URL
  * @param name {string} 文件名
+ * @param [folder] {string} 所在目录
  * @return {Promise<string>};
  */
-async function downloadFile(data, name) {
-    const target = utools.showSaveDialog({
-        title: '请选择文件保存位置',
-        buttonLabel: '保存',
-        defaultPath: path.join(utools.getPath('downloads'), name),
-        properties: ['createDirectory']
-    });
+async function downloadFile(data, name, folder) {
+    let target;
+    if (!folder) {
+        target = utools.showSaveDialog({
+            title: '请选择文件保存位置',
+            buttonLabel: '保存',
+            defaultPath: join(utools.getPath('downloads'), name),
+            properties: ['createDirectory']
+        });
+    } else {
+        target = join(folder, name);
+    }
     if (!target) {
         return Promise.reject(new Error("请选择文件保存位置"))
     }
     return new Promise(async (resolve, reject) => {
         if (data instanceof ArrayBuffer) {
-            fs.writeFile(target, new Uint8Array(data), e => {
+            writeFile(target, new Uint8Array(data), e => {
                 if (e) {
                     return reject(e)
                 }
@@ -89,7 +97,7 @@ async function downloadFile(data, name) {
             });
         } else if (data instanceof Blob) {
             const ab = await data.arrayBuffer();
-            fs.writeFile(target, new Uint8Array(ab), e => {
+            writeFile(target, new Uint8Array(ab), e => {
                 if (e) {
                     return reject(e)
                 }
@@ -111,7 +119,7 @@ async function downloadFile(data, name) {
                     byteNumbers[i] = byteCharacters.charCodeAt(i);
                 }
                 let byteArray = new Uint8Array(byteNumbers);
-                fs.writeFile(target, byteArray, e => {
+                writeFile(target, byteArray, e => {
                     if (e) {
                         return reject(e)
                     }
@@ -149,5 +157,5 @@ window.preload = {
     },
     ipcRenderer: {
         sendLyric
-    }
+    },
 }

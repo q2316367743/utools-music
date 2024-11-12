@@ -56,25 +56,25 @@ const columns: Array<BaseTableCol> = [{
       h(Button, {
         theme: 'primary',
         variant: 'text',
-        loading: operatorLoading.value,
-        disabled: isEmptyString(row.srcUrl)
+        disabled: isEmptyString(row.srcUrl) || operatorLoading.value,
+        onClick() {
+          operatorLoading.value = true
+          usePluginStore().updatePlugin(row.id)
+            .then(() => MessageUtil.success("更新成功"))
+            .catch(e => MessageUtil.error("更新失败", e))
+            .finally(() => operatorLoading.value = false)
+        }
       }, () => '更新'),
       h(Popconfirm, {
         content: '是否卸载插件',
         onConfirm: () => {
           operatorLoading.value = true
           usePluginStore().removePlugin(row.id)
-            .then(() => {
-              MessageUtil.success("卸载成功");
-            })
-            .catch(e => {
-              MessageUtil.error("卸载失败", e);
-            })
-            .finally(() => {
-              operatorLoading.value = false;
-            })
+            .then(() => MessageUtil.success("卸载成功"))
+            .catch(e => MessageUtil.error("卸载失败", e))
+            .finally(() => operatorLoading.value = false)
         }
-      }, () => h(Button, {theme: 'danger', variant: 'text', loading: operatorLoading.value}, () => '卸载'))
+      }, () => h(Button, {theme: 'danger', variant: 'text', disabled: operatorLoading.value}, () => '卸载'))
     ])
   }
 }];

@@ -170,6 +170,25 @@ interface IGetRecommendSheetTagsResult {
 }
 
 /**
+ * 搜索
+ * @param query 关键字
+ * @param page 分页
+ * @param type 搜索类型
+ */
+export type PluginInstanceSearch = <T extends SupportMediaType>(
+  query: string,
+  page: number,
+  type: T,
+) => Promise<ISearchResult<T>>;
+
+/**
+ * 获取音乐详情
+ * @param musicBase
+ */
+export type PluginInstanceInfo = (
+  musicBase: IMusicItem
+) => Promise<Partial<IMusicItem> | null>;
+/**
  * 差劲实体
  */
 export interface PluginInstance {
@@ -191,17 +210,7 @@ export interface PluginInstance {
     importMusicSheet: Array<string>,
   },
 
-  /**
-   * 搜索
-   * @param query 关键字
-   * @param page 分页
-   * @param type 搜索类型
-   */
-  search?: <T extends SupportMediaType>(
-    query: string,
-    page: number,
-    type: T,
-  ) => Promise<ISearchResult<T>>;
+  search?: PluginInstanceSearch;
   /**
    * 获取音源
    * @param mediaItem 媒体类型
@@ -212,13 +221,7 @@ export interface PluginInstance {
     quality?: "low" | "standard" | "high" | "super"
   ) => Promise<IMediaSourceResult | null>;
 
-  /**
-   * 获取音乐详情
-   * @param musicBase
-   */
-  getMusicInfo?: (
-    musicBase: IMusicItem
-  ) => Promise<Partial<IMusicItem> | null>;
+  getMusicInfo?: PluginInstanceInfo;
 
   /**
    * 获取歌词，当音乐详情没有返回歌词时，或者主动搜索歌词时调用
