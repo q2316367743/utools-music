@@ -5,6 +5,10 @@
         <t-image v-if="music && music.cover" :src="music.cover"></t-image>
         <t-avatar v-else-if="music" shape="round" size="42px">{{ music.name.substring(0, 1) }}</t-avatar>
         <t-avatar v-else shape="round" size="42px">无</t-avatar>
+        <div class="mask">
+          <t-icon v-if="displayVisible" name="chevron-down-double" size="32px"></t-icon>
+          <t-icon v-else name="chevron-up-double" size="32px"></t-icon>
+        </div>
       </div>
       <div>
         <div class="meta ellipsis">
@@ -94,7 +98,7 @@
 import {useMusicPlay} from "@/global/Event";
 import {
   audioControl,
-  currentTime, duration,
+  currentTime, displayVisible, duration,
   listVisible, loop, loopControl,
   music,
   musics,

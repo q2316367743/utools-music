@@ -1,100 +1,120 @@
 .music-player {
-    padding: 8px;
+  padding: 8px;
 
-    .container {
-        position: absolute;
-        top: 12px;
-        left: 8px;
-        right: 8px;
-        bottom: 0;
+  .container {
+    position: absolute;
+    top: 12px;
+    left: 8px;
+    right: 8px;
+    bottom: 0;
 
-        display: grid;
-        grid-template-columns: 50px 1fr 128px;
-        align-items: center;
+    display: grid;
+    grid-template-columns: 50px 1fr 128px;
+    align-items: center;
 
-        .image {
-            width: 42px;
-            left: 42px;
-            cursor: pointer;
-            user-select: none;
-        }
+    .image {
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
 
-        .meta {
-            max-width: 50vw;
-
-            .name {
-                color: var(--td-text-color-primary)
-            }
-
-            .artist {
-                color: var(--td-text-color-secondary)
-            }
-        }
-
-        .duration {
-            margin-top: 4px;
-        }
-    }
-
-
-    .progress {
+      .mask {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
+        bottom: 0;
+        padding: 5px;
+        transition: ease-in-out 0.2s;
+        backdrop-filter: blur(10px);
+        opacity: 0;
+        z-index: 1;
+      }
 
-        :deep(.t-progress__info) {
-            display: none;
+      &:hover {
+        .mask {
+          opacity: 1;
         }
+      }
     }
 
-    .controls {
-        position: absolute;
-        top: 16px;
-        left: calc(50vw - 48px);
+    .meta {
+      max-width: 50vw;
+
+      .name {
+        color: var(--td-text-color-primary)
+      }
+
+      .artist {
+        color: var(--td-text-color-secondary)
+      }
     }
+
+    .duration {
+      margin-top: 4px;
+    }
+  }
+
+
+  .progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    :deep(.t-progress__info) {
+      display: none;
+    }
+  }
+
+  .controls {
+    position: absolute;
+    top: 16px;
+    left: calc(50vw - 48px);
+  }
 
 }
 
 .music-player-volume {
-    padding: 16px;
-    height: 100px;
+  padding: 16px;
+  height: 100px;
 }
 
 .music-player-list {
-    .item {
-        padding: 4px 0;
-        border-bottom: 1px solid var(--td-component-border);
-        cursor: pointer;
-        user-select: none;
-        color: var(--td-text-color-primary);
-        line-height: 32px;
+  .item {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--td-component-border);
+    cursor: pointer;
+    user-select: none;
+    color: var(--td-text-color-primary);
+    line-height: 32px;
 
-        .name, .artist {
-            height: 32px;
-            line-height: 32px;
-        }
-
-        &.active {
-            background-color: var(--td-bg-color-container-hover);
-            color: var(--td-text-color-link);
-
-            .name, .artist {
-                color: var(--td-text-color-link);
-            }
-        }
-
-        &:hover {
-            background-color: var(--td-bg-color-container-hover);
-            color: var(--td-text-color-link);
-
-            .name, .artist {
-                color: var(--td-text-color-link);
-            }
-        }
-
-        .artist {
-            color: var(--td-text-color-secondary);
-        }
+    .name, .artist {
+      height: 32px;
+      line-height: 32px;
     }
+
+    &.active {
+      background-color: var(--td-bg-color-container-hover);
+      color: var(--td-text-color-link);
+
+      .name, .artist {
+        color: var(--td-text-color-link);
+      }
+    }
+
+    &:hover {
+      background-color: var(--td-bg-color-container-hover);
+      color: var(--td-text-color-link);
+
+      .name, .artist {
+        color: var(--td-text-color-link);
+      }
+    }
+
+    .artist {
+      color: var(--td-text-color-secondary);
+    }
+  }
 }
