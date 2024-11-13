@@ -184,11 +184,13 @@ async function renderMusicMeta(m: MusicItemView) {
   // 尝试获取元数据
   let tagsResult: IAudioMetadata;
   if (m.url.startsWith('http')) {
-    const rsp = await fetch(new URL(m.url), {
-      method: 'GET'
-    });
-    const mc = await rsp.blob();
-    tagsResult = await parseBlob(mc);
+    // 如果是网络数据，则不处理音乐元数据
+    return;
+    // const rsp = await fetch(new URL(m.url), {
+    //   method: 'GET'
+    // });
+    // const mc = await rsp.blob();
+    // tagsResult = await parseBlob(mc);
   } else {
     // 本地
     const ub = await readFile(m.url);
@@ -310,6 +312,28 @@ export function onMusicPlay(e: MusicPlayEvent) {
   index.value = e.index;
   // 触发重新播放
   rePlay();
+}
+
+export function onMusicAppend(e: MusicItemView) {
+  if (musics.value.length === 0) {
+    // 没有，直接覆盖
+    musics.value = [e];
+    index.value = 0;
+    // 触发重新播放
+    rePlay();
+  } else if (index.value >= musics.value.length - 1) {
+    // 插入
+    musics.value.push(e);
+    musics.value.splice(index.value, 0, e);
+  } else if (index.value < 0) {
+    musics.value.unshift(e);
+    index.value = 0;
+    // 触发重新播放
+    rePlay();
+  }else {
+    // 中间
+    musics.value.splice(index.value, 0, e);
+  }
 }
 
 export function switchDisplay() {

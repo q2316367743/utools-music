@@ -95,14 +95,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {useMusicPlay} from "@/global/Event";
+import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
   audioControl,
   currentTime, displayVisible, duration,
   listVisible, loop, loopControl,
   music,
   musics,
-  next,
+  next, onMusicAppend,
   onMusicPlay, played, pre,
   removeIndex, switchCurrentTime, switchDisplay,
   switchIndex, switchList, switchLyric, volume
@@ -136,9 +136,11 @@ function onChange(value: number | Array<number>) {
 
 onMounted(() => {
   useMusicPlay.on(onMusicPlay);
+  useMusicAppend.on(onMusicAppend);
 });
 onBeforeUnmount(() => {
   useMusicPlay.off(onMusicPlay);
+  useMusicAppend.off(onMusicAppend);
 })
 </script>
 <style scoped lang="less">
