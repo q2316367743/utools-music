@@ -7,6 +7,8 @@ import {map} from "@/utils/lang/ArrayUtil";
 import {isNotNull} from "@/utils/lang/FieldUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 
+const LIST_KEY = `${LocalNameEnum.LIST_MUSIC}/`;
+
 export const useMusicStore = defineStore('music', () => {
   const musics = ref(new Array<MusicItemView>());
   const nativeId = utools.getNativeId();
@@ -20,7 +22,7 @@ export const useMusicStore = defineStore('music', () => {
     // 获取全部存储
     const {list} = await listRepositories();
     // 获取全部的音乐
-    const all = await listRecordByAsync<Array<MusicItem>>(LocalNameEnum.LIST_MUSIC);
+    const all = await listRecordByAsync<Array<MusicItem>>(LIST_KEY);
     const musicMap = map(all, 'id');
     for (let repo of list) {
       const musicItems = musicMap.get(`${LocalNameEnum.LIST_MUSIC}/${repo.id}`);
@@ -54,7 +56,7 @@ export const useMusicStore = defineStore('music', () => {
     // 扫描音乐
     const items = await scanRepository();
     // 获取全部的音乐
-    const all = await listRecordByAsync<Array<MusicItem>>(LocalNameEnum.LIST_MUSIC);
+    const all = await listRecordByAsync<Array<MusicItem>>(LIST_KEY);
     const musicMap = map(all, 'id');
     // 刷新列表
     for (const item of items) {

@@ -19,17 +19,15 @@ export default {
     return new Promise<string>(resolve => {
       let value = ref(inputValue);
 
-      function onKeydown(value: string | number, context: { e: KeyboardEvent }) {
-        if (context.e.code === 'Enter') {
-          resolve(`${value}`);
-          res.destroy();
-        }
+      function onKeydown(value: string | number) {
+        resolve(`${value}`);
+        res.destroy();
       }
 
       const res = DialogPlugin({
         default: () => <div>
           <Paragraph>{content}</Paragraph>
-          <Input autofocus={true} v-model={value} clearable onKeydown={onKeydown}></Input>
+          <Input autofocus={true} v-model={value.value} clearable onEnter={onKeydown}></Input>
         </div>,
         header: title,
         draggable: true,
@@ -45,7 +43,8 @@ export default {
         onCancel() {
           res.destroy();
         },
-        onClose()  {
+        onClose() {
+          res.destroy();
           onClose && onClose()
         }
       })
