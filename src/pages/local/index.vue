@@ -30,6 +30,7 @@ const size = useWindowSize();
 
 const keyword = ref('');
 
+// TODO: 正在播放的音乐高亮显示
 const musics = computed(() => useMusicStore().musics);
 const maxHeight = computed(() => size.height.value - 106);
 
