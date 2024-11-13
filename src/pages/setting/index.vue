@@ -103,6 +103,15 @@ function updateDownloadFolder() {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: auto;
+
+  .t-tabs {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    :deep(.t-tabs__content) {
+      height: calc(100% - 48px);
+      overflow: auto;
+    }
+  }
 }
 </style>
