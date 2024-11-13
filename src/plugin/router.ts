@@ -28,6 +28,10 @@ const router = createRouter({
       name: "设置",
       path: '/setting',
       component: () => import('@/pages/setting/index.vue')
+    }, {
+      name: "我的歌单",
+      path: '/music-group',
+      component: () => import('@/pages/MusicGroup/index.vue')
     }]
 });
 
