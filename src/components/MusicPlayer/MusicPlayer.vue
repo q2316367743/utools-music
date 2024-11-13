@@ -16,7 +16,10 @@
           <span> - </span>
           <span class="artist">{{ artist }}</span>
         </div>
-        <div class="duration">{{ prettyDateTime(currentTime) }} / {{ prettyDateTime(duration) }}</div>
+        <t-space class="duration">
+          <div>{{ prettyDateTime(currentTime) }} / {{ prettyDateTime(duration) }}</div>
+          <t-tag theme="primary" size="small" v-if="isNotEmptyString(source)">{{source}}</t-tag>
+        </t-space>
       </div>
       <div class="operator">
         <t-popup trigger="click">
@@ -109,6 +112,8 @@ import {
 } from "@/components/MusicPlayer/MusicPlayer";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {isNull} from "@/utils/lang/FieldUtil";
+import {MusicItemSource} from "@/entity/MusicItem";
+import {isNotEmptyString} from "@/utils/lang/StringUtil";
 
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');
@@ -122,6 +127,22 @@ const loopText = computed(() => {
     return '随机循环'
   } else {
     return '顺序循环'
+  }
+});
+const source = computed(() => {
+  if (!music.value) {
+    return ''
+  }
+  const {source} = music.value;
+  switch (source) {
+    case MusicItemSource.LOCAL:
+      return '本地';
+    case MusicItemSource.WEBDAV:
+      return 'WebDAV';
+    case MusicItemSource.WEB:
+      return '网络';
+    default:
+      return '';
   }
 });
 

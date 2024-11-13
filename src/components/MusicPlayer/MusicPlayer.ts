@@ -5,7 +5,7 @@ import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
 import {readFile, readFileAsString} from "@/utils/file/FileUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {IAudioMetadata, parseBlob, parseBuffer} from "music-metadata";
+import {IAudioMetadata, parseBuffer} from "music-metadata";
 import {musicLyric} from "@/global/BeanFactory";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import {base64ToString} from "@/utils/file/CovertUtil";
@@ -324,15 +324,14 @@ export function onMusicAppend(e: MusicItemView) {
   } else if (index.value >= musics.value.length - 1) {
     // 插入
     musics.value.push(e);
-    musics.value.splice(index.value, 0, e);
   } else if (index.value < 0) {
     musics.value.unshift(e);
     index.value = 0;
     // 触发重新播放
     rePlay();
-  }else {
+  } else {
     // 中间
-    musics.value.splice(index.value, 0, e);
+    musics.value.splice(index.value + 1, 0, e);
   }
 }
 

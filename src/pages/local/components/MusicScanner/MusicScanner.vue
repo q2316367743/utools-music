@@ -20,15 +20,14 @@
               <span v-if="repo.type === RepositoryType.LOCAL">本地</span>
               <span v-else-if="repo.type === RepositoryType.WEBDAV">WebDAV</span>
             </t-tag>
-            <t-tooltip v-if="repo.nativeId !== nativeId" content="非此设备">
+            <t-tooltip v-if="repo.nativeId !== nativeId" content="此文件夹不是当前设备">
               <span class="ellipsis">{{ repo.name }}</span>
             </t-tooltip>
             <span v-else class="ellipsis">{{ repo.name }}</span>
           </t-space>
 
-          <t-popconfirm content="确认删除吗" @confirm="handleDelete(repo)">
-            <t-button size="small" theme="danger" variant="text" :loading
-                      :disabled="repo.nativeId !== nativeId || repo.type !== RepositoryType.LOCAL">
+          <t-popconfirm content="确认删除吗？" @confirm="handleDelete(repo)">
+            <t-button size="small" theme="danger" variant="text" :loading>
               <template #icon>
                 <t-icon name="delete"/>
               </template>
@@ -83,8 +82,6 @@ async function handleDelete(repo: Repository) {
     repositories.value.splice(index, 1);
     rev = await saveRepositories(repositories.value, rev);
     // 删除歌曲
-
-    // 重新初始化歌曲
     await useMusicStore().removeMusic(repo.id);
   }
 }

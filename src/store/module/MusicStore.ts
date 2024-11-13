@@ -63,6 +63,7 @@ export const useMusicStore = defineStore('music', () => {
         const docId = `${LocalNameEnum.LIST_MUSIC}/${key}`;
         // 已获取到，删除旧的
         const old = musicMap.get(docId);
+        // 此处需要判断是需要更新还是需要新增还是需要删除
         // 保存新的
         await saveListByAsync(docId, value!, old?.rev);
       }

@@ -30,7 +30,7 @@
       <div class="lyric">
         <div class="lyric-empty" v-if="lyrics.length === 0">
           <p>暂无歌词</p>
-          <t-link theme="primary">立即搜素</t-link>
+          <t-link theme="primary" :disabled="true">立即搜素</t-link>
         </div>
         <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
              :class="{active: lyricIndex === i}">
