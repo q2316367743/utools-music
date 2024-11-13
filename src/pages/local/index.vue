@@ -19,7 +19,7 @@
 </template>
 <script lang="tsx" setup>
 import MusicScanner from "@/pages/local/components/MusicScanner/MusicScanner.vue";
-import {useMusicStore} from "@/store/module/MusicStore";
+import {useMusicStore} from "@/store";
 import {BaseTableCol, RowEventContext, TableRowData} from "tdesign-vue-next";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";

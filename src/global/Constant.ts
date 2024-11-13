@@ -9,6 +9,7 @@ export const Constants = {
   version: '1.0.0',
   // 作者
   author: '落雨不悔',
+  website: 'https://blog.esion.xyz',
   // 仓库
   repo: '',
   umami: {

@@ -135,11 +135,11 @@ async function downloadFile(data, name, folder) {
 /**
  * 发送歌词到歌词窗口
  * @param ids {Array<number>} 接受者ID
- * @param text {string} 歌词内容
+ * @param content {any} 内容
  */
-function sendLyric(ids, text) {
+function sendLyric(ids, content) {
     for (let id of ids) {
-        ipcRenderer.sendTo(id, 'lyric', text);
+        ipcRenderer.sendTo(id, 'lyric', content);
     }
 }
 

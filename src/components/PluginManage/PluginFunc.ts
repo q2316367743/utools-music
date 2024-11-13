@@ -1,27 +1,26 @@
 import {PluginInstance} from "@/types/PluginInstance";
 import cryptoJs from 'crypto-js';
 import dayjs from 'dayjs';
-import axios from 'axios';
 import bigInteger from 'big-integer';
 import qs from 'qs';
 import he from 'he';
 import * as cheerio from 'cheerio';
 import * as webdav from 'webdav';
+import {getAxiosInstance} from "@/plugin/http";
 
 
-// TODO: 在app内安装的npm包
-const packages: Record<string, any> = {
-  'crypto-js': cryptoJs,
-  dayjs,
-  axios,
-  'big-integer': bigInteger,
-  qs,
-  he,
-  cheerio,
-  webdav
-}
 
 const _require = (packageName: string) => {
+  const packages: Record<string, any> = {
+    'crypto-js': cryptoJs,
+    dayjs,
+    axios: getAxiosInstance(),
+    'big-integer': bigInteger,
+    qs,
+    he,
+    cheerio,
+    webdav
+  }
   if (packageName === '@react-native-cookies/cookies') {
     throw new Error("插件暂不支持cookie操作")
   }

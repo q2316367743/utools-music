@@ -42,6 +42,7 @@ useDark({
 
 utools.onPluginEnter(action => {
   console.log(action);
+  // 后期加入播放指定
   detach.value = utools.getWindowType() !== 'main';
 });
 

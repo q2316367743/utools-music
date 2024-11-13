@@ -9,6 +9,7 @@ import {IAudioMetadata, parseBuffer} from "music-metadata";
 import {musicLyric} from "@/global/BeanFactory";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import {base64ToString} from "@/utils/file/CovertUtil";
+import {getForText} from "@/plugin/http";
 
 export const musics = ref(new Array<MusicItemView>());
 export const index = ref(0);
@@ -161,10 +162,7 @@ async function renderMusicMeta(m: MusicItemView) {
     // 读取歌词
     let lineStr: string
     if (/^https?:\/\//.test(m.lyric)) {
-      const rsp = await fetch(m.lyric, {
-        method: 'GET'
-      });
-      lineStr = await rsp.text();
+      lineStr = await getForText(m.lyric);
     } else if (/^data:(.*?);base64,/.test(m.lyric)) {
       lineStr = m.lyric.substring(5)
       lineStr = base64ToString(m.lyric.replace(/^data:(.*?);base64,/, ""));

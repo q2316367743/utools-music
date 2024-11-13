@@ -31,13 +31,12 @@
 </template>
 <script lang="ts" setup>
 import {IMusicItem, PluginInstanceInfo, PluginInstanceSearch} from "@/types/PluginInstance";
-import {usePluginStore} from "@/store/module/PluginStore";
+import {usePluginStore, useDownloadStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {BaseTableCellParams, BaseTableCol, Button, RowEventContext, TableRowData} from "tdesign-vue-next";
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {buildFromIMusicItem} from "@/entity/MusicItem";
-import {useDownloadStore} from "@/store/module/DownloadStore";
 
 interface PluginTab {
   id: number;

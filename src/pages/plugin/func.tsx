@@ -1,13 +1,13 @@
-import {usePluginStore} from "@/store/module/PluginStore";
+import {usePluginStore} from "@/store";
 import {readFileAsString} from "@/utils/file/FileUtil";
+import {getForText} from "@/plugin/http";
 
 export async function installFromUrl(url: string) {
-  const rsp = await fetch(url, {
-    method: 'GET'
-  });
-  const text = await rsp.text();
+  const text = await getForText(url);
   if (text) {
-    await usePluginStore().installPlugin(text);
+    await usePluginStore().installPlugin(text, url);
+  }else {
+    return Promise.reject(new Error("插件地址内容不存在"))
   }
 }
 

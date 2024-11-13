@@ -40,9 +40,8 @@
 </template>
 <script lang="ts" setup>
 import {Repository, RepositoryType} from "@/entity/Repository";
-import {listRepositories, saveRepositories} from "@/store/module/RepositoryStore";
+import {listRepositories, saveRepositories, useMusicStore} from "@/store";
 import {addRepository} from "@/pages/local/components/MusicScanner/MusicScannerEdit";
-import {useMusicStore} from "@/store/module/MusicStore";
 import MessageUtil from "@/utils/modal/MessageUtil";
 
 const nativeId = utools.getNativeId();

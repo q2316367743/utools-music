@@ -70,11 +70,23 @@
 <script>
     window.preload.receiveMsg(msg => {
         console.log('接收插件发送的消息：', msg);
-        // 发送消息到插件
-        document.querySelectorAll('.lyric')
-            .forEach(e => {
-                e.innerHTML = `${msg}`
-            })
+        const {type, value} = msg;
+        if (type === 'lyric') {
+            document.querySelectorAll('.lyric')
+                .forEach(e => {
+                    e.innerHTML = `${value}`
+                })
+        } else if (type === 'config') {
+            const {fontSize, color, borderColor} = value;
+            document.querySelectorAll('.container').forEach(e => {
+                e.style.border = `1px solid ${borderColor}`;
+            });
+            document.querySelectorAll('.lyric')
+                .forEach(e => {
+                    e.style.fontSize = `${fontSize}px`;
+                    e.style.color = color;
+                })
+        }
     });
 </script>
 </html>

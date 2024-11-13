@@ -1,4 +1,5 @@
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {globalSetting} from "@/store";
 
 export class MusicLyric {
 
@@ -25,6 +26,15 @@ export class MusicLyric {
       try {
         ubWindow.show();
         this.entityMap.set(ubWindow.webContents.id, ubWindow);
+        const {lyricBorderColor, lyricColor, lyricFontSize} = toRaw(globalSetting.value);
+        window.preload.ipcRenderer.sendLyric([ubWindow.webContents.id], {
+          type: 'config',
+          value: {
+            fontSize: lyricFontSize,
+            color: lyricColor,
+            borderColor: lyricBorderColor,
+          }
+        })
         callback()
       } catch (e) {
         MessageUtil.error("打开小窗失败", e);
@@ -54,7 +64,10 @@ export class MusicLyric {
     if (this.entityMap.size === 0) {
       return;
     }
-    window.preload.ipcRenderer.sendLyric(Array.from(this.entityMap.keys()), lyric);
+    window.preload.ipcRenderer.sendLyric(Array.from(this.entityMap.keys()), {
+      type: 'lyric',
+      value: lyric
+    });
   }
 
 }

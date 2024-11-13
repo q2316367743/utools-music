@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {MusicItem, MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {listRecordByAsync, removeOneByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
-import {listRepositories, scanRepository} from "@/store/module/RepositoryStore";
+import {listRepositories, scanRepository} from "@/store";
 import {map} from "@/utils/lang/ArrayUtil";
 import {isNotNull} from "@/utils/lang/FieldUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";

@@ -21,13 +21,13 @@ const router = createRouter({
       path: '/plugin',
       component: () => import('@/pages/plugin/index.vue')
     }, {
-      name: "最近播放",
-      path: '/lately',
-      component: () => import('@/pages/lately/index.vue')
-    }, {
       name: "音乐搜索",
       path: '/search',
       component: () => import('@/pages/search/index.vue')
+    }, {
+      name: "设置",
+      path: '/setting',
+      component: () => import('@/pages/setting/index.vue')
     }]
 });
 

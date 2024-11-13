@@ -5,8 +5,10 @@ import {listRecordByAsync, removeOneByAsync, saveOneByAsync} from "@/utils/utool
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {getPluginInstance} from "@/components/PluginManage/PluginFunc";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {isEmptyString} from "@/utils/lang/StringUtil";
+import {isEmptyString, isNotEmptyString} from "@/utils/lang/StringUtil";
 import {versionCompare} from "@/utils/lang/FieldUtil";
+import {getForText} from "@/plugin/http";
+import {globalSetting} from "@/store";
 
 export const usePluginStore = defineStore('plugin-store', () => {
   const plugins = ref(new Array<PluginEntityView>());
@@ -27,7 +29,19 @@ export const usePluginStore = defineStore('plugin-store', () => {
   }
 
   init()
-    .then(() => console.log("插件初始化成功"))
+    .then(() => {
+      console.log("插件初始化成功");
+      // 成功后，判断是否自动更新插件
+      const {pluginAutoUpdate} = toRaw(globalSetting.value);
+      if (pluginAutoUpdate) {
+        Promise.all(plugins.value
+          .filter(plugin => isNotEmptyString(plugin.srcUrl))
+          .map(plugin => plugin.id)
+          .map(id => updatePlugin(id, true)))
+          .then(() => console.log("全部更新完成"))
+          .catch(e => console.error("更新部分失败", e));
+      }
+    })
     .catch(err => MessageUtil.error('插件初始化失败', err));
 
 
@@ -45,14 +59,15 @@ export const usePluginStore = defineStore('plugin-store', () => {
     return instance;
   }
 
-  async function installPlugin(content: string): Promise<void> {
+  async function installPlugin(content: string, url?: string, ignoreVersion?: boolean): Promise<void> {
     const instance = getPluginInstance(content);
     const plugin: PluginEntity = {
       id: Date.now(),
       content,
       author: instance.author,
       name: instance.platform,
-      srcUrl: instance.srcUrl || '',
+      // 优先取内容，取不到尝试获取外部
+      srcUrl: instance.srcUrl || url || '',
       version: instance.version
     }
     // 校验必填项是否存在
@@ -77,7 +92,9 @@ export const usePluginStore = defineStore('plugin-store', () => {
     } else {
       // 旧的，判断版本号
       const old = plugins.value[oldIndex];
-      if (versionCompare(plugin.version, old.version) > 0) {
+
+      const {pluginIgnoreVersion} = toRaw(globalSetting.value);
+      if (pluginIgnoreVersion || versionCompare(plugin.version, old.version) > 0) {
         // 更新
         plugin.id = old.id;
         const key = `${LocalNameEnum.ITEM_PLUGIN}/${plugin.id}`;
@@ -90,6 +107,9 @@ export const usePluginStore = defineStore('plugin-store', () => {
           _rev: rev
         };
       } else {
+        if (ignoreVersion) {
+          return ;
+        }
         return Promise.reject(new Error("插件已安装，请勿重复安装"))
       }
     }
@@ -111,7 +131,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
     instanceMap.delete(id);
   }
 
-  async function updatePlugin(id: number) {
+  async function updatePlugin(id: number, ignoreVersion?: boolean) {
     const idx = plugins.value.findIndex(e => e.id === id);
     if (idx === -1) {
       return Promise.reject(new Error(`插件[${id}]不存在`))
@@ -120,18 +140,14 @@ export const usePluginStore = defineStore('plugin-store', () => {
     if (isEmptyString(old.srcUrl)) {
       return Promise.reject(new Error(`插件[${old.id}]没有更新地址`));
     }
-    const rsp = await fetch(old.srcUrl, {
-      method: 'GET'
-    });
-    const text = await rsp.text();
+    const text = await getForText(old.srcUrl);
     // 重新安装插件
-    await installPlugin(text);
+    await installPlugin(text, '', ignoreVersion);
   }
 
 
-
   return {
-    plugins,instanceMap,
+    plugins, instanceMap,
     init, getInstance, installPlugin, removePlugin, updatePlugin
   }
 

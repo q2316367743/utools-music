@@ -5,7 +5,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {useDownloadStore} from "@/store/module/DownloadStore";
+import {useDownloadStore} from "@/store";
 import {BaseTableCol, Button, Popconfirm, Tag} from "tdesign-vue-next";
 import MessageUtil from "@/utils/modal/MessageUtil";
 

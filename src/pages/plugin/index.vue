@@ -19,7 +19,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {usePluginStore} from "@/store/module/PluginStore";
+import {usePluginStore} from "@/store";
 import {BaseTableCol, Button, Popconfirm} from "tdesign-vue-next";
 import {installFromLocal, installFromUrl} from "@/pages/plugin/func";
 import MessageUtil from "@/utils/modal/MessageUtil";

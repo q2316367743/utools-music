@@ -78,7 +78,7 @@ interface Window {
       extname(path: string): string;
     },
     ipcRenderer: {
-      sendLyric(ids: Array<number>, text: string): void
+      sendLyric(ids: Array<number>, content: any): void
     },
   }
 }
