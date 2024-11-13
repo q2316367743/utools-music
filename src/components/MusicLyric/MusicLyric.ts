@@ -15,6 +15,7 @@ export class MusicLyric {
       frame: false,
       transparent: true,
       hasShadow: false,
+      backgroundColor: '#00000000',
       webPreferences: {
         preload: 'lyric/preload.js',
         zoomFactor: 0,
