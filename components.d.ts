@@ -15,6 +15,7 @@ declare module 'vue' {
     MusicPlayer: typeof import('./src/components/MusicPlayer/MusicPlayer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TAlert: typeof import('tdesign-vue-next')['Alert']
     TAvatar: typeof import('tdesign-vue-next')['Avatar']
     TBackTop: typeof import('tdesign-vue-next')['BackTop']
     TBaseTable: typeof import('tdesign-vue-next')['BaseTable']

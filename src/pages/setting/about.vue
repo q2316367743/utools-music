@@ -26,6 +26,11 @@
           </t-link>
         </t-space>
       </t-paragraph>
+      <t-alert theme="success">
+        <span>特别感谢</span>
+        <t-link theme="primary" @click="openUrl('https://musicfree.catcat.work/')">MusicFree</t-link>
+        <span>项目对本插件的启发</span>
+      </t-alert>
       <t-paragraph>
         本地音乐播放器，构建属于你的音乐库。
       </t-paragraph>
