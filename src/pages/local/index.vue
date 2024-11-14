@@ -10,11 +10,11 @@
         <music-scanner/>
       </div>
       <t-table row-key="id" :data="data" :columns="columns" :bordered="false" :height="maxHeight"
-                    :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }" active-row-type="single"
-                    :active-row-keys="activeRowKeys" @row-dblclick="handleRowDblclick">
+               :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }" active-row-type="single"
+               :active-row-keys="activeRowKeys" @row-dblclick="handleRowDblclick">
       </t-table>
     </div>
-    <t-back-top container=".local-music .container .t-table__content"/>
+    <t-back-top container=".local-music .container .t-table__content" style="bottom: 24px;right: 24px"/>
   </div>
 </template>
 <script lang="tsx" setup>

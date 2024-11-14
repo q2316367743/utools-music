@@ -3,7 +3,7 @@
 
   .container {
     position: absolute;
-    top: 12px;
+    top: 8px;
     left: 8px;
     right: 8px;
     bottom: 0;
@@ -18,6 +18,10 @@
       cursor: pointer;
       user-select: none;
       position: relative;
+
+      :deep(.t-image__wrapper) {
+        height: 42px;
+      }
 
       .mask {
         position: absolute;
