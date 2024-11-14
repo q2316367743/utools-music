@@ -106,7 +106,7 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
   const index = data.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
     views: list.map(e => ({...e, repositoryId: 0, repositoryName: ''})),
-    index: Math.max(index, 1)
+    index: Math.max(index, 0)
   });
 }
 

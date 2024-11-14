@@ -9,10 +9,10 @@
         </t-input>
         <music-scanner/>
       </div>
-      <t-base-table row-key="id" :data="data" :columns="columns" :bordered="false" :height="maxHeight"
-                    :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }"
-                    @row-dblclick="handleRowDblclick">
-      </t-base-table>
+      <t-table row-key="id" :data="data" :columns="columns" :bordered="false" :height="maxHeight"
+                    :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }" active-row-type="single"
+                    :active-row-keys="activeRowKeys" @row-dblclick="handleRowDblclick">
+      </t-table>
     </div>
     <t-back-top container=".local-music .container .t-table__content"/>
   </div>
@@ -25,12 +25,13 @@ import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {useFuse} from "@vueuse/integrations/useFuse";
 import {useMusicPlay} from "@/global/Event";
+import {music} from "@/components/MusicPlayer/MusicPlayer";
 
 const size = useWindowSize();
 
 const keyword = ref('');
+const activeRowKeys = ref<Array<number>>([])
 
-// TODO: 正在播放的音乐高亮显示
 const musics = computed(() => useMusicStore().musics);
 const maxHeight = computed(() => size.height.value - 106);
 
@@ -45,15 +46,15 @@ const data = computed(() => results.value.map(e => e.item))
 const columns: Array<BaseTableCol> = [{
   colKey: 'name',
   title: '歌曲名',
-  ellipsis: true
+  ellipsis: true,
 }, {
   colKey: 'artist',
   title: '演唱者',
-  ellipsis: true
+  ellipsis: true,
 }, {
   colKey: 'album',
   title: '专辑',
-  ellipsis: true
+  ellipsis: true,
 }, {
   colKey: 'duration',
   title: '时长',
@@ -80,13 +81,19 @@ const columns: Array<BaseTableCol> = [{
   }
 }];
 
+watch(music, val => {
+  if (val) {
+    activeRowKeys.value = [val.id];
+  }
+}, {immediate: true});
+
 function handleRowDblclick(context: RowEventContext<TableRowData>) {
   const {row} = context;
   const list = data.value;
   const index = data.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
     views: list,
-    index: Math.max(index, 1)
+    index: Math.max(index, 0)
   });
 }
 

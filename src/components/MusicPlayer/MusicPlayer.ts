@@ -233,6 +233,7 @@ export function play() {
   }
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
   // TODO: 此处如果是本地需要判断URL是否存在
+  // TODO: 如果是网络音乐，是否支持缓存
   audio.src = music.value.url;
   lyricGroups.value = []
   lyrics.value = [];

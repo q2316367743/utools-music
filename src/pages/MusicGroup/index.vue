@@ -28,8 +28,6 @@ import {DropdownOption} from "tdesign-vue-next";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 
-const nativeId = utools.getNativeId();
-
 const options: Array<DropdownOption> = [
   {content: '重命名', value: 1},
   {content: '删除', value: 2, theme: 'error'},
@@ -37,11 +35,7 @@ const options: Array<DropdownOption> = [
 
 const musicGroup = shallowRef<MusicGroupIndex>();
 
-const musicGroups = computed(() => {
-  const {musicGroups} = useMusicGroupStore()
-  // 只查看本身被的歌单
-  return musicGroups.filter(e => e.nativeId === nativeId)
-});
+const musicGroups = computed(() => useMusicGroupStore().musicGroupItems);
 
 function onClick(res: MusicGroupIndex) {
   musicGroup.value = res;

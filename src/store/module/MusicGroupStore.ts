@@ -14,6 +14,9 @@ import {isEmptyString} from "@/utils/lang/StringUtil";
 export const useMusicGroupStore = defineStore('music-group', () => {
   const musicGroups = ref(new Array<MusicGroupIndex>());
   let rev: string | undefined = undefined;
+  const nativeId = utools.getNativeId();
+
+  const musicGroupItems = computed(() => musicGroups.value.filter(e => e.nativeId === nativeId));
 
   async function init() {
     const res = await listByAsync(LocalNameEnum.LIST_MUSIC_GROUP);
@@ -52,7 +55,7 @@ export const useMusicGroupStore = defineStore('music-group', () => {
       });
     }
     // 保存列表
-    await saveListByAsync(LocalNameEnum.LIST_MUSIC_GROUP, musicGroups.value);
+    rev = await saveListByAsync(LocalNameEnum.LIST_MUSIC_GROUP, musicGroups.value);
   }
 
   async function postMusicGroup(musicItem: MusicGroup): Promise<void> {
@@ -73,14 +76,14 @@ export const useMusicGroupStore = defineStore('music-group', () => {
     if (index >= 0) {
       // 删除列表
       musicGroups.value.splice(index, 1);
-      await saveListByAsync(LocalNameEnum.LIST_MUSIC_GROUP, musicGroups.value);
+      rev = await saveListByAsync(LocalNameEnum.LIST_MUSIC_GROUP, musicGroups.value);
       // 删除歌曲
       await removeOneByAsync(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`)
     }
   }
 
   return {
-    musicGroups,
+    musicGroups, musicGroupItems,
     loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup
   }
 
