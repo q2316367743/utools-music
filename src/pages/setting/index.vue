@@ -4,7 +4,7 @@
       <t-tab-panel label="下载" value="download" style="padding: 8px">
         <t-form-item label="音乐下载目录">
           <t-input-group style="min-width: 400px">
-            <t-input :disabled="true" v-model="globalSetting.downloadFolder"/>
+            <t-input :disabled="true" v-model="downloadFolder"/>
             <t-button theme="primary" @click="updateDownloadFolder">
               <template #icon>
                 <t-icon name="file"/>
@@ -80,7 +80,7 @@
   </t-form>
 </template>
 <script lang="ts" setup>
-import {globalSetting} from "@/store";
+import {downloadFolder, globalSetting} from "@/store";
 import About from "@/pages/setting/about.vue";
 
 const active = ref('download');
@@ -93,7 +93,7 @@ function updateDownloadFolder() {
     buttonLabel: '下载'
   });
   if (paths && paths[0]) {
-    globalSetting.value.downloadFolder = paths[0];
+    downloadFolder.value = paths[0];
   }
 }
 

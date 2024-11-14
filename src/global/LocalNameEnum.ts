@@ -32,5 +32,10 @@ export enum LocalNameEnum {
    * 插件项
    * @see PluginEntity
    */
-  ITEM_PLUGIN = '/item/plugin'
+  ITEM_PLUGIN = '/item/plugin',
+
+  KEY_GLOBAL_SETTING = '/key/global-setting',
+
+  KEY_DOWNLOAD_FOLDER = '/key/download-folder',
+
 }

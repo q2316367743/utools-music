@@ -1,7 +1,8 @@
 import {buildGlobalSetting} from "@/entity/GlobalSetting";
+import {LocalNameEnum} from "@/global/LocalNameEnum";
 
-export  const globalSetting = useStorage(
-  "setting-store",
+export const globalSetting = useStorage(
+  LocalNameEnum.KEY_GLOBAL_SETTING,
   buildGlobalSetting(),
   utools.dbStorage,
   {
@@ -9,3 +10,13 @@ export  const globalSetting = useStorage(
     flush: "sync"
   }
 );
+
+export const downloadFolder = useStorage(
+  `${LocalNameEnum.KEY_DOWNLOAD_FOLDER}/${utools.getNativeId()}`,
+  utools.getPath("music"),
+  utools.dbStorage,
+  {
+    deep: true,
+    flush: "sync"
+  }
+)

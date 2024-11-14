@@ -1,6 +1,4 @@
 export interface GlobalSetting {
-  // 下载目录
-  downloadFolder: string;
 
   // 歌词字体大小
   lyricFontSize: number;
@@ -29,7 +27,6 @@ export interface GlobalSetting {
 
 export function buildGlobalSetting(): GlobalSetting {
   return {
-    downloadFolder: utools.getPath("music"),
     lyricFontSize: 36,
     lyricColor: '#0052D9',
     lyricBorderColor: 'rgba(110, 110, 110, 0.8)',
