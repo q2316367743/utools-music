@@ -40,3 +40,9 @@ export async function getForJSON<T>(url: string): Promise<T> {
   })
   return rsp.data;
 }
+
+export function headForExist(url: string): Promise<boolean> {
+  return getAxiosInstance().head(url)
+    .then(() => true)
+    .catch(() => false)
+}

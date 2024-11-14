@@ -9,7 +9,9 @@ import {IAudioMetadata, parseBuffer} from "music-metadata";
 import {musicLyric} from "@/global/BeanFactory";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import {base64ToString} from "@/utils/file/CovertUtil";
-import {getForText} from "@/plugin/http";
+import {getForText, headForExist} from "@/plugin/http";
+import {globalSetting} from "@/store";
+import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 
 export const musics = ref(new Array<MusicItemView>());
 export const index = ref(0);
@@ -223,7 +225,19 @@ async function renderMusicMeta(m: MusicItemView) {
   }
 }
 
-export function play() {
+function onError(m: MusicItemView) {
+  const {playError} = toRaw(globalSetting.value);
+  if (playError === GlobalSettingPlayErrorType.NEXT) {
+    if (musics.value.length > 1) {
+      MessageUtil.warning(`歌曲【${m.name}】不存在，自动切换下一曲`)
+      next();
+      return;
+    }
+  }
+  MessageUtil.warning(`歌曲【${m.name}】不存在，已暂停`)
+}
+
+export async function play() {
   if (music.value) {
     // 销毁旧的封面
     const {cover} = music.value;
@@ -233,7 +247,18 @@ export function play() {
   }
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
   // TODO: 此处如果是本地需要判断URL是否存在
-  // TODO: 如果是网络音乐，是否支持缓存
+  let exist: boolean;
+  if (/^https?:\/\//.test(music.value.url)) {
+    // 网络音乐
+    exist = await headForExist(music.value.url);
+    // TODO: 如果是网络音乐，是否支持缓存
+  }else {
+    // 本地音乐
+    exist = window.preload.fs.existsSync(music.value.url);
+  }
+  if (!exist) {
+    return onError(music.value);
+  }
   audio.src = music.value.url;
   lyricGroups.value = []
   lyrics.value = [];

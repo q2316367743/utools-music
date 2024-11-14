@@ -13,6 +13,14 @@
           </t-input-group>
         </t-form-item>
       </t-tab-panel>
+      <t-tab-panel label="播放" value="play" style="padding: 8px;overflow: auto">
+        <t-form-item label="播放失败时">
+          <t-radio-group v-model="globalSetting.playError">
+            <t-radio label="下一曲" :value="GlobalSettingPlayErrorType.NEXT"></t-radio>
+            <t-radio label="暂停" :value="GlobalSettingPlayErrorType.PAUSE"></t-radio>
+          </t-radio-group>
+        </t-form-item>
+      </t-tab-panel>
       <t-tab-panel label="歌词" value="lyric" style="padding: 8px;overflow: auto">
         <t-form-item label="字体大小">
           <t-input-number :clearable="true" v-model="globalSetting.lyricFontSize"></t-input-number>
@@ -82,6 +90,7 @@
 <script lang="ts" setup>
 import {downloadFolder, globalSetting} from "@/store";
 import About from "@/pages/setting/about.vue";
+import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 
 const active = ref('download');
 
@@ -108,6 +117,7 @@ function updateDownloadFolder() {
     position: relative;
     width: 100%;
     height: 100%;
+
     :deep(.t-tabs__content) {
       height: calc(100% - 48px);
       overflow: auto;

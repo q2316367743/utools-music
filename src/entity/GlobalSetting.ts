@@ -1,4 +1,11 @@
+export enum GlobalSettingPlayErrorType {
+  NEXT = 1,
+  PAUSE = 2
+}
+
 export interface GlobalSetting {
+
+  playError: GlobalSettingPlayErrorType
 
   // 歌词字体大小
   lyricFontSize: number;
@@ -27,6 +34,7 @@ export interface GlobalSetting {
 
 export function buildGlobalSetting(): GlobalSetting {
   return {
+    playError: GlobalSettingPlayErrorType.NEXT,
     lyricFontSize: 36,
     lyricColor: '#0052D9',
     lyricBorderColor: 'rgba(110, 110, 110, 0.8)',

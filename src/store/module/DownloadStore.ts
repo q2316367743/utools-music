@@ -60,8 +60,8 @@ export const useDownloadStore = defineStore('download', () => {
 
     // 修改转改为下载中
     for (let i = 0; i < items.value.length; i++) {
-      const item = items.value[i];
-      if (item.id === item.id) {
+      const r = items.value[i];
+      if (r.id === item.id) {
         items.value[i] = {
           ...items.value[i],
           status: 1,
@@ -73,8 +73,8 @@ export const useDownloadStore = defineStore('download', () => {
     try {
       const mainPath = await window.preload.downloadFile(url, `${basename}${extname ? extname[0] : '.mp3'}`, downloadFolder.value);
       for (let i = 0; i < items.value.length; i++) {
-        const item = items.value[i];
-        if (item.id === item.id) {
+        const r = items.value[i];
+        if (r.id === item.id) {
           items.value[i] = {
             ...items.value[i],
             status: 2,
@@ -86,8 +86,8 @@ export const useDownloadStore = defineStore('download', () => {
       await updateList();
     } catch (e) {
       for (let i = 0; i < items.value.length; i++) {
-        const item = items.value[i];
-        if (item.id === item.id) {
+        const r = items.value[i];
+        if (r.id === item.id) {
           items.value[i] = {
             ...items.value[i],
             status: 3,
