@@ -80,7 +80,7 @@ export function buildFromIMusicItem(item: IMusicItem, url: string): MusicItemVie
   if (item.lrc) {
     lyric = item.lrc;
   } else if (item.rawLrc) {
-    lyric = `data:text/plain;base64:${stringToBase64(item.rawLrc)}`;
+    lyric = `data:text/plain;base64,${stringToBase64(item.rawLrc)}`;
   }
   return {
     id: Date.now(),

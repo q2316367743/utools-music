@@ -19,6 +19,11 @@
         <t-space class="duration">
           <div>{{ prettyDateTime(currentTime) }} / {{ prettyDateTime(duration) }}</div>
           <t-tag theme="primary" size="small" v-if="isNotEmptyString(source)">{{ source }}</t-tag>
+          <t-button size="small" variant="text" theme="primary" v-if="enableDownload" @click="onDownload">
+            <template #icon>
+              <t-icon name="download"/>
+            </template>
+          </t-button>
         </t-space>
       </div>
       <div class="operator">
@@ -117,6 +122,8 @@ import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {isNull} from "@/utils/lang/FieldUtil";
 import {MusicItemSource} from "@/entity/MusicItem";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
+import MessageUtil from "@/utils/modal/MessageUtil";
+import {useDownloadStore} from "@/store";
 
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');
@@ -148,6 +155,12 @@ const source = computed(() => {
       return '';
   }
 });
+const enableDownload = computed(() => {
+  if (!music.value) {
+    return false;
+  }
+  return /^https?:\/\//.test(music.value.url);
+})
 
 function onLabel(h: any, props: { value: number }) {
   return `${prettyDateTime(props.value)} / ${prettyDateTime(duration.value)}`
@@ -160,6 +173,14 @@ function onChange(value: number | Array<number>) {
 
 function onAddMusicGroup() {
   useAddMusicGroup.emit();
+}
+
+function onDownload() {
+  if (!music.value) {
+    MessageUtil.error("音乐不存在");
+    return;
+  }
+  useDownloadStore().emit(music.value);
 }
 
 onMounted(() => {

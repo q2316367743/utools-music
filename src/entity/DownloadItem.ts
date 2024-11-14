@@ -6,4 +6,7 @@ export interface DownloadItem {
   // 1下载中,2成功,3失败
   status: 1|2|3;
   msg: string;
+  url: string;
+  cover?: string;
+  lyric?: string;
 }

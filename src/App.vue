@@ -21,6 +21,7 @@ import {detach} from "@/store/AppStore";
 import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
 import MusicAddGroup from "@/components/MusicPlayer/MusicAddGroup.vue";
+import {usePluginStore} from "@/store";
 
 const route = useRoute();
 const router = useRouter();
@@ -48,6 +49,8 @@ utools.onPluginEnter(action => {
   detach.value = utools.getWindowType() !== 'main';
 });
 
+// 插件初始刷
+usePluginStore().init();
 
 </script>
 <style scoped lang="less">

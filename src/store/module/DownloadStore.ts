@@ -13,7 +13,12 @@ export const useDownloadStore = defineStore('download', () => {
 
   async function init() {
     const res = await listByAsync<DownloadItem>(LocalNameEnum.LIST_DOWNLOAD);
-    items.value = res.list;
+    // 刚创建，如果下载中，则变成失败
+    items.value = res.list.map(e => ({
+      ...e,
+      status: e.status === 1 ? 3 : e.status,
+      msg: e.status === 1 ? '下载中断' : ''
+    }));
     rev = res.rev
   }
 
@@ -27,25 +32,49 @@ export const useDownloadStore = defineStore('download', () => {
 
   async function emitWrap(item: MusicItemView) {
     const {url, cover, lyric, name, artist} = item;
-    const basename = `${artist} - ${name}`;
-    const u = new URL(url);
-    const extname = u.pathname.match(/\.[a-zA-Z]*$/);
     const downloadItem: DownloadItem = {
       id: Date.now(),
       name,
       artist,
       music: '',
       status: 1,
-      msg: ''
+      msg: '',
+      url,
+      cover,
+      lyric
     }
     items.value.push(downloadItem);
     await updateList();
+    // 执行下载
+    await download(downloadItem);
+
+  }
+
+  async function download(item: DownloadItem) {
+    MessageUtil.success("开始下载");
+
+    const {name, artist, url, cover, lyric} = item;
+    const u = new URL(url);
+    const extname = u.pathname.match(/\.[a-zA-Z]*$/);
+    const basename = `${artist} - ${name}`;
+
+    // 修改转改为下载中
+    for (let i = 0; i < items.value.length; i++) {
+      const item = items.value[i];
+      if (item.id === item.id) {
+        items.value[i] = {
+          ...items.value[i],
+          status: 1,
+        }
+        break;
+      }
+    }
 
     try {
       const mainPath = await window.preload.downloadFile(url, `${basename}${extname ? extname[0] : '.mp3'}`, downloadFolder.value);
       for (let i = 0; i < items.value.length; i++) {
         const item = items.value[i];
-        if (item.id === downloadItem.id) {
+        if (item.id === item.id) {
           items.value[i] = {
             ...items.value[i],
             status: 2,
@@ -58,7 +87,7 @@ export const useDownloadStore = defineStore('download', () => {
     } catch (e) {
       for (let i = 0; i < items.value.length; i++) {
         const item = items.value[i];
-        if (item.id === downloadItem.id) {
+        if (item.id === item.id) {
           items.value[i] = {
             ...items.value[i],
             status: 3,
@@ -74,7 +103,7 @@ export const useDownloadStore = defineStore('download', () => {
     // 下载完成
 
     try {
-      if (isNotEmptyString(cover)) {
+      if (isNotEmptyString(cover) && cover) {
         const c = new URL(cover);
         const coverExtname = c.pathname.match(/\.[a-zA-Z]*$/);
         await window.preload.downloadFile(cover, `${basename}${coverExtname ? coverExtname[0] : '.png'}`, downloadFolder.value)
@@ -83,15 +112,14 @@ export const useDownloadStore = defineStore('download', () => {
       MessageUtil.error("封面下载失败");
     }
     try {
-      if (isNotEmptyString(lyric)) {
+      if (isNotEmptyString(lyric) && lyric) {
         const l = new URL(lyric);
         const lyricExtname = l.pathname.match(/\.[a-zA-Z]*$/);
-        await window.preload.downloadFile(cover, `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`, downloadFolder.value)
+        await window.preload.downloadFile(lyric, `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`, downloadFolder.value)
       }
     } catch (e) {
       MessageUtil.error("歌词下载失败");
     }
-
   }
 
   function emit(item: MusicItemView) {
@@ -110,6 +138,6 @@ export const useDownloadStore = defineStore('download', () => {
 
   return {
     items,
-    emit, remove
+    emit, remove, download
   }
 })

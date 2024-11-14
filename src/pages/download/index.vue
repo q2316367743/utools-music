@@ -8,6 +8,7 @@
 import {useDownloadStore} from "@/store";
 import {BaseTableCol, Button, Popconfirm, Tag} from "tdesign-vue-next";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {DownloadItem} from "@/entity/DownloadItem";
 
 const size = useWindowSize();
 
@@ -32,7 +33,7 @@ const columns: Array<BaseTableCol> = [{
       text = '下载完成'
       theme = 'success'
     } else if (row.status === 3) {
-      text = '下载失败，' + row.msg;
+      text = row.msg;
       theme = 'danger'
     }
     return h(Tag, {
@@ -45,15 +46,25 @@ const columns: Array<BaseTableCol> = [{
   title: '操作',
   width: 140,
   cell: (h, {row}) => {
-    return h(Popconfirm, {
-      content: '是否删除下载记录',
-      onConfirm: () => {
-        useDownloadStore()
-          .remove(row.id)
-          .then(() => MessageUtil.success("删除成功"))
-          .catch(e => MessageUtil.error("删除失败", e));
-      }
-    }, () => h(Button, {theme: 'danger', variant: 'text'}, () => '删除'))
+    return [
+      h(Button, {
+        theme: 'primary',
+        variant: 'text',
+        disabled: row.status !== 3,
+        onClick: () => {
+          useDownloadStore().download(row as DownloadItem);
+        }
+      }, () => '重'),
+      h(Popconfirm, {
+        content: '是否删除下载记录',
+        onConfirm: () => {
+          useDownloadStore()
+            .remove(row.id)
+            .then(() => MessageUtil.success("删除成功"))
+            .catch(e => MessageUtil.error("删除失败", e));
+        }
+      }, () => h(Button, {theme: 'danger', variant: 'text'}, () => '删'))
+    ]
   }
 }]
 </script>

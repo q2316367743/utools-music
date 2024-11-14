@@ -14,7 +14,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
   const plugins = ref(new Array<PluginEntityView>());
   const instanceMap = new Map<number, PluginInstance>();
 
-  async function init() {
+  async function initWrap() {
     const records = await listRecordByAsync<PluginEntity>(LocalNameEnum.ITEM_PLUGIN);
     records.forEach((record) => {
       plugins.value.push({
@@ -28,21 +28,23 @@ export const usePluginStore = defineStore('plugin-store', () => {
     });
   }
 
-  init()
-    .then(() => {
-      console.log("插件初始化成功");
-      // 成功后，判断是否自动更新插件
-      const {pluginAutoUpdate} = toRaw(globalSetting.value);
-      if (pluginAutoUpdate) {
-        Promise.all(plugins.value
-          .filter(plugin => isNotEmptyString(plugin.srcUrl))
-          .map(plugin => plugin.id)
-          .map(id => updatePlugin(id, true)))
-          .then(() => console.log("全部更新完成"))
-          .catch(e => console.error("更新部分失败", e));
-      }
-    })
-    .catch(err => MessageUtil.error('插件初始化失败', err));
+  function init() {
+    initWrap()
+      .then(() => {
+        console.log("插件初始化成功");
+        // 成功后，判断是否自动更新插件
+        const {pluginAutoUpdate} = toRaw(globalSetting.value);
+        if (pluginAutoUpdate) {
+          Promise.all(plugins.value
+            .filter(plugin => isNotEmptyString(plugin.srcUrl))
+            .map(plugin => plugin.id)
+            .map(id => updatePlugin(id, true)))
+            .then(() => console.log("全部更新完成"))
+            .catch(e => console.error("更新部分失败", e));
+        }
+      })
+      .catch(err => MessageUtil.error('插件初始化失败', err));
+  }
 
 
   async function getInstance(id: number): Promise<PluginInstance> {
