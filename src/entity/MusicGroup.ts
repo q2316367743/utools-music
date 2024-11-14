@@ -23,5 +23,5 @@ export interface MusicGroupContent {
   items: Array<MusicItem>;
 }
 
-export interface MusicGroup extends MusicGroupBase, MusicGroupContent {
+export interface MusicGroup extends MusicGroupIndex, MusicGroupContent {
 }

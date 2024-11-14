@@ -22,6 +22,9 @@
         </t-space>
       </div>
       <div class="operator">
+        <t-button shape="circle" theme="primary" variant="text">
+          添
+        </t-button>
         <t-popup trigger="click">
           <t-button shape="circle" theme="primary" variant="text">
             音

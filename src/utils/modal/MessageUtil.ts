@@ -2,8 +2,8 @@ import Optional from "@/utils/lang/Optional";
 import {MessagePlugin} from "tdesign-vue-next";
 
 function render(message: string, e?: any) {
-  if (typeof e === 'string') {
-    return Optional.ofNullable(e).map(e => `${message}，${e}`).orElse(message)
+  if (e instanceof Error) {
+    return Optional.ofNullable(e).map(e => `${message}，${e.message}`).orElse(message)
   } else {
     return Optional.ofNullable(e).map(e => `${message}，${e}`).orElse(message)
   }

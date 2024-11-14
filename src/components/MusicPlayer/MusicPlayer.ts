@@ -39,9 +39,9 @@ watch(lyricIndex, val => {
     if (cur) {
       musicLyric.sendLyric(cur.text);
       // 滚动
-      let selector = document.querySelector('.lyric-line.active');
+      let selector = document.querySelectorAll('.lyric-line');
       if (selector) {
-        selector.scrollIntoView({behavior: "smooth", inline: 'center', block: 'center'});
+        selector[val]?.scrollIntoView({behavior: "smooth", inline: 'center', block: 'center'});
       }
     }
   }
@@ -232,6 +232,7 @@ export function play() {
     }
   }
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
+  // TODO: 此处如果是本地需要判断URL是否存在
   audio.src = music.value.url;
   lyricGroups.value = []
   lyrics.value = [];

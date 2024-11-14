@@ -4,7 +4,6 @@ import {listRecordByAsync, removeOneByAsync, saveListByAsync} from "@/utils/utoo
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {listRepositories, scanRepository} from "@/store";
 import {map} from "@/utils/lang/ArrayUtil";
-import {isNotNull} from "@/utils/lang/FieldUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 
 const LIST_KEY = `${LocalNameEnum.LIST_MUSIC}/`;
@@ -61,13 +60,26 @@ export const useMusicStore = defineStore('music', () => {
     // 刷新列表
     for (const item of items) {
       const {key, value} = item;
-      if (isNotNull(value)) {
+      if (!!value) {
         const docId = `${LocalNameEnum.LIST_MUSIC}/${key}`;
-        // 已获取到，删除旧的
+        // 获取到旧的
         const old = musicMap.get(docId);
+        const oldRecords = old?.record || [];
+        const oldMap = map(oldRecords, 'url', (e1, e2) => e2);
         // 此处需要判断是需要更新还是需要新增还是需要删除
+        for (let i = 0; i < value.length; i++) {
+          const newItem = value[i];
+          let oldItem = oldMap.get(newItem.url);
+          if (oldItem) {
+            value[i] = {
+              ...newItem,
+              // 保持旧的ID
+              id: oldItem.id,
+            }
+          }
+        }
         // 保存新的
-        await saveListByAsync(docId, value!, old?.rev);
+        await saveListByAsync(docId, value, old?.rev);
       }
     }
     // 重新初始化

@@ -37,11 +37,12 @@ async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
   // 文件分组，用于处理封面和歌词
   const fileMap = group(files, 'basename');
   // 寻找合适的音乐
+  let start = Date.now();
   for (const e of fileMap) {
     const [k, v] = e;
     const {name, artist} = parseMusicName(k);
     const musicItem: MusicItem = {
-      id: Date.now(),
+      id: start++,
       name,
       nativeId,
       source: MusicItemSource.LOCAL,

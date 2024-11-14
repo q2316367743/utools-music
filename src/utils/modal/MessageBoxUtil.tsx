@@ -39,6 +39,7 @@ export default {
         },
         onConfirm: () => {
           resolve(value.value);
+          res.destroy();
         },
         onCancel() {
           res.destroy();
@@ -50,5 +51,38 @@ export default {
       })
     })
   },
+  alert(content: string, title?: string, config?: {
+    confirmButtonText?: string,
+    cancelButtonText?: string,
+  }) {
+    const {
+      confirmButtonText = '确认',
+      cancelButtonText = '取消',
+    } = config || {};
+    return new Promise<void>(resolve => {
+
+      const res = DialogPlugin({
+        default: () => <Paragraph>{content}</Paragraph>,
+        header: title,
+        draggable: true,
+        confirmBtn: {
+          default: confirmButtonText,
+        },
+        cancelBtn: {
+          default: cancelButtonText
+        },
+        onConfirm: () => {
+          resolve();
+          res.destroy();
+        },
+        onCancel() {
+          res.destroy();
+        },
+        onClose() {
+          res.destroy();
+        }
+      })
+    })
+  }
 }
 
