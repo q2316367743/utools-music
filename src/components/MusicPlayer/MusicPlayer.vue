@@ -18,12 +18,12 @@
         </div>
         <t-space class="duration">
           <div>{{ prettyDateTime(currentTime) }} / {{ prettyDateTime(duration) }}</div>
-          <t-tag theme="primary" size="small" v-if="isNotEmptyString(source)">{{source}}</t-tag>
+          <t-tag theme="primary" size="small" v-if="isNotEmptyString(source)">{{ source }}</t-tag>
         </t-space>
       </div>
       <div class="operator">
-        <t-button shape="circle" theme="primary" variant="text">
-          添
+        <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="!music">
+          加
         </t-button>
         <t-popup trigger="click">
           <t-button shape="circle" theme="primary" variant="text">
@@ -101,7 +101,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {useMusicAppend, useMusicPlay} from "@/global/Event";
+import {useAddMusicGroup, useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
   audioControl,
   currentTime, displayVisible, duration,
@@ -158,6 +158,10 @@ function onChange(value: number | Array<number>) {
   switchCurrentTime(val);
 }
 
+function onAddMusicGroup() {
+  useAddMusicGroup.emit();
+}
+
 onMounted(() => {
   useMusicPlay.on(onMusicPlay);
   useMusicAppend.on(onMusicAppend);
@@ -165,7 +169,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   useMusicPlay.off(onMusicPlay);
   useMusicAppend.off(onMusicAppend);
-})
+});
 </script>
 <style scoped lang="less">
 @import './MusicPlayer.less';

@@ -100,7 +100,7 @@ export function musicGroupAppend(defaultMusicItemIds: Array<number>, musicGroupI
     onConfirm() {
       // 确定
       const newList = data.value.filter(e => selectedRowKeys.value.includes(e.id));
-      // TODO: 修改旧的
+      // 修改旧的
       saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${musicGroupId}`, {
         id: musicGroupId,
         items: newList

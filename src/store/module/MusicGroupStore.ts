@@ -36,38 +36,38 @@ export const useMusicGroupStore = defineStore('music-group', () => {
     return res.record.items;
   }
 
-  async function postMusicGroupIndex(musicItem: MusicGroupIndex): Promise<void> {
-    if (isEmptyString(musicItem.name)) return Promise.reject(new Error("歌单必须有名称"));
+  async function postMusicGroupIndex(musicGroup: MusicGroupIndex): Promise<void> {
+    if (isEmptyString(musicGroup.name)) return Promise.reject(new Error("歌单必须有名称"));
     // 新增列表
-    const index = musicGroups.value.findIndex((e) => e.id === musicItem.id);
+    const index = musicGroups.value.findIndex((e) => e.id === musicGroup.id);
     if (index >= 0) {
       // 修改
       musicGroups.value[index] = {
         ...musicGroups.value[index],
-        name: musicItem.name,
+        name: musicGroup.name,
       }
     } else {
       // 新增
       musicGroups.value.push({
-        id: musicItem.id,
-        name: musicItem.name,
-        nativeId: musicItem.nativeId,
+        id: musicGroup.id,
+        name: musicGroup.name,
+        nativeId: musicGroup.nativeId,
       });
     }
     // 保存列表
     rev = await saveListByAsync(LocalNameEnum.LIST_MUSIC_GROUP, musicGroups.value);
   }
 
-  async function postMusicGroup(musicItem: MusicGroup): Promise<void> {
-    await postMusicGroupIndex(musicItem);
+  async function postMusicGroup(musicGroup: MusicGroup): Promise<void> {
+    await postMusicGroupIndex(musicGroup);
 
     // 获取旧的歌单列表
-    const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${musicItem.id}`);
+    const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${musicGroup.id}`);
 
     // 保存新的歌单列表
-    await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${musicItem.id}`, {
-      id: musicItem.id,
-      items: musicItem.items,
+    await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${musicGroup.id}`, {
+      id: musicGroup.id,
+      items: musicGroup.items,
     }, res.rev);
   }
 
@@ -82,9 +82,31 @@ export const useMusicGroupStore = defineStore('music-group', () => {
     }
   }
 
+  async function appendMusicGroup(ids: Array<number>, musicItem: MusicItem): Promise<void> {
+    for (let id of ids) {
+      const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`);
+      const {record, rev} = res;
+      if (record) {
+        // 更新
+        const index = record.items.findIndex((e) => e.id === id);
+        if (index === -1) {
+          // 不存在，新增
+          record.items.push(musicItem);
+          await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, record, rev);
+        }
+      } else {
+        // 新增
+        await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, {
+          id,
+          items: [musicItem],
+        });
+      }
+    }
+  }
+
   return {
     musicGroups, musicGroupItems,
-    loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup
+    loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup, appendMusicGroup
   }
 
 })

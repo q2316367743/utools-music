@@ -6,10 +6,11 @@
       </div>
       <menu-side class="main-side"></menu-side>
     </div>
-    <music-display />
+    <music-display/>
     <div class="main-player">
       <music-player/>
     </div>
+    <music-add-group/>
   </div>
 </template>
 <script lang="ts" setup>
@@ -19,6 +20,7 @@ import {useDark} from "@vueuse/core";
 import {detach} from "@/store/AppStore";
 import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
+import MusicAddGroup from "@/components/MusicPlayer/MusicAddGroup.vue";
 
 const route = useRoute();
 const router = useRouter();
