@@ -29,7 +29,7 @@
           <t-popconfirm content="确认删除吗？" @confirm="handleDelete(repo)">
             <t-button size="small" theme="danger" variant="text" :loading>
               <template #icon>
-                <t-icon name="delete"/>
+                <delete-icon />
               </template>
             </t-button>
           </t-popconfirm>
@@ -43,6 +43,7 @@ import {Repository, RepositoryType} from "@/entity/Repository";
 import {listRepositories, saveRepositories, useMusicStore} from "@/store";
 import {addRepository} from "@/pages/local/components/MusicScanner/MusicScannerEdit";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {DeleteIcon} from 'tdesign-icons-vue-next';
 
 const nativeId = utools.getNativeId();
 const visible = ref(false);

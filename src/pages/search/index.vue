@@ -5,7 +5,7 @@
         <t-input :clearable="true" v-model="keyword" @enter="search" placeholder="请输入关键字，回车搜索"
                  :disabled="loading || !active">
           <template #suffix-icon>
-            <t-icon name="search"></t-icon>
+            <search-icon/>
           </template>
         </t-input>
       </div>
@@ -37,6 +37,7 @@ import {isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {BaseTableCellParams, BaseTableCol, Button, RowEventContext, TableRowData} from "tdesign-vue-next";
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {buildFromIMusicItem} from "@/entity/MusicItem";
+import {SearchIcon} from "tdesign-icons-vue-next";
 
 interface PluginTab {
   id: number;

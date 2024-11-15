@@ -4,7 +4,7 @@
       <div class="local-music__header">
         <t-input style="width: 200px" placeholder="搜索本地音乐" v-model="keyword" :clearable="true">
           <template #suffix-icon>
-            <t-icon name="search"/>
+            <search-icon/>
           </template>
         </t-input>
         <music-scanner/>
@@ -26,6 +26,7 @@ import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {useFuse} from "@vueuse/integrations/useFuse";
 import {useMusicPlay} from "@/global/Event";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
+import {SearchIcon} from 'tdesign-icons-vue-next';
 
 const size = useWindowSize();
 

@@ -12,6 +12,7 @@ import {useMusicGroupStore} from "@/store";
 import {useAddMusicGroup} from "@/global/Event";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {isEmptyArray} from "@/utils/lang/FieldUtil";
 
 const visible = ref(false);
 const groupIds = ref(new Array<number>());
@@ -27,6 +28,9 @@ function onConfirm() {
   visible.value = false;
   if (!music.value) {
     MessageUtil.warning("没有正在播放的音乐，无法加入到歌单")
+    return;
+  }
+  if (isEmptyArray(groupIds.value)) {
     return;
   }
   useMusicGroupStore().appendMusicGroup(groupIds.value, music.value)

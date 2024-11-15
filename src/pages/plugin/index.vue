@@ -2,10 +2,19 @@
   <div class="plugin-manage">
     <div class="header">
       <t-space>
-        <t-button theme="primary" size="small" @click="installFromLocalWrap" :loading="installLoading">从本地安装
+        <t-button theme="primary" size="small" @click="installFromLocalWrap" :loading="installLoading">
+          从本地安装
         </t-button>
-        <t-button theme="primary" size="small" @click="installFromUrlWrap" :loading="installLoading">从网络安装
+        <t-button theme="primary" size="small" @click="installFromUrlWrap" :loading="installLoading">
+          从网络安装
         </t-button>
+        <t-tooltip content="支持MusicFree协议的插件，目前只实现了歌曲搜索和歌曲详情" theme="primary" placement="bottom">
+          <t-button theme="primary" size="small" variant="text">
+            <template #icon>
+              <questionnaire-icon />
+            </template>
+          </t-button>
+        </t-tooltip>
       </t-space>
       <t-space>
         <t-button theme="primary" size="small" :disabled="true">订阅管理</t-button>
@@ -25,6 +34,7 @@ import {installFromLocal, installFromUrl} from "@/pages/plugin/func";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import {isEmptyString} from "@/utils/lang/StringUtil";
+import {QuestionnaireIcon} from 'tdesign-icons-vue-next';
 
 const size = useWindowSize();
 

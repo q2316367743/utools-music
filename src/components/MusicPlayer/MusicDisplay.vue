@@ -13,7 +13,7 @@
           <t-col :span="2">
             <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
               <template #icon>
-                <t-icon name="delete"/>
+                <DeleteIcon />
               </template>
             </t-button>
           </t-col>
@@ -42,7 +42,7 @@
         <t-dropdown :options trigger="click" placement="top-right" @click="clickHandler">
           <t-button theme="primary" variant="text" shape="circle">
             <template #icon>
-              <t-icon name="adjustment"/>
+              <adjustment-icon />
             </template>
           </t-button>
         </t-dropdown>
@@ -60,6 +60,7 @@ import {
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
 import {DropdownOption} from "tdesign-vue-next";
+import {DeleteIcon, AdjustmentIcon} from 'tdesign-icons-vue-next';
 
 
 const name = computed(() => music.value?.name || '无歌曲');

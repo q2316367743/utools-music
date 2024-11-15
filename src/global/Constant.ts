@@ -13,8 +13,8 @@ export const Constants = {
   // 仓库
   repo: '',
   umami: {
-    id: '',
-    url: ''
+    id: '888d78b7-155c-44b1-8d4e-62d2fa6de2b6',
+    url: 'https://umami.esion.xyz'
   }
 }
 

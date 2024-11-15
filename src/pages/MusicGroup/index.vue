@@ -4,7 +4,7 @@
                 @click="onContextMenu(group, $event)">
       <div class="music-group-item" @click="onClick(group)">
         <div class="music-group-item__cover">
-          <t-icon name="music" size="80px"></t-icon>
+          <music-icon size="80px"></music-icon>
         </div>
         <div class="music-group-item__title ellipsis">
           {{ group.name }}
@@ -13,7 +13,7 @@
     </t-dropdown>
     <div class="music-group-item plus" @click="addMusicGroup">
       <div class="music-group-item__image">
-        <t-icon name="plus" size="80px"></t-icon>
+        <plus-icon size="80px"></plus-icon>
       </div>
     </div>
   </div>
@@ -27,6 +27,7 @@ import MusicGroupContent from "@/pages/MusicGroup/MusicGroupContent.vue";
 import {DropdownOption} from "tdesign-vue-next";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {MusicIcon, PlusIcon} from 'tdesign-icons-vue-next'
 
 const options: Array<DropdownOption> = [
   {content: '重命名', value: 1},

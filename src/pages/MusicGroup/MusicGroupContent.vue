@@ -6,7 +6,7 @@
         <div>{{ header }}</div>
         <t-button theme="primary" variant="outline" size="small" @click="musicGroupAppendWrap">
           <template #icon>
-            <t-icon name="edit"></t-icon>
+            <edit-icon/>
           </template>
         </t-button>
       </t-space>
@@ -28,6 +28,7 @@ import {BaseTableCol, RowEventContext, TableRowData} from "tdesign-vue-next";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {useMusicPlay} from "@/global/Event";
 import {musicGroupAppend} from "@/pages/MusicGroup/MusicGroupFunc";
+import {EditIcon} from 'tdesign-icons-vue-next';
 
 const size = useWindowSize();
 const {loadMusicItems} = useMusicGroupStore()

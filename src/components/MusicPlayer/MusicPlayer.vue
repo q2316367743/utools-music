@@ -6,8 +6,8 @@
         <t-avatar v-else-if="music" shape="round" size="42px">{{ music.name.substring(0, 1) }}</t-avatar>
         <t-avatar v-else shape="round" size="42px">无</t-avatar>
         <div class="mask">
-          <t-icon v-if="displayVisible" name="chevron-down-double" size="32px" color="#fff"/>
-          <t-icon v-else name="chevron-up-double" size="32px" color="#fff"/>
+          <chevron-down-double-icon v-if="displayVisible" size="32px" color="#fff"/>
+          <chevron-up-double-icon v-else size="32px" color="#fff"/>
         </div>
       </div>
       <div>
@@ -21,7 +21,7 @@
           <t-tag theme="primary" size="small" v-if="isNotEmptyString(source)">{{ source }}</t-tag>
           <t-button size="small" variant="text" theme="primary" v-if="enableDownload" @click="onDownload">
             <template #icon>
-              <t-icon name="download"/>
+              <download-icon/>
             </template>
           </t-button>
         </t-space>
@@ -65,18 +65,18 @@
     <div class="controls">
       <t-button shape="circle" theme="primary" variant="text" size="large" :disabled @click="pre">
         <template #icon>
-          <t-icon name="previous"></t-icon>
+          <previous-icon></previous-icon>
         </template>
       </t-button>
       <t-button shape="circle" theme="primary" variant="text" size="large" :disabled @click="audioControl">
         <template #icon>
-          <t-icon v-if="played" name="pause"></t-icon>
-          <t-icon v-else name="play"></t-icon>
+          <pause-icon v-if="played"/>
+          <play-icon v-else/>
         </template>
       </t-button>
       <t-button shape="circle" theme="primary" variant="text" size="large" :disabled @click="next">
         <template #icon>
-          <t-icon name="next"></t-icon>
+          <next-icon/>
         </template>
       </t-button>
     </div>
@@ -95,7 +95,7 @@
             <t-col :span="2">
               <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
                 <template #icon>
-                  <t-icon name="delete"/>
+                  <delete-icon/>
                 </template>
               </t-button>
             </t-col>
@@ -106,6 +106,16 @@
   </div>
 </template>
 <script lang="ts" setup>
+import {
+  DownloadIcon,
+  DeleteIcon,
+  PlayIcon,
+  PauseIcon,
+  NextIcon,
+  PreviousIcon,
+  ChevronDownDoubleIcon,
+  ChevronUpDoubleIcon
+} from 'tdesign-icons-vue-next';
 import {useAddMusicGroup, useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
   audioControl,

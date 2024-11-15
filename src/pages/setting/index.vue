@@ -7,7 +7,7 @@
             <t-input :disabled="true" v-model="downloadFolder"/>
             <t-button theme="primary" @click="updateDownloadFolder">
               <template #icon>
-                <t-icon name="file"/>
+                <file-icon/>
               </template>
             </t-button>
           </t-input-group>
@@ -94,6 +94,7 @@
 import {downloadFolder, globalSetting} from "@/store";
 import About from "@/pages/setting/about.vue";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
+import {FileIcon} from 'tdesign-icons-vue-next';
 
 const active = ref('download');
 
