@@ -2,7 +2,11 @@
   <div class="main">
     <div class="main-container">
       <div class="main-content">
-        <router-view/>
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
       </div>
       <menu-side class="main-side"></menu-side>
     </div>
