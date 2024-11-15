@@ -66,8 +66,12 @@ async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
     });
     if (isNotEmptyString(musicItem.url)) {
       // 获取歌曲元信息
-      const meta = await parseFileToMusic(musicItem.url);
-      copyProperties(meta, musicItem);
+      try {
+        const meta = await parseFileToMusic(musicItem.url);
+        copyProperties(meta, musicItem);
+      } catch (e) {
+        console.error("元数据解析失败", e)
+      }
       musicItems.push(musicItem);
     }
   }

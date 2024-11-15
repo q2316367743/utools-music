@@ -25,9 +25,9 @@ export default {
       closeBtn: true
     })
   },
-  error(content: string, title?: string): void {
+  error(content: string, title?: string, e?: any): void {
     NotificationPlugin('warning', {
-      content,
+      content: `${content}，${e.message || e}`,
       title,
       closeBtn: true
     })

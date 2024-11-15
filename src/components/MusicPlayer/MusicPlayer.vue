@@ -27,7 +27,7 @@
         </t-space>
       </div>
       <div class="operator">
-        <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="!music">
+        <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="disableAddGroup">
           加
         </t-button>
         <t-popup trigger="click">
@@ -170,6 +170,12 @@ const enableDownload = computed(() => {
     return false;
   }
   return /^https?:\/\//.test(music.value.url);
+});
+const disableAddGroup = computed(() => {
+  if (!music.value) {
+    return true;
+  }
+  return music.value.source === MusicItemSource.WEB;
 })
 
 function onLabel(h: any, props: { value: number }) {

@@ -56,6 +56,9 @@ const columns: Array<BaseTableCol> = [{
   colKey: 'album',
   title: '专辑',
   ellipsis: true,
+  cell: (h, {row}) => {
+    return row.album || '-';
+  }
 }, {
   colKey: 'duration',
   title: '时长',

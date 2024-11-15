@@ -24,7 +24,7 @@ export const useDownloadStore = defineStore('download', () => {
 
   init()
     .then(() => console.log("下载列表初始化成功"))
-    .catch(err => NotificationUtil.error('下载列表初始化失败', err));
+    .catch(err => NotificationUtil.error('下载列表初始化失败', "下载管理器", err));
 
   async function updateList() {
     rev = await saveListByAsync(LocalNameEnum.LIST_DOWNLOAD, items.value, rev);
@@ -51,7 +51,7 @@ export const useDownloadStore = defineStore('download', () => {
   }
 
   async function download(item: DownloadItem) {
-    NotificationUtil.success("开始下载");
+    NotificationUtil.success("开始下载", '下载管理器');
 
     const {name, artist, url, cover, lyric} = item;
     const u = new URL(url);
@@ -109,7 +109,7 @@ export const useDownloadStore = defineStore('download', () => {
         await window.preload.downloadFile(cover, `${basename}${coverExtname ? coverExtname[0] : '.png'}`, downloadFolder.value)
       }
     } catch (e) {
-      NotificationUtil.error("封面下载失败");
+      NotificationUtil.error("封面下载失败", '下载管理器');
     }
     try {
       if (isNotEmptyString(lyric) && lyric) {
@@ -118,14 +118,14 @@ export const useDownloadStore = defineStore('download', () => {
         await window.preload.downloadFile(lyric, `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`, downloadFolder.value)
       }
     } catch (e) {
-      NotificationUtil.error("歌词下载失败");
+      NotificationUtil.error("歌词下载失败", '下载管理器');
     }
   }
 
   function emit(item: MusicItemView) {
     emitWrap(item)
-      .then(() => NotificationUtil.success("下载成功"))
-      .catch(e => NotificationUtil.error("下载失败", e));
+      .then(() => NotificationUtil.success("下载成功", '下载管理器'))
+      .catch(e => NotificationUtil.error("下载失败", '下载管理器', e));
   }
 
   async function remove(id: number) {
@@ -252,7 +252,7 @@ export const useDownloadStore = defineStore('download', () => {
       .then(res => res ?
         console.log(`音乐【${music.name} - ${music.artist}】缓存成功`) :
         console.log(`音乐【${music.name} - ${music.artist}】已存在，无需缓存`))
-      .catch(e => NotificationUtil.error(`音乐【${music.name} - ${music.artist}】缓存失败`, e));
+      .catch(e => NotificationUtil.error(`音乐【${music.name} - ${music.artist}】缓存失败`, '下载管理器', e));
   }
 
   return {

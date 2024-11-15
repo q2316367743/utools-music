@@ -1,4 +1,5 @@
 import {listify} from "radash";
+import {isEmptyString} from "@/utils/lang/StringUtil";
 
 export function isNull(value?: any): boolean {
   return typeof value === "undefined" || value === null;
@@ -11,7 +12,7 @@ export function isNotNull(value?: any): boolean {
 export function copyProperties<S extends Record<string, any>, T extends Record<string, any>>(source: S, target: T) {
   const keys = Object.keys(target);
   listify(source, (k, v) => {
-    if (keys.includes(k) && isNotNull(v)) {
+    if (keys.includes(k) && isNotNull(v) && v) {
       // @ts-ignore
       target[k] = v;
     }
@@ -24,6 +25,9 @@ interface MusicInfo {
 }
 
 export function parseMusicName(basename: string): MusicInfo {
+  if (isEmptyString(basename)) {
+    return {artist: '', name: ''}
+  }
   let strings = basename.split("-");
   if (strings.length > 1) {
     return {
