@@ -2,21 +2,18 @@
   <div class="music-search">
     <t-loading text="正在加载中" :loading="playLoading">
       <div class="music-search__header">
-        <t-input :clearable="true" v-model="keyword" @enter="search" placeholder="请输入关键字，回车搜索"
-                 :disabled="loading || !active">
-          <template #suffix-icon>
-            <search-icon/>
-          </template>
-        </t-input>
-      </div>
-      <div class="music-search__tab">
-        <!-- 每一个插件 -->
-        <t-radio-group v-model="active">
-          <t-space>
-            <t-radio v-for="plugin in plugins" :key="plugin.id" :label="plugin.name" :value="plugin.id">
-            </t-radio>
-          </t-space>
-        </t-radio-group>
+        <t-input-group style="width: 100%">
+          <t-input :clearable="true" v-model="keyword" @enter="search" placeholder="请输入关键字，回车搜索"
+                   :disabled="loading || !active">
+            <template #suffix-icon>
+              <search-icon/>
+            </template>
+          </t-input>
+          <t-select style="width: 150px" v-model="active">
+            <t-option v-for="plugin in plugins" :key="plugin.id" :label="plugin.name" :value="plugin.id">
+            </t-option>
+          </t-select>
+        </t-input-group>
       </div>
       <t-base-table :data :columns :bordered="false" :height="maxHeight" row-key="id" :loading
                     :loading-props="{ text: '正在搜索中' }"
@@ -107,7 +104,13 @@ const columns: Array<BaseTableCol> = [{
 }]
 
 const plugins = ref<Array<PluginTab>>([]);
-const maxHeight = computed(() => size.height.value - 100);
+const maxHeight = computed(() => size.height.value - 108);
+
+watch(active, val => {
+  if (val && keyword.value) {
+    search();
+  }
+})
 
 async function initPlugin() {
   const {instanceMap} = usePluginStore();
@@ -250,6 +253,8 @@ watch(() => usePluginStore().plugins, () => initPlugin(), {
   &__tab {
     padding: 0 8px 8px;
     border-bottom: 1px solid var(--td-component-border);
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 }
 </style>

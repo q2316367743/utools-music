@@ -188,8 +188,9 @@ export type PluginInstanceSearch = <T extends SupportMediaType>(
 export type PluginInstanceInfo = (
   musicBase: IMusicItem
 ) => Promise<Partial<IMusicItem> | null>;
+
 /**
- * 差劲实体
+ * 插件实体
  */
 export interface PluginInstance {
   // 插件名称
