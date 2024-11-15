@@ -9,6 +9,7 @@ import {isEmptyString, isNotEmptyString} from "@/utils/lang/StringUtil";
 import {versionCompare} from "@/utils/lang/FieldUtil";
 import {getForText} from "@/plugin/http";
 import {globalSetting} from "@/store";
+import {stringToBase64} from "@/utils/file/CovertUtil";
 
 export const usePluginStore = defineStore('plugin-store', () => {
   const plugins = ref(new Array<PluginEntityView>());
@@ -110,7 +111,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
         };
       } else {
         if (ignoreVersion) {
-          return ;
+          return;
         }
         return Promise.reject(new Error("插件已安装，请勿重复安装"))
       }
@@ -147,10 +148,22 @@ export const usePluginStore = defineStore('plugin-store', () => {
     await installPlugin(text, '', ignoreVersion);
   }
 
+  async function downloadPlugin(id: number) {
+    const idx = plugins.value.findIndex(e => e.id === id);
+    if (idx === -1) {
+      return Promise.reject(new Error(`插件[${id}]不存在`))
+    }
+    const target = plugins.value[idx];
+    // 下载
+    await window.preload.downloadFile(
+      `data:text/plain;base64,${stringToBase64(target.content)}`,
+      `${target.name.replace(/\s+/, '_')}.js`);
+  }
+
 
   return {
     plugins, instanceMap,
-    init, getInstance, installPlugin, removePlugin, updatePlugin
+    init, getInstance, installPlugin, removePlugin, updatePlugin, downloadPlugin
   }
 
 

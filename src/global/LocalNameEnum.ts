@@ -11,7 +11,7 @@ export enum LocalNameEnum {
   LIST_REPOSITORY = '/list/repository',
 
   /**
-   * 音乐列表，后面跟着仓库ID
+   * 音乐列表，后面跟着仓库ID，但是由于LIST_MUSIC_GROUP的存在，所以在批量查询是，建议后面加个/
    * @see MusicItem
    */
   LIST_MUSIC = '/list/music',

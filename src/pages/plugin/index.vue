@@ -56,6 +56,20 @@ const columns: Array<BaseTableCol> = [{
       h(Button, {
         theme: 'primary',
         variant: 'text',
+        shape: 'circle',
+        disabled: isEmptyString(row.srcUrl) || operatorLoading.value,
+        onClick() {
+          operatorLoading.value = true
+          usePluginStore().downloadPlugin(row.id)
+            .then(() => MessageUtil.success("下载成功"))
+            .catch(e => MessageUtil.error("下载失败", e))
+            .finally(() => operatorLoading.value = false)
+        }
+      }, () => '下'),
+      h(Button, {
+        theme: 'primary',
+        variant: 'text',
+        shape: 'circle',
         disabled: isEmptyString(row.srcUrl) || operatorLoading.value,
         onClick() {
           operatorLoading.value = true
@@ -64,7 +78,7 @@ const columns: Array<BaseTableCol> = [{
             .catch(e => MessageUtil.error("更新失败", e))
             .finally(() => operatorLoading.value = false)
         }
-      }, () => '更新'),
+      }, () => '更'),
       h(Popconfirm, {
         content: '是否卸载插件',
         onConfirm: () => {
@@ -74,7 +88,12 @@ const columns: Array<BaseTableCol> = [{
             .catch(e => MessageUtil.error("卸载失败", e))
             .finally(() => operatorLoading.value = false)
         }
-      }, () => h(Button, {theme: 'danger', variant: 'text', disabled: operatorLoading.value}, () => '卸载'))
+      }, () => h(Button, {
+        theme: 'danger',
+        variant: 'text',
+        shape: 'circle',
+        disabled: operatorLoading.value
+      }, () => '卸'))
     ])
   }
 }];
