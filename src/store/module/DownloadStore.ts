@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {MusicItemView} from "@/entity/MusicItem";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
-import MessageUtil from "@/utils/modal/MessageUtil";
+import NotificationUtil from "@/utils/modal/NotificationUtil";
 import {DownloadItem} from "@/entity/DownloadItem";
 import {listByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
@@ -24,7 +24,7 @@ export const useDownloadStore = defineStore('download', () => {
 
   init()
     .then(() => console.log("下载列表初始化成功"))
-    .catch(err => MessageUtil.error('下载列表初始化失败', err));
+    .catch(err => NotificationUtil.error('下载列表初始化失败', err));
 
   async function updateList() {
     rev = await saveListByAsync(LocalNameEnum.LIST_DOWNLOAD, items.value, rev);
@@ -51,7 +51,7 @@ export const useDownloadStore = defineStore('download', () => {
   }
 
   async function download(item: DownloadItem) {
-    MessageUtil.success("开始下载");
+    NotificationUtil.success("开始下载");
 
     const {name, artist, url, cover, lyric} = item;
     const u = new URL(url);
@@ -109,7 +109,7 @@ export const useDownloadStore = defineStore('download', () => {
         await window.preload.downloadFile(cover, `${basename}${coverExtname ? coverExtname[0] : '.png'}`, downloadFolder.value)
       }
     } catch (e) {
-      MessageUtil.error("封面下载失败");
+      NotificationUtil.error("封面下载失败");
     }
     try {
       if (isNotEmptyString(lyric) && lyric) {
@@ -118,14 +118,14 @@ export const useDownloadStore = defineStore('download', () => {
         await window.preload.downloadFile(lyric, `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`, downloadFolder.value)
       }
     } catch (e) {
-      MessageUtil.error("歌词下载失败");
+      NotificationUtil.error("歌词下载失败");
     }
   }
 
   function emit(item: MusicItemView) {
     emitWrap(item)
-      .then(() => MessageUtil.success("下载成功"))
-      .catch(e => MessageUtil.error("下载失败", e));
+      .then(() => NotificationUtil.success("下载成功"))
+      .catch(e => NotificationUtil.error("下载失败", e));
   }
 
   async function remove(id: number) {
@@ -136,8 +136,127 @@ export const useDownloadStore = defineStore('download', () => {
     }
   }
 
+  async function cacheAttachment(music: MusicItemView, basename: string) {
+    const {cover, lyric} = music;
+    try {
+      if (isNotEmptyString(cover) && cover) {
+        const c = new URL(cover);
+        const coverExtname = c.pathname.match(/\.[a-zA-Z]*$/);
+        const coverFileName = `${basename}${coverExtname ? coverExtname[0] : '.png'}`;
+        const coverPath = window.preload.path.join(
+          downloadFolder.value,
+          coverFileName,
+        );
+        if (!window.preload.fs.existsSync(coverPath)) {
+          // 不存在，则下载
+          await window.preload.downloadFile(cover, coverFileName, downloadFolder.value)
+        }
+      }
+    } catch (e) {
+      console.error(`音乐【${music.name} - ${music.artist}】封面下载失败`);
+    }
+    try {
+      if (isNotEmptyString(lyric) && lyric) {
+        const l = new URL(lyric);
+        const lyricExtname = l.pathname.match(/\.[a-zA-Z]*$/);
+        const lyricFilename = `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`;
+        const lyricPath = window.preload.path.join(
+          downloadFolder.value,
+          lyricFilename
+        );
+        if (!window.preload.fs.existsSync(lyricPath)) {
+          await window.preload.downloadFile(lyric, lyricFilename, downloadFolder.value)
+        }
+      }
+    } catch (e) {
+      console.error(`音乐【${music.name} - ${music.artist}】歌词下载失败`);
+    }
+  }
+
+  async function cacheWrap(music: MusicItemView): Promise<boolean> {
+    const {name, artist, url, cover, lyric} = music;
+    const u = new URL(url);
+    const extname = u.pathname.match(/\.[a-zA-Z]*$/);
+    const basename = `${artist} - ${name}`;
+    const fileName = `${basename}${extname ? extname[0] : '.mp3'}`;
+    // 音乐路径
+    const musicPath = window.preload.path.join(
+      downloadFolder.value,
+      fileName,
+    );
+    const exist = window.preload.fs.existsSync(musicPath);
+
+    // 异步缓存附件
+    cacheAttachment(music, basename)
+      .then(() => console.log(`音乐【${basename}】附件缓存完成`))
+      .catch(e => console.error(`音乐【${basename}】附件缓存失败`, e))
+
+    if (!exist) {
+      const downloadItem: DownloadItem = {
+        id: Date.now(),
+        name,
+        artist,
+        music: '',
+        status: 1,
+        msg: '',
+        url,
+        cover,
+        lyric
+      }
+      items.value.push(downloadItem);
+      await updateList();
+      try {
+        // 开始下载
+        await window.preload.downloadFile(url, fileName, downloadFolder.value);
+        for (let i = 0; i < items.value.length; i++) {
+          const r = items.value[i];
+          if (r.id === downloadItem.id) {
+            items.value[i] = {
+              ...items.value[i],
+              status: 2,
+              music: musicPath
+            }
+            break;
+          }
+        }
+        await updateList();
+      } catch (e) {
+        for (let i = 0; i < items.value.length; i++) {
+          const r = items.value[i];
+          if (r.id === downloadItem.id) {
+            items.value[i] = {
+              ...items.value[i],
+              status: 3,
+              msg: `${(e as any).message || e}`
+            }
+            break;
+          }
+        }
+        await updateList();
+        return Promise.reject(e);
+      }
+      return true;
+    } else {
+      return false;
+    }
+
+
+  }
+
+  /**
+   * 边听边存
+   * @param music 当前播放的音乐
+   */
+  function cache(music: MusicItemView) {
+    cacheWrap(music)
+      .then(res => res ?
+        console.log(`音乐【${music.name} - ${music.artist}】缓存成功`) :
+        console.log(`音乐【${music.name} - ${music.artist}】已存在，无需缓存`))
+      .catch(e => NotificationUtil.error(`音乐【${music.name} - ${music.artist}】缓存失败`, e));
+  }
+
   return {
     items,
-    emit, remove, download
+    emit, remove, download, cache
   }
 })

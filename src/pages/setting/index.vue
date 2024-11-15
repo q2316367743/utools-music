@@ -15,10 +15,13 @@
       </t-tab-panel>
       <t-tab-panel label="播放" value="play" style="padding: 8px;overflow: auto">
         <t-form-item label="播放失败时">
-          <t-radio-group v-model="globalSetting.playError">
+          <t-radio-group v-model="globalSetting.playError" :default-value="GlobalSettingPlayErrorType.NEXT">
             <t-radio label="下一曲" :value="GlobalSettingPlayErrorType.NEXT"></t-radio>
             <t-radio label="暂停" :value="GlobalSettingPlayErrorType.PAUSE"></t-radio>
           </t-radio-group>
+        </t-form-item>
+        <t-form-item label="边听边存" help="开启后，当播放网络音乐时，会自动将音乐下载">
+          <t-switch v-model="globalSetting.playDownload"></t-switch>
         </t-form-item>
       </t-tab-panel>
       <t-tab-panel label="歌词" value="lyric" style="padding: 8px;overflow: auto">

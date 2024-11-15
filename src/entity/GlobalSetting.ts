@@ -5,7 +5,10 @@ export enum GlobalSettingPlayErrorType {
 
 export interface GlobalSetting {
 
-  playError: GlobalSettingPlayErrorType
+  // 播放异常
+  playError: GlobalSettingPlayErrorType;
+  // 边听边存
+  playDownload: boolean;
 
   // 歌词字体大小
   lyricFontSize: number;
@@ -35,6 +38,7 @@ export interface GlobalSetting {
 export function buildGlobalSetting(): GlobalSetting {
   return {
     playError: GlobalSettingPlayErrorType.NEXT,
+    playDownload: false,
     lyricFontSize: 36,
     lyricColor: '#0052D9',
     lyricBorderColor: 'rgba(110, 110, 110, 0.8)',

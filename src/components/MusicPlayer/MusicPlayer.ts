@@ -1,5 +1,5 @@
 import {MusicPlayEvent} from "@/global/Event";
-import {MusicItemView} from "@/entity/MusicItem";
+import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {getEffectiveNumber, isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
@@ -10,7 +10,7 @@ import {musicLyric} from "@/global/BeanFactory";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import {base64ToString} from "@/utils/file/CovertUtil";
 import {getForText, headForExist} from "@/plugin/http";
-import {globalSetting} from "@/store";
+import {globalSetting, useDownloadStore} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 
 export const musics = ref(new Array<MusicItemView>());
@@ -246,14 +246,21 @@ export async function play() {
     }
   }
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
-  // TODO: 此处如果是本地需要判断URL是否存在
   let exist: boolean;
   if (/^https?:\/\//.test(music.value.url)) {
     // 网络音乐
     exist = await headForExist(music.value.url);
-    // TODO: 如果是网络音乐，是否支持缓存
+    if (music.value.source === MusicItemSource.WEB) {
+      // 如果支持缓存
+      const {playDownload} = toRaw(globalSetting.value);
+      if (playDownload) {
+        // 下载
+        useDownloadStore().cache(music.value);
+      }
+    }
+    // TODO: 如果是webdav，还要进行缓存
   }else {
-    // 本地音乐
+    // 本地音乐，判断URL是否存在
     exist = window.preload.fs.existsSync(music.value.url);
   }
   if (!exist) {
