@@ -1,19 +1,25 @@
-# vite的utools模板
+# uTools插件 - 音乐播放器
 
-## 使用说明
+一个本地音乐优先的uTools插件，插件中的音乐源参考自[MusicFree](https://musicfree.catcat.work)。
 
-src-utools目录为utools项目目录，新建utools项目后，设置`plugin.json`为`src-utools`的`plugin.json`。
+## 特性
 
-图标请放在`src-utools/public`中，如果打包`web`版，请按照vite方式处理。
+- 本地优先
+- 支持封面、歌词
+- 支持拓展音乐源，插件内下载音乐
+- 轻量、易用
 
-在`src-utools/preload.js`中写入代码后，挂载到`window.preload`上，修改`src/vite-env.d.ts`文件，将定义写在`preload`中。
+## 预览图
 
-请修改`src/global/Constant`中的项目信息
-
-## 打包
-
-先在主目录下执行`pnpm build`进行打包，打包后的资源在`src-utools/dist`中，打包`src-utools`目录即可。
-
-## 注意
-
-vite项目中，所有的静态资源引用都要使用相对路径，不能使用绝对路径
+- 本地音乐
+  ![1.png](./images/1.png)
+- 播放器
+  ![播放器](./images/2.png)
+- 歌单
+  ![歌单](./images/3.png)
+- 歌单详情
+  ![歌单详情](./images/4.png)
+- 插件
+  ![插件](./images/5.png)
+- 音乐搜索
+  ![音乐搜索](./images/6.png)
