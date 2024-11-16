@@ -1,5 +1,5 @@
 <template>
-  <div class="side-menu-item" :class="{active: active === value}" @click="onClick">
+  <div class="side-menu-item" :class="{active: active.startsWith(value || '')}" @click="onClick">
     <slot/>
   </div>
 </template>

@@ -13,7 +13,7 @@
           <t-col :span="2">
             <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
               <template #icon>
-                <DeleteIcon />
+                <DeleteIcon/>
               </template>
             </t-button>
           </t-col>
@@ -33,8 +33,9 @@
           <t-link theme="primary" :disabled="true">立即搜素</t-link>
         </div>
         <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
-             :class="{active: lyricIndex === i}">
-          {{ lyric.text }}
+             :class="{active: lyricIndex === i}" @click="handleLyricClick(lyric)">
+          <span>{{ lyric.text }}</span>
+          <play-icon class="play" size="1.5rem"/>
         </div>
       </div>
       <!-- TODO: 存在多选时显示，那么是否可以额外搜索歌词并下载？ -->
@@ -42,7 +43,7 @@
         <t-dropdown :options trigger="click" placement="top-right" @click="clickHandler">
           <t-button theme="primary" variant="text" shape="circle">
             <template #icon>
-              <adjustment-icon />
+              <adjustment-icon/>
             </template>
           </t-button>
         </t-dropdown>
@@ -52,15 +53,17 @@
 </template>
 <script lang="ts" setup>
 import {
+  audio,
   displayVisible, lyricGroups, lyricIndex,
   lyrics,
   music,
-  musics,
-  removeIndex,
+  musics, played,
+  removeIndex, switchCurrentTime,
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
 import {DropdownOption} from "tdesign-vue-next";
-import {DeleteIcon, AdjustmentIcon} from 'tdesign-icons-vue-next';
+import {DeleteIcon, AdjustmentIcon, PlayIcon} from 'tdesign-icons-vue-next';
+import {LyricLine} from "@/types/LyricLine";
 
 
 const name = computed(() => music.value?.name || '无歌曲');
@@ -78,6 +81,14 @@ const clickHandler = (data: DropdownOption) => {
     lyrics.value = lyricGroups.value[idx].lines;
   }
 };
+
+
+function handleLyricClick(value: LyricLine) {
+  switchCurrentTime(value.start + 1);
+  if (!played.value) {
+    audio.play();
+  }
+}
 </script>
 <style scoped lang="less">
 .music-display {
@@ -169,7 +180,28 @@ const clickHandler = (data: DropdownOption) => {
       transition: font-size 0.5s;
 
       .lyric-line {
-        padding: 4px 0;
+        padding: 8px 0;
+        font-size: 1.5rem;
+        cursor: pointer;
+        position: relative;
+
+        .play {
+          display: none;
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          padding: 10px;
+          color: var(--td-text-color-link);
+        }
+
+        &:hover {
+          background-color: var(--td-bg-color-component-hover);
+
+          .play {
+            display: block;
+          }
+        }
 
         &.active {
           color: var(--td-text-color-link);
