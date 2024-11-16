@@ -10,7 +10,12 @@ const router = useRouter();
 const active = computed(() => route.path);
 const props = defineProps({
   value: String,
+  sub: Boolean
 });
+
+const paddingLeft = computed(() => {
+  return props.sub ? '32px' : '16px';
+})
 
 function onClick() {
   router.push(props.value!);
@@ -18,9 +23,9 @@ function onClick() {
 </script>
 <style scoped lang="less">
 .side-menu-item {
-  padding: 16px;
   cursor: pointer;
   border-left: 6px solid transparent;
+  padding: 16px 16px 16px v-bind(paddingLeft);
 
   &.active {
     color: var(--td-brand-color);

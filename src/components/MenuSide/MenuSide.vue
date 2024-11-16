@@ -1,21 +1,34 @@
 <template>
   <div class="menu-side">
-    <div class="side-menu">
-      <menu-side-item value="/local">本地音乐</menu-side-item>
-      <menu-side-item value="/music-group">我的歌单</menu-side-item>
-      <t-divider style="margin: 16px 0"/>
-      <menu-side-item value="/plugin">插件管理</menu-side-item>
-      <menu-side-item value="/search">音乐搜索</menu-side-item>
-      <menu-side-item value="/download">下载管理</menu-side-item>
-      <t-divider style="margin: 16px 0" />
-      <menu-side-item value="/setting">设置</menu-side-item>
-    </div>
-    <t-divider style="margin: 16px 0"/>
+    <t-menu width="200px" :value="active" @change="handleChange">
+      <t-menu-item value="/local">
+        本地音乐
+      </t-menu-item>
+      <t-menu-item value="/music-group">
+        我的歌单
+      </t-menu-item>
+      <t-submenu value="/extra" title="拓展工具">
+        <t-menu-item value="/extra/plugin">插件管理</t-menu-item>
+        <t-menu-item value="/extra/search">音乐搜索</t-menu-item>
+        <t-menu-item value="/extra/download">下载管理</t-menu-item>
+      </t-submenu>
+      <t-menu-item value="/setting">
+        设置
+      </t-menu-item>
+    </t-menu>
   </div>
 </template>
 <script lang="ts" setup>
-import MenuSideItem from "@/components/MenuSide/MenuSideItem.vue";
+import {MenuValue} from "tdesign-vue-next";
 
+const route = useRoute();
+const router = useRouter();
+
+const active = computed(() => route.path);
+
+function handleChange(e: MenuValue) {
+  router.push(e + '');
+}
 
 </script>
 <style scoped lang="less">
@@ -25,5 +38,6 @@ import MenuSideItem from "@/components/MenuSide/MenuSideItem.vue";
   height: 100%;
   border-right: 1px solid var(--td-component-border);
   overflow: auto;
+  z-index: 1;
 }
 </style>
