@@ -1,5 +1,5 @@
 import {MusicPlayEvent} from "@/global/Event";
-import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {MusicItemSource, MusicItem} from "@/entity/MusicItem";
 import {getEffectiveNumber, isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
@@ -13,9 +13,9 @@ import {getForText, headForExist} from "@/plugin/http";
 import {globalSetting, useDownloadStore} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 
-export const musics = ref(new Array<MusicItemView>());
+export const musics = ref(new Array<MusicItem>());
 export const index = ref(0);
-export const music = ref<MusicItemView | null>(null);
+export const music = ref<MusicItem | null>(null);
 // 1: 单，2：顺，3：随
 export const loop = ref(2);
 
@@ -141,7 +141,7 @@ function renderLyricFromMeta(meta: IAudioMetadata): Array<Array<LyricLine>> {
   return res;
 }
 
-function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItemView) {
+function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItem) {
   if (isNotEmptyString(m.cover)) {
     return;
   }
@@ -154,7 +154,7 @@ function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItemView) {
   }
 }
 
-async function renderMusicMeta(m: MusicItemView) {
+async function renderMusicMeta(m: MusicItem) {
   // 解析音乐，解析歌词
   let lyricContents = new Array<LyricContent>();
   let index = 0;
@@ -225,7 +225,7 @@ async function renderMusicMeta(m: MusicItemView) {
   }
 }
 
-function onError(m: MusicItemView) {
+function onError(m: MusicItem) {
   const {playError} = toRaw(globalSetting.value);
   if (playError === GlobalSettingPlayErrorType.NEXT) {
     if (musics.value.length > 1) {
@@ -259,7 +259,7 @@ export async function play() {
       }
     }
     // TODO: 如果是webdav，还要进行缓存
-  }else {
+  } else {
     // 本地音乐，判断URL是否存在
     exist = window.preload.fs.existsSync(music.value.url);
   }
@@ -316,7 +316,7 @@ export function switchIndex(idx: number) {
   play();
 }
 
-export function removeIndex(idx: number, m: MusicItemView) {
+export function removeIndex(idx: number, m: MusicItem) {
   musics.value.splice(idx, 1);
   if (music.value?.id === m.id) {
     console.log(index.value, musics.value.length)
@@ -346,7 +346,7 @@ export function onMusicPlay(e: MusicPlayEvent) {
   rePlay();
 }
 
-export function onMusicAppend(e: MusicItemView) {
+export function onMusicAppend(e: MusicItem) {
   if (musics.value.length === 0) {
     // 没有，直接覆盖
     musics.value = [e];

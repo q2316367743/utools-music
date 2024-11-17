@@ -1,10 +1,10 @@
-import {MusicItemView} from "@/entity/MusicItem";
+import {MusicItem} from "@/entity/MusicItem";
 
 export interface MusicPlayEvent {
-  views: Array<MusicItemView>;
+  views: Array<MusicItem>;
   index: number;
 }
 
 export const useMusicPlay = useEventBus<MusicPlayEvent>('music-play');
-export const useMusicAppend = useEventBus<MusicItemView>('music-append');
+export const useMusicAppend = useEventBus<MusicItem>('music-append');
 export const useAddMusicGroup = useEventBus('add-music-group');

@@ -22,10 +22,11 @@ import {ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useDark} from "@vueuse/core";
 import {detach} from "@/store/AppStore";
+import {usePluginStore} from "@/store";
+import {useMainPush} from "@/hooks/MainPush";
 import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
 import MusicAddGroup from "@/components/MusicPlayer/MusicAddGroup.vue";
-import {usePluginStore} from "@/store";
 
 const route = useRoute();
 const router = useRouter();
@@ -52,6 +53,10 @@ utools.onPluginEnter(action => {
   // 后期加入播放指定
   detach.value = utools.getWindowType() !== 'main';
 });
+
+
+const {onMainPush, onSelectCallback} = useMainPush();
+utools.onMainPush<any>(onMainPush, onSelectCallback);
 
 // 插件初始刷
 usePluginStore().init();

@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {MusicItemView} from "@/entity/MusicItem";
+import {MusicItem} from "@/entity/MusicItem";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import NotificationUtil from "@/utils/modal/NotificationUtil";
 import {DownloadItem} from "@/entity/DownloadItem";
@@ -30,7 +30,7 @@ export const useDownloadStore = defineStore('download', () => {
     rev = await saveListByAsync(LocalNameEnum.LIST_DOWNLOAD, items.value, rev);
   }
 
-  async function emitWrap(item: MusicItemView) {
+  async function emitWrap(item: MusicItem) {
     const {url, cover, lyric, name, artist} = item;
     const downloadItem: DownloadItem = {
       id: Date.now(),
@@ -122,7 +122,7 @@ export const useDownloadStore = defineStore('download', () => {
     }
   }
 
-  function emit(item: MusicItemView) {
+  function emit(item: MusicItem) {
     emitWrap(item)
       .then(() => NotificationUtil.success("下载成功", '下载管理器'))
       .catch(e => NotificationUtil.error("下载失败", '下载管理器', e));
@@ -136,7 +136,7 @@ export const useDownloadStore = defineStore('download', () => {
     }
   }
 
-  async function cacheAttachment(music: MusicItemView, basename: string) {
+  async function cacheAttachment(music: MusicItem, basename: string) {
     const {cover, lyric} = music;
     try {
       if (isNotEmptyString(cover) && cover) {
@@ -173,7 +173,7 @@ export const useDownloadStore = defineStore('download', () => {
     }
   }
 
-  async function cacheWrap(music: MusicItemView): Promise<boolean> {
+  async function cacheWrap(music: MusicItem): Promise<boolean> {
     const {name, artist, url, cover, lyric} = music;
     const u = new URL(url);
     const extname = u.pathname.match(/\.[a-zA-Z]*$/);
@@ -247,7 +247,7 @@ export const useDownloadStore = defineStore('download', () => {
    * 边听边存
    * @param music 当前播放的音乐
    */
-  function cache(music: MusicItemView) {
+  function cache(music: MusicItem) {
     cacheWrap(music)
       .then(res => res ?
         console.log(`音乐【${music.name} - ${music.artist}】缓存成功`) :

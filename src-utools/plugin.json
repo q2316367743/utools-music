@@ -29,6 +29,18 @@
         "音乐播放器",
         "music"
       ]
+    },
+    {
+      "code": "music-group",
+      "explain": "歌单搜索",
+      "icon": "public/logo.png",
+      "platform": ["win32", "darwin", "linux"],
+      "mainPush": true,
+      "cmds": [{
+        "type": "over",
+        "minLength": 1,
+        "maxLength": 9999
+      }]
     }
   ]
 }
