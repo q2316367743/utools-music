@@ -5,7 +5,7 @@ import {isNotEmptyString} from "@/utils/lang/StringUtil";
 
 export function getAxiosInstance() {
   const config: AxiosRequestConfig = {
-    timeout: 15000
+    timeout: 15000,
   }
   const setting = toRaw(globalSetting.value);
   if (setting.proxyEnabled) {

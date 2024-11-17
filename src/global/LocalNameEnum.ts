@@ -29,6 +29,12 @@ export enum LocalNameEnum {
   ITEM_MUSIC_GROUP = '/item/music-group',
 
   /**
+   * 插件订阅
+   * @see PluginSubscribe
+   */
+  LIST_PLUGIN_SUBSCRIBE = '/list/plugin-subscribe',
+
+  /**
    * 插件项
    * @see PluginEntity
    */

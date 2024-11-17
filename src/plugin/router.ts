@@ -23,15 +23,15 @@ const router = createRouter({
   }, {
     name: "拓展工具-下载管理",
     path: '/extra/download',
-    component: () => import('@/pages/download/index.vue')
+    component: () => import('@/pages/extra/subpage/download/index.vue')
   }, {
     name: "拓展工具-插件管理",
     path: '/extra/plugin',
-    component: () => import('@/pages/plugin/index.vue')
+    component: () => import('@/pages/extra/subpage/plugin/index.vue')
   }, {
     name: "拓展工具-音乐搜索",
     path: '/extra/search',
-    component: () => import('@/pages/search/index.vue')
+    component: () => import('@/pages/extra/subpage/search/index.vue')
   }, {
     name: "设置",
     path: '/setting',

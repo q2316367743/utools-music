@@ -11,14 +11,16 @@
         <t-tooltip content="支持MusicFree协议的插件，目前只实现了歌曲搜索和歌曲详情" theme="primary" placement="bottom">
           <t-button theme="primary" size="small" variant="text">
             <template #icon>
-              <questionnaire-icon />
+              <questionnaire-icon/>
             </template>
           </t-button>
         </t-tooltip>
       </t-space>
       <t-space>
-        <t-button theme="primary" size="small" :disabled="true">订阅管理</t-button>
-        <t-button theme="primary" size="small" :disabled="true">更新订阅</t-button>
+        <t-button theme="primary" size="small" @click="openPluginSubscribeDialog">订阅管理</t-button>
+        <t-button theme="primary" size="small" @click="updatePluginSubscribe"
+                  :loading="updatePluginSubscribeLoading">更新订阅
+        </t-button>
       </t-space>
     </div>
     <div class="container">
@@ -30,11 +32,16 @@
 <script lang="ts" setup>
 import {usePluginStore} from "@/store";
 import {BaseTableCol, Button, Popconfirm} from "tdesign-vue-next";
-import {installFromLocal, installFromUrl} from "@/pages/plugin/func";
+import {installFromLocal, installFromUrl} from "@/pages/extra/subpage/plugin/func";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import {isEmptyString} from "@/utils/lang/StringUtil";
 import {QuestionnaireIcon} from 'tdesign-icons-vue-next';
+import {
+  openPluginSubscribeDialog,
+  updatePluginSubscribe,
+  updatePluginSubscribeLoading
+} from "@/pages/extra/subpage/plugin/subscribe";
 
 const size = useWindowSize();
 
