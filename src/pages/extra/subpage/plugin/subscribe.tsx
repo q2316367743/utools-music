@@ -89,6 +89,7 @@ export function openPluginSubscribeDialog() {
 export const updatePluginSubscribeLoading = ref(false);
 
 // TODO: 此处有问题，https总是重定向
+// 参考：https://github.com/xxnuo/MusicFreePluginsHub/blob/main/README.md
 async function updatePluginSubscribeWrap() {
   const {init} = usePluginSubscribeStore();
   await init();
