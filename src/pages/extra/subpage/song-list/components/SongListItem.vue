@@ -38,6 +38,7 @@
     <div class="ranking-item__container">
       <div class="ri-item" v-for="item in items" :key="item.id" @click="handleItemClick(item)">
         <div class="ri-item__cover">
+          <!-- TODO: 封面可能不存在 -->
           <img :src="item.artwork" :alt="item.title"/>
         </div>
         <div class="ri-item__title ellipsis-2">

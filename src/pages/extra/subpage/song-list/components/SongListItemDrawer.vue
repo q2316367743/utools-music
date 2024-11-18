@@ -3,9 +3,10 @@
             size="100%" class="slid">
     <div class="song-list-item-drawer" v-if="item">
       <header class="song-list-item-drawer__header">
-        <t-row :gutter="16">
-          <t-col flex="200px">
+        <t-row>
+          <t-col flex="180px">
             <div class="artwork">
+              <!-- TODO: 封面可能不存在 -->
               <t-image :src="item.artwork"/>
             </div>
           </t-col>
@@ -24,9 +25,12 @@
           </t-col>
         </t-row>
         <div class="operator">
-          <t-space>
-            <t-button>下载全部</t-button>
-          </t-space>
+          <t-button>下载全部</t-button>
+          <t-input :clearable="true" style="width: 200px" placeholder="请输入关键字" v-model="keyword">
+            <template #suffix-icon>
+              <search-icon/>
+            </template>
+          </t-input>
         </div>
       </header>
       <main>
@@ -47,6 +51,8 @@ import {buildFromIMusicItem} from "@/entity/MusicItem";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {useMusicPlay} from "@/global/Event";
 import {getMusicItemFromPlugin} from "@/plugin/music";
+import {SearchIcon} from "tdesign-icons-vue-next";
+import {useFuse} from "@vueuse/integrations/useFuse";
 
 const visible = defineModel({
   type: Boolean
@@ -63,8 +69,18 @@ const props = defineProps({
 const page = ref(1);
 const isBottom = ref(false);
 const sheet = ref<IMusicSheetItem>();
-const data = ref(new Array<IMusicItem>());
+const items = ref(new Array<IMusicItem>());
 const loading = ref(false);
+const keyword = ref('');
+
+const {results} = useFuse(keyword, items, {
+  matchAllWhenSearchEmpty: true,
+  fuseOptions: {
+    keys: ['title', 'artist', 'album'],
+  }
+});
+
+const data = computed(() => results.value.map(e => e.item));
 
 const columns: Array<BaseTableCol> = [{
   colKey: 'title',
@@ -89,7 +105,7 @@ const columns: Array<BaseTableCol> = [{
 
 watch(visible, val => {
   sheet.value = undefined;
-  data.value = [];
+  items.value = [];
   isBottom.value = true;
   const {pluginId, item} = props;
   if (val && item) {
@@ -102,7 +118,7 @@ watch(visible, val => {
           .then(res => {
             const {isEnd, musicList, sheetItem} = res;
             sheet.value = Object.assign(item, sheetItem);
-            data.value = musicList;
+            items.value = musicList;
             isBottom.value = isEnd || true;
           })
           .catch(e => MessageUtil.error("获取歌单数据失败", e))
@@ -167,8 +183,11 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
 
     .operator {
       position: absolute;
+      left: 178px;
       right: 0;
       bottom: 0;
+      display: flex;
+      justify-content: space-between;
     }
   }
 }

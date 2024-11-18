@@ -1,5 +1,5 @@
 import {MusicPlayEvent} from "@/global/Event";
-import {MusicItemSource, MusicItem} from "@/entity/MusicItem";
+import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
 import {getEffectiveNumber, isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
@@ -168,35 +168,32 @@ async function renderMusicMeta(m: MusicItem) {
     lyrics.value = lyricContents[0].lines;
   }
 
-  // 尝试获取元数据
-  let tagsResult: IAudioMetadata;
-  if (m.url.startsWith('http')) {
-    // 如果是网络数据，则不处理音乐元数据
-    return;
-    // const rsp = await fetch(new URL(m.url), {
-    //   method: 'GET'
-    // });
-    // const mc = await rsp.blob();
-    // tagsResult = await parseBlob(mc);
-  } else {
-    // 本地
-    const ub = await readFile(m.url);
-    tagsResult = await parseBuffer(ub);
-
-  }
-  // 渲染封面
-  renderCoverFromMeta(tagsResult, m);
-  // 渲染歌词
-  const res = renderLyricFromMeta(tagsResult)
-  if (res.length > 0) {
-    res.forEach(t => {
-      lyricContents.push({
-        id: index++,
-        lines: t
+  // 只有本地才需要处理元数据
+  if (m.source === MusicItemSource.LOCAL) {
+    // 尝试获取元数据
+    let tagsResult: IAudioMetadata;
+    if (m.url.startsWith('http')) {
+      // 如果是网络数据，则不处理音乐元数据
+      return;
+    } else {
+      // 本地
+      const ub = await readFile(m.url);
+      tagsResult = await parseBuffer(ub);
+    }
+    // 渲染封面
+    renderCoverFromMeta(tagsResult, m);
+    // 渲染歌词
+    const res = renderLyricFromMeta(tagsResult)
+    if (res.length > 0) {
+      res.forEach(t => {
+        lyricContents.push({
+          id: index++,
+          lines: t
+        })
       })
-    })
-  }
+    }
 
+  }
 
   // 处理歌词
   if (lyricContents.length > 0) {

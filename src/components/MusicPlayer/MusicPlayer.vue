@@ -62,13 +62,13 @@
     <div class="progress">
       <t-slider :max="duration" :min="0" :value="currentTime" :label="onLabel" @change-end="onChange"/>
     </div>
-    <div class="controls">
+    <t-space class="controls">
       <t-button shape="circle" theme="primary" variant="text" size="large" :disabled @click="pre">
         <template #icon>
           <previous-icon></previous-icon>
         </template>
       </t-button>
-      <t-button shape="circle" theme="primary" variant="text" size="large" :disabled @click="audioControl">
+      <t-button shape="circle" theme="primary" size="large" :disabled @click="audioControl">
         <template #icon>
           <pause-icon v-if="played"/>
           <play-icon v-else/>
@@ -79,7 +79,7 @@
           <next-icon/>
         </template>
       </t-button>
-    </div>
+    </t-space>
     <t-drawer v-model:visible="listVisible" :header="`播放列表(${musics.length}首)`" attach=".main-container"
               :footer="false" size="400px">
       <div class="music-player-list">
