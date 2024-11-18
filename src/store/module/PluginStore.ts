@@ -87,7 +87,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
     }
     // 校验必填项是否存在
     if (isEmptyString(plugin.name)) return Promise.reject(new Error("插件名称不存在"))
-    if (isEmptyString(plugin.author)) return Promise.reject(new Error("插件作者不存在"))
+    if (isEmptyString(plugin.author)) plugin.author = '未知作者';
     if (isEmptyString(plugin.version)) return Promise.reject(new Error("插件版本不存在"))
     // 查询插件名称和作者是否存在
     const oldIndex = plugins.value.findIndex(e =>
