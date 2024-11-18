@@ -80,6 +80,9 @@ interface Window {
     ipcRenderer: {
       sendLyric(ids: Array<number>, content: any): void
     },
+    lib: {
+      axios: any
+    }
   }
 }
 

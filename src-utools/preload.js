@@ -1,11 +1,14 @@
-const {readFile, readdir, statSync, writeFile
-    , existsSync, createWriteStream} = require('node:fs');
+const {
+    readFile, readdir, statSync, writeFile
+    , existsSync, createWriteStream
+} = require('node:fs');
 const {join, basename, extname} = require('node:path');
 const {URL} = require("node:url");
 const https = require("node:https");
 const http = require("node:http");
 const {atob} = require('node:buffer')
 const {ipcRenderer} = require("electron");
+const axios = require('axios');
 
 /**
  * 获取一个文件
@@ -158,4 +161,7 @@ window.preload = {
     ipcRenderer: {
         sendLyric
     },
+    lib: {
+        axios
+    }
 }

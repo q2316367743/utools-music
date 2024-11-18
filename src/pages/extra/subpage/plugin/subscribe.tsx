@@ -105,7 +105,13 @@ async function updatePluginSubscribeWrap() {
       // 链接为空跳过
       continue;
     }
-    const text = await getForJSON(url);
+    let text: string = '';
+    try {
+      text = await getForJSON(url);
+    } catch (e) {
+      MessageUtil.warning(`插件订阅【${name}】网络错误`, e);
+      continue;
+    }
     if (isNull(text) || !isObject(text)) {
       MessageUtil.warning(`插件订阅【${name}】格式错误`)
       continue;
@@ -116,11 +122,17 @@ async function updatePluginSubscribeWrap() {
       continue;
     }
     for (const plugin of plugins) {
-      const {url} = plugin;
+      const {url, name} = plugin;
       if (isEmptyString(url)) {
         continue;
       }
-      const content = await getForText(url);
+      let content = ''
+      try {
+        content = await getForText(url);
+      } catch (e) {
+        MessageUtil.warning(`插件【${name}】网络错误`, e);
+        continue;
+      }
       try {
         await usePluginStore().installPlugin(content, url);
       } catch (e) {

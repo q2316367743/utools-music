@@ -148,14 +148,14 @@ interface ITopListInfoResult {
   musicList?: IMusicItem[];
 }
 
-interface ITag {
+export interface ITag {
   // tag 的唯一标识
   id: string;
   // tag 标题
   title: string;
 }
 
-interface ITagGroup {
+export interface ITagGroup {
   // 分组标题
   title: string;
   // tag 列表

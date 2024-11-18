@@ -15,17 +15,25 @@ export const usePluginStore = defineStore('plugin-store', () => {
   const plugins = ref(new Array<PluginEntityView>());
   const instanceMap = new Map<number, PluginInstance>();
 
-  const pluginInstances = computed<Array<PluginInstanceView>>(() => plugins.value.map(p => {
-    let instance = instanceMap.get(p.id);
-    if (!instance) {
-      instance = getPluginInstance(p.content)
-      instanceMap.set(p.id, instance);
+  const pluginInstances = computed<Array<PluginInstanceView>>(() => {
+    const list = new Array<PluginInstanceView>();
+    for (let p of plugins.value) {
+      try {
+        let instance = instanceMap.get(p.id);
+        if (!instance) {
+          instance = getPluginInstance(p.content)
+          instanceMap.set(p.id, instance);
+        }
+        list.push({
+          ...p,
+          instance
+        });
+      } catch (e) {
+        console.error(`初始化插件【${p.name}】失败`, e)
+      }
     }
-    return {
-      ...p,
-      instance
-    }
-  }))
+    return list;
+  });
 
   async function initWrap() {
     const records = await listRecordByAsync<PluginEntity>(LocalNameEnum.ITEM_PLUGIN);
@@ -35,9 +43,6 @@ export const usePluginStore = defineStore('plugin-store', () => {
         _rev: record.rev,
         _id: record.id,
       });
-      // 创建实例
-      const {id, content} = record.record;
-      instanceMap.set(id, getPluginInstance(content));
     });
   }
 

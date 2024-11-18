@@ -1,11 +1,16 @@
-import axios, {AxiosRequestConfig, AxiosProxyConfig} from "axios";
+import {AxiosRequestConfig, AxiosProxyConfig, AxiosInstance} from "axios";
 import {globalSetting} from "@/store";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 
 
-export function getAxiosInstance() {
+export function getAxiosInstance(): AxiosInstance {
   const config: AxiosRequestConfig = {
     timeout: 15000,
+    adapter: 'http',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0',
+    }
   }
   const setting = toRaw(globalSetting.value);
   if (setting.proxyEnabled) {
@@ -23,7 +28,15 @@ export function getAxiosInstance() {
   }
 
   // 此处处理代理问题
-  return axios.create(config);
+  const i = window.preload.lib.axios.create(config);
+  // @ts-ignore
+  i.default = i;
+
+  (i as AxiosInstance).interceptors.request.use(c => {
+    console.log("请求：", c.url)
+    return c;
+  });
+  return i
 }
 
 export async function getForText(url: string): Promise<string> {
