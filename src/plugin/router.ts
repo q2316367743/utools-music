@@ -27,7 +27,11 @@ const router = createRouter({
   }, {
     name: "拓展工具-排行榜",
     path: '/extra/ranking',
-    component: () => import('@/pages/extra/subpage/ranking/index.vue')
+    component: () => import('@/pages/extra/subpage/song-list/index.vue')
+  }, {
+    name: "拓展工具-热门歌单",
+    path: '/extra/song-list',
+    component: () => import('@/pages/extra/subpage/song-list/index.vue')
   }, {
     name: "拓展工具-音乐搜索",
     path: '/extra/search',

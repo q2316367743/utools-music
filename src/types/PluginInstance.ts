@@ -73,7 +73,7 @@ interface IAlbumItem extends IMediaBase {
   artist?: string;
 }
 
-interface IMusicSheetItem extends IMediaBase {
+export interface IMusicSheetItem extends IMediaBase {
   // 媒体来源
   platform: string;
   // 媒体ID

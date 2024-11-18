@@ -9,7 +9,7 @@
       </t-menu-item>
       <t-submenu value="/extra" title="拓展工具">
         <t-menu-item value="/extra/plugin">插件管理</t-menu-item>
-        <t-menu-item value="/extra/ranking">排行榜</t-menu-item>
+        <t-menu-item value="/extra/song-list">热门歌单</t-menu-item>
         <t-menu-item value="/extra/search">音乐搜索</t-menu-item>
         <t-menu-item value="/extra/download">下载管理</t-menu-item>
       </t-submenu>

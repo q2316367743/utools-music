@@ -35,15 +35,11 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {buildFromIMusicItem} from "@/entity/MusicItem";
 import {PluginInstanceView} from "@/entity/PluginEntity";
+import {getMusicItemFromPlugin} from "@/plugin/music";
 
 interface IMusicItemWrap extends IMusicItem {
   keyword: string;
   pluginId: number
-}
-
-interface MusicInfo {
-  item: IMusicItemWrap,
-  url: string
 }
 
 const size = useWindowSize();
@@ -137,29 +133,9 @@ function search() {
     .finally(() => loading.value = false)
 }
 
-async function getMusicItem(context: RowEventContext<TableRowData> | BaseTableCellParams<TableRowData>): Promise<MusicInfo> {
-  let musicItem = context.row as IMusicItemWrap;
-  for (let plugin of plugins.value) {
-    if (plugin.id === musicItem.pluginId) {
-      if (plugin.instance.getMusicInfo) {
-        const info = await plugin.instance.getMusicInfo(musicItem);
-        if (info) {
-          musicItem = Object.assign(musicItem, info);
-        }
-      }
-      break;
-    }
-  }
-  let url: string
-  if (!musicItem.url) {
-    return Promise.reject(new Error("音乐链接不存在"));
-  }
-  url = musicItem.url;
-  return {item: musicItem, url}
-}
-
 async function handleRowDblclickWrap(context: RowEventContext<TableRowData>) {
-  const {item, url} = await getMusicItem(context);
+  let musicItem = context.row as IMusicItemWrap;
+  const {item, url} = await getMusicItemFromPlugin(context, musicItem.pluginId);
   // 此处获取音频详情
   useMusicPlay.emit({
     index: 0,
@@ -176,7 +152,8 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
 }
 
 async function handleNextPlayWrap(context: BaseTableCellParams<TableRowData>) {
-  const {item, url} = await getMusicItem(context);
+  let musicItem = context.row as IMusicItemWrap;
+  const {item, url} = await getMusicItemFromPlugin(context, musicItem.pluginId);
   useMusicAppend.emit(buildFromIMusicItem(item, url))
 }
 
@@ -206,7 +183,6 @@ function handleDownloadWrap(context: BaseTableCellParams<TableRowData>) {
   handleDownload(context)
     .catch(e => MessageUtil.error("下载失败", e))
     .finally(() => operatorLoading.value = false);
-
 }
 
 watch(plugins, value => {
