@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {PluginEntity, PluginEntityView} from "@/entity/PluginEntity";
+import {PluginEntity, PluginEntityView, PluginInstanceView} from "@/entity/PluginEntity";
 import {PluginInstance} from "@/types/PluginInstance";
 import {listRecordByAsync, removeOneByAsync, saveOneByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
@@ -14,6 +14,18 @@ import {stringToBase64} from "@/utils/file/CovertUtil";
 export const usePluginStore = defineStore('plugin-store', () => {
   const plugins = ref(new Array<PluginEntityView>());
   const instanceMap = new Map<number, PluginInstance>();
+
+  const pluginInstances = computed<Array<PluginInstanceView>>(() => plugins.value.map(p => {
+    let instance = instanceMap.get(p.id);
+    if (!instance) {
+      instance = getPluginInstance(p.content)
+      instanceMap.set(p.id, instance);
+    }
+    return {
+      ...p,
+      instance
+    }
+  }))
 
   async function initWrap() {
     const records = await listRecordByAsync<PluginEntity>(LocalNameEnum.ITEM_PLUGIN);
@@ -162,7 +174,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
 
 
   return {
-    plugins, instanceMap,
+    plugins, instanceMap, pluginInstances,
     init, getInstance, installPlugin, removePlugin, updatePlugin, downloadPlugin
   }
 

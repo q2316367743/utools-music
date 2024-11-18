@@ -136,7 +136,7 @@ async function updatePluginSubscribeWrap() {
 export function updatePluginSubscribe() {
   updatePluginSubscribeLoading.value = true;
   updatePluginSubscribeWrap()
-    .then(res => res ?? MessageUtil.success("更新成功"))
+    .then(res => res && MessageUtil.success("更新成功"))
     .catch(e => MessageUtil.error("更新失败", e))
     .finally(() => updatePluginSubscribeLoading.value = false);
 

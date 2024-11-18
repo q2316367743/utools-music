@@ -30,7 +30,7 @@
       <div class="lyric">
         <div class="lyric-empty" v-if="lyrics.length === 0">
           <p>暂无歌词</p>
-          <t-link theme="primary" :disabled="true">立即搜素</t-link>
+          <music-lyric-search/>
         </div>
         <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
              :class="{active: lyricIndex === i}" @click="handleLyricClick(lyric)">
@@ -64,6 +64,7 @@ import {
 import {DropdownOption} from "tdesign-vue-next";
 import {DeleteIcon, AdjustmentIcon, PlayIcon} from 'tdesign-icons-vue-next';
 import {LyricLine} from "@/types/LyricLine";
+import MusicLyricSearch from "@/components/MusicPlayer/MusicLyricSearch.vue";
 
 
 const name = computed(() => music.value?.name || '无歌曲');

@@ -12,6 +12,7 @@ import {base64ToString} from "@/utils/file/CovertUtil";
 import {getForText, headForExist} from "@/plugin/http";
 import {globalSetting, useDownloadStore} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
+import {transferTextToLyric} from "@/plugin/music";
 
 export const musics = ref(new Array<MusicItem>());
 export const index = ref(0);
@@ -39,7 +40,6 @@ watch(lyricIndex, val => {
   if (lyrics.value.length > 0) {
     const cur = lyrics.value[val];
     if (cur) {
-      musicLyric.sendLyric(cur.text);
       // 滚动
       let selector = document.querySelectorAll('.lyric-line');
       if (selector) {
@@ -55,15 +55,7 @@ audio.addEventListener('canplay', () => {
 audio.addEventListener('timeupdate', () => {
   currentTime.value = audio.currentTime;
   // 歌词处理
-  if (lyrics.value.length > 0) {
-    for (let i = 0; i < lyrics.value.length; i++) {
-      const ly = lyrics.value[i];
-      if (ly.start <= currentTime.value && currentTime.value <= ly.end) {
-        lyricIndex.value = i;
-        return;
-      }
-    }
-  }
+  sendLyricWrap()
 });
 audio.addEventListener('playing', () => {
   played.value = true;
@@ -76,6 +68,23 @@ audio.addEventListener('ended', () => {
   // 播放完，下一个
   next();
 });
+
+function sendLyricWrap() {
+  // 歌词处理
+  if (lyrics.value.length > 0) {
+    for (let i = 0; i < lyrics.value.length; i++) {
+      const ly = lyrics.value[i];
+      if (ly.start <= currentTime.value && currentTime.value <= ly.end) {
+        lyricIndex.value = i;
+        musicLyric.sendLyric(ly.text);
+        return;
+      }
+    }
+  }else {
+    lyricIndex.value = 0;
+    musicLyric.sendLyric("暂无歌词");
+  }
+}
 
 export function audioControl() {
   if (played.value) {
@@ -100,28 +109,6 @@ export function loopControl() {
       loop.value = 2;
       break;
   }
-}
-
-function transferTextToLyric(text: string): Array<LyricLine> {
-  const lyricLines = new Array<LyricLine>();
-  const lines = text.split("\n");
-  for (let line of lines) {
-    const time = line.match(/\[\d{2}:\d{2}\.\d{2}]/g);
-    const text = line.replace(/\[\d{2}:\d{2}\.\d{2}]/g, '');
-    if (time) {
-      time.forEach(t => {
-        const minutes = parseInt(t.slice(1, 3));
-        const seconds = parseFloat(t.slice(4, 9));
-        const timeInSeconds = minutes * 60 + seconds;
-        lyricLines.push({
-          text: text.trim(),
-          start: timeInSeconds,
-          end: 0
-        })
-      });
-    }
-  }
-  return lyricLines;
 }
 
 function renderLyricFromMeta(meta: IAudioMetadata): Array<Array<LyricLine>> {
@@ -385,16 +372,7 @@ export function switchList() {
 }
 
 export function switchLyric() {
-  musicLyric.switchWindow(() => {
-    if (lyrics.value.length > 0) {
-      for (let ly of lyrics.value) {
-        if (ly.start <= currentTime.value && currentTime.value <= ly.end) {
-          musicLyric.sendLyric(ly.text);
-          return;
-        }
-      }
-    }
-  });
+  musicLyric.switchWindow(sendLyricWrap);
 }
 
 export function switchCurrentTime(currentTime: number) {

@@ -1,3 +1,5 @@
+import {PluginInstance} from "@/types/PluginInstance";
+
 export interface PluginEntity {
   id: number;
   /**
@@ -26,4 +28,9 @@ export interface PluginEntity {
 export interface PluginEntityView extends PluginEntity {
   _id: string;
   _rev?: string;
+}
+
+
+export interface PluginInstanceView extends PluginEntity {
+  instance: PluginInstance;
 }

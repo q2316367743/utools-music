@@ -27,21 +27,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {IMusicItem, PluginInstanceInfo, PluginInstanceSearch} from "@/types/PluginInstance";
+import {BaseTableCellParams, BaseTableCol, Button, RowEventContext, TableRowData} from "tdesign-vue-next";
+import {SearchIcon} from "tdesign-icons-vue-next";
+import {IMusicItem} from "@/types/PluginInstance";
 import {usePluginStore, useDownloadStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {isNotEmptyArray} from "@/utils/lang/FieldUtil";
-import {BaseTableCellParams, BaseTableCol, Button, RowEventContext, TableRowData} from "tdesign-vue-next";
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {buildFromIMusicItem} from "@/entity/MusicItem";
-import {SearchIcon} from "tdesign-icons-vue-next";
-
-interface PluginTab {
-  id: number;
-  name: string;
-  search: PluginInstanceSearch,
-  info?: PluginInstanceInfo
-}
+import {PluginInstanceView} from "@/entity/PluginEntity";
 
 interface IMusicItemWrap extends IMusicItem {
   keyword: string;
@@ -63,6 +56,13 @@ const loading = ref(false);
 
 const playLoading = ref(false);
 const operatorLoading = ref(false);
+
+
+const plugins = computed<Array<PluginInstanceView>>(() => {
+  return usePluginStore().pluginInstances.filter(e => !!e.instance.search);
+});
+
+const maxHeight = computed(() => size.height.value - 108);
 
 const columns: Array<BaseTableCol> = [{
   colKey: 'title',
@@ -103,44 +103,18 @@ const columns: Array<BaseTableCol> = [{
   }
 }]
 
-const plugins = ref<Array<PluginTab>>([]);
-const maxHeight = computed(() => size.height.value - 108);
-
 watch(active, val => {
   if (val && keyword.value) {
     search();
   }
 })
 
-async function initPlugin() {
-  const {instanceMap} = usePluginStore();
-  if (instanceMap.size === 0) {
-    plugins.value = [];
-    return;
-  }
-  const res = new Array<PluginTab>()
-  instanceMap.forEach((instance, id) => {
-    if (instance.search) {
-      res.push({
-        id: id,
-        search: instance.search,
-        name: instance.platform,
-        info: instance.getMusicInfo
-      })
-    }
-  });
-  if (isNotEmptyArray(res)) {
-    active.value = res[0].id;
-  }
-
-  plugins.value = res;
-}
 
 async function searchWrap() {
   for (let pluginTab of plugins.value) {
     if (pluginTab.id === active.value) {
       // 搜索
-      const rsp = await pluginTab.search(keyword.value, page.value, 'music');
+      const rsp = await pluginTab.instance.search!(keyword.value, page.value, 'music');
       data.value = rsp.data.map(e => ({
         ...e,
         keyword: keyword.value,
@@ -167,8 +141,8 @@ async function getMusicItem(context: RowEventContext<TableRowData> | BaseTableCe
   let musicItem = context.row as IMusicItemWrap;
   for (let plugin of plugins.value) {
     if (plugin.id === musicItem.pluginId) {
-      if (plugin.info) {
-        const info = await plugin.info(musicItem);
+      if (plugin.instance.getMusicInfo) {
+        const info = await plugin.instance.getMusicInfo(musicItem);
         if (info) {
           musicItem = Object.assign(musicItem, info);
         }
@@ -235,7 +209,9 @@ function handleDownloadWrap(context: BaseTableCellParams<TableRowData>) {
 
 }
 
-watch(() => usePluginStore().plugins, () => initPlugin(), {
+watch(plugins, value => {
+  active.value = value[0] ? value[0].id : 0;
+}, {
   immediate: true,
   deep: true
 })
