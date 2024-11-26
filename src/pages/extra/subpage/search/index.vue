@@ -4,7 +4,7 @@
       <div class="music-search__header">
         <t-input-group style="width: 100%">
           <t-input :clearable="true" v-model="keyword" @enter="search" placeholder="请输入关键字，回车搜索"
-                   :disabled="loading || !active">
+                   :disabled="loading || !active" @clear="onClear">
             <template #suffix-icon>
               <search-icon/>
             </template>
@@ -18,12 +18,13 @@
       <t-base-table :data :columns :bordered="false" :height="maxHeight" row-key="id" :loading
                     :loading-props="{ text: '正在搜索中' }"
                     :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }"
-                    @row-dblclick="handleRowDblclick">
+                    @row-dblclick="handleRowDblclick" @scroll="onScroll">
         <template #empty>
           <t-empty title="空空如也" style="margin-top: 25vh"></t-empty>
         </template>
       </t-base-table>
     </t-loading>
+    <t-back-top container=".music-search .t-table__content" style="bottom: 24px;right: 24px"/>
   </div>
 </template>
 <script lang="ts" setup>
@@ -36,6 +37,8 @@ import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {buildFromIMusicItem} from "@/entity/MusicItem";
 import {PluginInstanceView} from "@/entity/PluginEntity";
 import {getMusicItemFromPlugin} from "@/plugin/music";
+import {isEmptyString} from "@/utils/lang/StringUtil";
+import {MusicInstanceWeb} from "@/types/MusicInstance";
 
 interface IMusicItemWrap extends IMusicItem {
   keyword: string;
@@ -48,6 +51,7 @@ const keyword = ref('');
 const page = ref(1);
 const active = ref(0);
 const data = ref(new Array<IMusicItemWrap>());
+const isBottom = ref(false);
 const loading = ref(false);
 
 const playLoading = ref(false);
@@ -111,19 +115,33 @@ async function searchWrap() {
     if (pluginTab.id === active.value) {
       // 搜索
       const rsp = await pluginTab.instance.search!(keyword.value, page.value, 'music');
-      data.value = rsp.data.map(e => ({
+      const items = rsp.data.map(e => ({
         ...e,
         keyword: keyword.value,
         pluginId: pluginTab.id
       }));
+      data.value.push(...items);
+      isBottom.value = !!rsp.isEnd;
       return;
     }
   }
   return Promise.reject(new Error("该插件不支持搜索"))
 }
 
+function onClear() {
+  loading.value = false;
+  isBottom.value = false;
+  data.value = [];
+  page.value = 1;
+}
+
 function search() {
+  if (loading.value) return;
+  if (isEmptyString(keyword.value)) return;
   loading.value = true;
+  isBottom.value = false;
+  data.value = [];
+  page.value = 1;
   searchWrap()
     .then(() => MessageUtil.success("搜索完成"))
     .catch(e => {
@@ -135,11 +153,10 @@ function search() {
 
 async function handleRowDblclickWrap(context: RowEventContext<TableRowData>) {
   let musicItem = context.row as IMusicItemWrap;
-  const {item, url} = await getMusicItemFromPlugin(context, musicItem.pluginId);
   // 此处获取音频详情
   useMusicPlay.emit({
     index: 0,
-    views: [buildFromIMusicItem(item, url)]
+    views: [new MusicInstanceWeb(musicItem, musicItem.pluginId)]
   })
 }
 
@@ -153,8 +170,7 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
 
 async function handleNextPlayWrap(context: BaseTableCellParams<TableRowData>) {
   let musicItem = context.row as IMusicItemWrap;
-  const {item, url} = await getMusicItemFromPlugin(context, musicItem.pluginId);
-  useMusicAppend.emit(buildFromIMusicItem(item, url))
+  useMusicAppend.emit(new MusicInstanceWeb(musicItem, musicItem.pluginId))
 }
 
 function handleNextPlay(context: BaseTableCellParams<TableRowData>) {
@@ -165,17 +181,9 @@ function handleNextPlay(context: BaseTableCellParams<TableRowData>) {
 }
 
 async function handleDownload(context: BaseTableCellParams<TableRowData>) {
-  const {item, url} = await getMusicItem(context);
-  const view = buildFromIMusicItem(item, url);
-  useDownloadStore().emit(view)
-  // 跳转插件
-  // utools.redirect(['下载器', '下载链接'], url.replace(/\s+/, ''));
-  // if (view.cover) {
-  //   utools.redirect(['下载器', '下载链接'], view.cover.replace(/\s+/, ''));
-  // }
-  // if (view.lyric) {
-  //   utools.redirect(['下载器', '下载链接'], view.lyric.replace(/\s+/, ''));
-  // }
+  let musicItem = context.row as IMusicItemWrap;
+  const {item, url} = await getMusicItemFromPlugin(context, musicItem.pluginId);
+  useDownloadStore().emit(buildFromIMusicItem(item, url))
 }
 
 function handleDownloadWrap(context: BaseTableCellParams<TableRowData>) {
@@ -190,7 +198,50 @@ watch(plugins, value => {
 }, {
   immediate: true,
   deep: true
-})
+});
+
+async function onBottomWrap() {
+  for (let pluginTab of plugins.value) {
+    if (pluginTab.id === active.value) {
+      // 搜索
+      const rsp = await pluginTab.instance.search!(keyword.value, page.value, 'music');
+      const items = rsp.data.map(e => ({
+        ...e,
+        keyword: keyword.value,
+        pluginId: pluginTab.id
+      }));
+      data.value.push(...items);
+      isBottom.value = !!rsp.isEnd;
+      return;
+    }
+  }
+  return Promise.reject(new Error("该插件不支持搜索"))
+}
+
+function onBottom() {
+  if (loading.value) return;
+  if (isBottom.value) return;
+  if (isEmptyString(keyword.value)) return;
+  loading.value = true;
+  page.value += 1;
+  onBottomWrap()
+    .then(() => MessageUtil.success("加载完成"))
+    .catch(e => {
+      MessageUtil.error("加载失败", e);
+      data.value = [];
+    })
+    .finally(() => loading.value = false)
+}
+
+function onScroll(params: { e: WheelEvent }) {
+  const {e} = params;
+  const target = e.target as HTMLDivElement;
+  console.log(target.scrollTop, target.offsetHeight, target.scrollHeight);
+
+  if (target.scrollHeight - target.scrollTop - target.offsetHeight < 20) {
+    onBottom();
+  }
+}
 </script>
 <style scoped lang="less">
 .music-search {

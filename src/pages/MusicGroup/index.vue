@@ -2,14 +2,7 @@
   <div class="music-group">
     <t-dropdown v-for="group in musicGroups" :key="group.id" :options trigger="context-menu"
                 @click="onContextMenu(group, $event)">
-      <div class="music-group-item" @click="onClick(group)">
-        <div class="music-group-item__cover">
-          <music-icon size="80px"></music-icon>
-        </div>
-        <div class="music-group-item__title ellipsis">
-          {{ group.name }}
-        </div>
-      </div>
+      <music-group-item :item="group" @click="onClick(group)"/>
     </t-dropdown>
     <div class="music-group-item plus" @click="addMusicGroup">
       <div class="music-group-item__image">
@@ -21,13 +14,14 @@
 </template>
 <script lang="ts" setup>
 import {useMusicGroupStore} from "@/store/module/MusicGroupStore";
-import {addMusicGroup, editMusicGroup} from "@/pages/MusicGroup/MusicGroupFunc";
+import {addMusicGroup, editMusicGroup} from "@/pages/MusicGroup/components/MusicGroupFunc";
 import {MusicGroupIndex} from "@/entity/MusicGroup";
-import MusicGroupContent from "@/pages/MusicGroup/MusicGroupContent.vue";
+import MusicGroupContent from "@/pages/MusicGroup/components/MusicGroupContent.vue";
 import {DropdownOption} from "tdesign-vue-next";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {MusicIcon, PlusIcon} from 'tdesign-icons-vue-next'
+import {PlusIcon} from 'tdesign-icons-vue-next'
+import MusicGroupItem from "@/pages/MusicGroup/components/MusicGroupItem.vue";
 
 const options: Array<DropdownOption> = [
   {content: '重命名', value: 1},
@@ -82,6 +76,7 @@ function onClose() {
     transition: 0.3s;
     border: 3px dashed var(--td-border-level-1-color);
     margin: 8px;
+    position: relative;
 
     &:hover {
       background-color: var(--td-bg-color-component-hover);
@@ -105,6 +100,13 @@ function onClose() {
       justify-content: center;
       flex-direction: column;
       align-items: center;
+    }
+
+    &__web {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      z-index: 9;
     }
 
   }

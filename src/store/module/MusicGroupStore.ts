@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {MusicGroup, MusicGroupContent, MusicGroupIndex} from "@/entity/MusicGroup";
+import {MusicGroup, MusicGroupContent, MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
 import {
   getFromOneByAsync,
   listByAsync,
@@ -16,7 +16,13 @@ export const useMusicGroupStore = defineStore('music-group', () => {
   let rev: string | undefined = undefined;
   const nativeId = utools.getNativeId();
 
-  const musicGroupItems = computed(() => musicGroups.value.filter(e => e.nativeId === nativeId));
+  const musicGroupItems = computed(() =>
+    musicGroups.value.filter(e => {
+      if (e.type === MusicGroupType.WEB) {
+        return true;
+      }
+      return e.nativeId === nativeId
+    }));
 
   async function init() {
     const res = await listByAsync(LocalNameEnum.LIST_MUSIC_GROUP);
@@ -52,6 +58,10 @@ export const useMusicGroupStore = defineStore('music-group', () => {
         id: musicGroup.id,
         name: musicGroup.name,
         nativeId: musicGroup.nativeId,
+        type: musicGroup.type,
+        pluginId: musicGroup.pluginId,
+        cover: musicGroup.cover,
+        author: musicGroup.author,
       });
     }
     // 保存列表

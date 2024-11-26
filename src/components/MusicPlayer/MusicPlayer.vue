@@ -2,7 +2,7 @@
   <div class="music-player">
     <div class="container">
       <div class="image" @click="switchDisplay">
-        <t-image v-if="music && music.cover" :src="music.cover"></t-image>
+        <img v-if="music && music.cover" :src="music.cover" :alt="music.name"/>
         <t-avatar v-else-if="music" shape="round" size="42px">{{ music.name.substring(0, 1) }}</t-avatar>
         <t-avatar v-else shape="round" size="42px">无</t-avatar>
         <div class="mask">
@@ -68,7 +68,7 @@
           <previous-icon></previous-icon>
         </template>
       </t-button>
-      <t-button shape="circle" theme="primary" size="large" :disabled @click="audioControl">
+      <t-button shape="circle" theme="primary" size="large" :disabled @click="audioControl" :loading="playLoading">
         <template #icon>
           <pause-icon v-if="played"/>
           <play-icon v-else/>
@@ -107,26 +107,39 @@
 </template>
 <script lang="ts" setup>
 import {
-  DownloadIcon,
-  DeleteIcon,
-  PlayIcon,
-  PauseIcon,
-  NextIcon,
-  PreviousIcon,
   ChevronDownDoubleIcon,
-  ChevronUpDoubleIcon
+  ChevronUpDoubleIcon,
+  DeleteIcon,
+  DownloadIcon,
+  NextIcon,
+  PauseIcon,
+  PlayIcon,
+  PreviousIcon
 } from 'tdesign-icons-vue-next';
 import {useAddMusicGroup, useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
   audioControl,
-  currentTime, displayVisible, duration,
-  listVisible, loop, loopControl,
+  currentTime,
+  displayVisible,
+  duration,
+  listVisible,
+  loop,
+  loopControl,
   music,
   musics,
-  next, onMusicAppend,
-  onMusicPlay, played, pre,
-  removeIndex, switchCurrentTime, switchDisplay,
-  switchIndex, switchList, switchLyric, volume
+  next,
+  onMusicAppend,
+  onMusicPlay,
+  played,
+  playLoading,
+  pre,
+  removeIndex,
+  switchCurrentTime,
+  switchDisplay,
+  switchIndex,
+  switchList,
+  switchLyric,
+  volume
 } from "@/components/MusicPlayer/MusicPlayer";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {isNull} from "@/utils/lang/FieldUtil";
@@ -169,7 +182,7 @@ const enableDownload = computed(() => {
   if (!music.value) {
     return false;
   }
-  return /^https?:\/\//.test(music.value.url);
+  return music.value.source != MusicItemSource.LOCAL;
 });
 const disableAddGroup = computed(() => {
   if (!music.value) {
@@ -196,7 +209,8 @@ function onDownload() {
     MessageUtil.error("音乐不存在");
     return;
   }
-  useDownloadStore().emit(music.value);
+  // 执行下载
+  music.value.getInfo().then(res => useDownloadStore().emit(res));
 }
 
 onMounted(() => {

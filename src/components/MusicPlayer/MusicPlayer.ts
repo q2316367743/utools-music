@@ -1,22 +1,18 @@
 import {MusicPlayEvent} from "@/global/Event";
 import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
-import {getEffectiveNumber, isNotEmptyArray} from "@/utils/lang/FieldUtil";
+import {getEffectiveNumber} from "@/utils/lang/FieldUtil";
 import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
-import {readFile, readFileAsString} from "@/utils/file/FileUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {IAudioMetadata, parseBuffer} from "music-metadata";
 import {musicLyric} from "@/global/BeanFactory";
-import {isNotEmptyString} from "@/utils/lang/StringUtil";
-import {base64ToString} from "@/utils/file/CovertUtil";
-import {getForText, headForExist} from "@/plugin/http";
+import {headForExist} from "@/plugin/http";
 import {globalSetting, useDownloadStore} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
-import {transferTextToLyric} from "@/plugin/music";
+import {MusicInstance} from "@/types/MusicInstance";
 
-export const musics = ref(new Array<MusicItem>());
+export const musics = ref(new Array<MusicInstance>());
 export const index = ref(0);
-export const music = ref<MusicItem | null>(null);
+export const music = ref<MusicInstance>();
 // 1: 单，2：顺，3：随
 export const loop = ref(2);
 
@@ -32,6 +28,8 @@ export const displayVisible = ref(false);
 export const lyricGroups = ref(new Array<LyricContent>())
 export const lyrics = ref(new Array<LyricLine>());
 export const lyricIndex = ref(0);
+
+export const playLoading = ref(false);
 
 watch(volume, val => {
   audio.volume = val / 100
@@ -80,7 +78,7 @@ function sendLyricWrap() {
         return;
       }
     }
-  }else {
+  } else {
     lyricIndex.value = 0;
     musicLyric.sendLyric("暂无歌词");
   }
@@ -111,104 +109,6 @@ export function loopControl() {
   }
 }
 
-function renderLyricFromMeta(meta: IAudioMetadata): Array<Array<LyricLine>> {
-  const {common} = meta;
-  const res = new Array<Array<LyricLine>>();
-  const {lyrics: lyricsTag} = common;
-  if (lyricsTag) {
-    if (lyricsTag.length > 0) {
-      lyricsTag.forEach(t => {
-        const {text} = t;
-        if (text) {
-          res.push(transferTextToLyric(text));
-        }
-      })
-    }
-  }
-  return res;
-}
-
-function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItem) {
-  if (isNotEmptyString(m.cover)) {
-    return;
-  }
-  const {common} = meta;
-  const {picture} = common;
-  if (isNotEmptyArray(picture)) {
-    const first = picture![0];
-    const blob = new Blob([first.data], {type: 'image/png'});
-    m.cover = URL.createObjectURL(blob);
-  }
-}
-
-async function renderMusicMeta(m: MusicItem) {
-  // 解析音乐，解析歌词
-  let lyricContents = new Array<LyricContent>();
-  let index = 0;
-
-  // 尝试读取自带的歌词
-  if (m.lyric) {
-    // 读取歌词
-    let lineStr: string
-    if (/^https?:\/\//.test(m.lyric)) {
-      lineStr = await getForText(m.lyric);
-    } else if (/^data:(.*?);base64,/.test(m.lyric)) {
-      lineStr = m.lyric.substring(5)
-      lineStr = base64ToString(m.lyric.replace(/^data:(.*?);base64,/, ""));
-    } else {
-      // 读取文件
-      lineStr = await readFileAsString(m.lyric);
-    }
-    lyricContents.push({
-      id: index++,
-      lines: transferTextToLyric(lineStr)
-    });
-    // 存在本地歌词，先设置一波
-    lyricGroups.value = lyricContents;
-    lyrics.value = lyricContents[0].lines;
-  }
-
-  // 只有本地才需要处理元数据
-  if (m.source === MusicItemSource.LOCAL) {
-    // 尝试获取元数据
-    let tagsResult: IAudioMetadata;
-    if (m.url.startsWith('http')) {
-      // 如果是网络数据，则不处理音乐元数据
-      return;
-    } else {
-      // 本地
-      const ub = await readFile(m.url);
-      tagsResult = await parseBuffer(ub);
-    }
-    // 渲染封面
-    renderCoverFromMeta(tagsResult, m);
-    // 渲染歌词
-    const res = renderLyricFromMeta(tagsResult)
-    if (res.length > 0) {
-      res.forEach(t => {
-        lyricContents.push({
-          id: index++,
-          lines: t
-        })
-      })
-    }
-
-  }
-
-  // 处理歌词
-  if (lyricContents.length > 0) {
-    // 处理每一个歌词的截止时间
-    for (let lyricContent of lyricContents) {
-      const {lines} = lyricContent;
-      for (let i = 0; i < lines.length; i++) {
-        lines[i].end = lines[i + 1]?.start || 9999999999;
-      }
-    }
-    lyricGroups.value = lyricContents;
-    lyrics.value = lyricContents[0].lines;
-  }
-}
-
 function onError(m: MusicItem) {
   const {playError} = toRaw(globalSetting.value);
   if (playError === GlobalSettingPlayErrorType.NEXT) {
@@ -221,36 +121,41 @@ function onError(m: MusicItem) {
   MessageUtil.warning(`歌曲【${m.name}】不存在，已暂停`)
 }
 
-export async function play() {
+async function playWrapper() {
   if (music.value) {
     // 销毁旧的封面
-    const {cover} = music.value;
-    if (cover.startsWith('blob')) {
-      URL.revokeObjectURL(cover);
-    }
+    await music.value.destroy()
   }
+  // 暂停音乐
+  audio.pause()
+  const oldIndex = index.value;
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
+  console.log(music.value)
+  const instance = await music.value.getInfo();
   let exist: boolean;
-  if (/^https?:\/\//.test(music.value.url)) {
+  if (/^https?:\/\//.test(instance.url)) {
     // 网络音乐
-    exist = await headForExist(music.value.url);
-    if (music.value.source === MusicItemSource.WEB) {
+    exist = await headForExist(instance.url);
+    if (instance.source === MusicItemSource.WEB) {
       // 如果支持缓存
       const {playDownload} = toRaw(globalSetting.value);
       if (playDownload) {
         // 下载
-        useDownloadStore().cache(music.value);
+        useDownloadStore().cache(instance);
       }
     }
-    // TODO: 如果是webdav，还要进行缓存
   } else {
     // 本地音乐，判断URL是否存在
-    exist = window.preload.fs.existsSync(music.value.url);
+    exist = window.preload.fs.existsSync(instance.url);
   }
   if (!exist) {
-    return onError(music.value);
+    return onError(instance);
   }
-  audio.src = music.value.url;
+  if (oldIndex != index.value) {
+    // 索引变了，代表用户没有等待
+    return;
+  }
+  audio.src = instance.url;
   lyricGroups.value = []
   lyrics.value = [];
   lyricIndex.value = 0;
@@ -258,9 +163,18 @@ export async function play() {
   audio.play()
     .then(() => console.log('播放成功'))
     .catch(e => MessageUtil.error("播放失败", e));
-  renderMusicMeta(music.value)
-    .then(() => console.log('渲染歌词成功'))
-    .catch(e => console.error("渲染歌词失败", e));
+  lyricGroups.value = await music.value.getLyric();
+  lyricIndex.value = 0
+  if (lyricGroups.value.length > 0) {
+    lyrics.value = lyricGroups.value[0].lines;
+  }
+}
+
+export function play() {
+  playLoading.value = true;
+  playWrapper()
+    .catch(e => MessageUtil.error("获取音乐播放信息失败", e))
+    .finally(() => playLoading.value = false);
 }
 
 export function pre() {
@@ -300,7 +214,7 @@ export function switchIndex(idx: number) {
   play();
 }
 
-export function removeIndex(idx: number, m: MusicItem) {
+export function removeIndex(idx: number, m: MusicInstance) {
   musics.value.splice(idx, 1);
   if (music.value?.id === m.id) {
     console.log(index.value, musics.value.length)
@@ -330,7 +244,7 @@ export function onMusicPlay(e: MusicPlayEvent) {
   rePlay();
 }
 
-export function onMusicAppend(e: MusicItem) {
+export function onMusicAppend(e: MusicInstance) {
   if (musics.value.length === 0) {
     // 没有，直接覆盖
     musics.value = [e];

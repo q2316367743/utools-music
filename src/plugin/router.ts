@@ -44,6 +44,10 @@ const router = createRouter({
     name: "设置",
     path: '/setting',
     component: () => import('@/pages/setting/index.vue')
+  }, {
+    name: '关于',
+    path: '/about',
+    component: () => import('@/pages/about/index.vue')
   }]
 });
 

@@ -4,7 +4,8 @@
     <template #header>
       <t-space>
         <div>{{ header }}</div>
-        <t-button theme="primary" variant="outline" size="small" @click="musicGroupAppendWrap">
+        <t-button theme="primary" variant="outline" size="small" @click="musicGroupAppendWrap"
+                  v-if="musicGroup && musicGroup.type !== MusicGroupType.WEB">
           <template #icon>
             <edit-icon/>
           </template>
@@ -20,15 +21,16 @@
   </t-drawer>
 </template>
 <script lang="tsx" setup>
-import {MusicGroupIndex} from "@/entity/MusicGroup";
-import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
+import {MusicItemSource} from "@/entity/MusicItem";
 import {useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {BaseTableCol, RowEventContext, TableRowData} from "tdesign-vue-next";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {useMusicPlay} from "@/global/Event";
-import {musicGroupAppend} from "@/pages/MusicGroup/MusicGroupFunc";
+import {musicGroupAppend} from "@/pages/MusicGroup/components/MusicGroupFunc";
 import {EditIcon} from 'tdesign-icons-vue-next';
+import {MusicInstanceLocal, MusicInstanceWeb} from "@/types/MusicInstance";
 
 const size = useWindowSize();
 const {loadMusicItems} = useMusicGroupStore()
@@ -41,7 +43,7 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 
 const visible = ref(false);
-const data = ref(new Array<MusicItem>())
+const data = ref(new Array<any>())
 
 const maxHeight = computed(() => size.height.value - 150);
 const header = computed(() => props.musicGroup?.name ?? '');
@@ -50,7 +52,10 @@ const header = computed(() => props.musicGroup?.name ?? '');
 const columns: Array<BaseTableCol> = [{
   colKey: 'name',
   title: '歌曲名',
-  ellipsis: true
+  ellipsis: true,
+  cell: (h, {row}) => {
+    return row.name || row.title
+  }
 }, {
   colKey: 'artist',
   title: '演唱者',
@@ -64,7 +69,7 @@ const columns: Array<BaseTableCol> = [{
   title: '时长',
   width: 70,
   cell: (h, {row}) => {
-    return prettyDateTime(row.duration);
+    return row.duration ? prettyDateTime(row.duration) : '--:--';
   }
 }, {
   colKey: 'source',
@@ -72,7 +77,7 @@ const columns: Array<BaseTableCol> = [{
   width: 60,
   cell: (h, {row}) => {
     const {source} = row;
-    let text = '';
+    let text = '网络';
     if (source === MusicItemSource.LOCAL) {
       text = '本地';
     } else if (source === MusicItemSource.WEBDAV) {
@@ -102,11 +107,14 @@ watch(() => props.musicGroup, val => {
 });
 
 function handleRowDblclick(context: RowEventContext<TableRowData>) {
+  const {musicGroup} = props
   const {row} = context;
   const list = data.value;
-  const index = data.value.findIndex(e => e.url === row.url);
+  const index = data.value.findIndex(e => e.id === row.id);
   useMusicPlay.emit({
-    views: list,
+    views: list.map(e => musicGroup && musicGroup.type === MusicGroupType.WEB ?
+      new MusicInstanceWeb(e, musicGroup.pluginId) :
+      new MusicInstanceLocal(e)),
     index: Math.max(index, 0)
   });
 }

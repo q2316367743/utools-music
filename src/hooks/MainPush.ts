@@ -2,6 +2,7 @@ import {useMusicGroupStore} from "@/store";
 import Fuse from "fuse.js";
 import {isEmptyArray} from "@/utils/lang/FieldUtil";
 import {useMusicPlay} from "@/global/Event";
+import {MusicInstanceLocal} from "@/types/MusicInstance";
 
 interface MainPushResultItem {
   icon?: string,
@@ -57,7 +58,7 @@ export function useMainPush(): MainPushResult<string> {
             return
           }
           useMusicPlay.emit({
-            views: items,
+            views: items.map(e => new MusicInstanceLocal(e)),
             index: 0
           });
         });

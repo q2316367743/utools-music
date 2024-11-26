@@ -27,6 +27,7 @@ import {useFuse} from "@vueuse/integrations/useFuse";
 import {useMusicPlay} from "@/global/Event";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
 import {SearchIcon} from 'tdesign-icons-vue-next';
+import {MusicInstanceLocal} from "@/types/MusicInstance";
 
 const size = useWindowSize();
 
@@ -87,7 +88,7 @@ const columns: Array<BaseTableCol> = [{
 
 watch(music, val => {
   if (val) {
-    activeRowKeys.value = [val.id];
+    activeRowKeys.value = [Number(val.id)];
   }
 }, {immediate: true});
 
@@ -96,7 +97,7 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
   const list = data.value;
   const index = data.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
-    views: list,
+    views: list.map(e => new MusicInstanceLocal(e)),
     index: Math.max(index, 0)
   });
 }

@@ -2,25 +2,72 @@
   <div class="menu-side">
     <t-menu width="200px" :value="active" @change="handleChange">
       <t-menu-item value="/local">
+        <template #icon>
+          <folder-icon />
+        </template>
         本地音乐
       </t-menu-item>
       <t-menu-item value="/music-group">
+        <template #icon>
+          <music-icon />
+        </template>
         我的歌单
       </t-menu-item>
       <t-submenu value="/extra" title="拓展工具">
-        <t-menu-item value="/extra/plugin">插件管理</t-menu-item>
-        <t-menu-item value="/extra/song-list">热门歌单</t-menu-item>
-        <t-menu-item value="/extra/search">音乐搜索</t-menu-item>
-        <t-menu-item value="/extra/download">下载管理</t-menu-item>
+        <template #icon>
+          <extension-icon />
+        </template>
+        <t-menu-item value="/extra/plugin">
+          <template #icon>
+            <app-icon />
+          </template>
+          插件管理
+        </t-menu-item>
+        <t-menu-item value="/extra/song-list">
+          <template #icon>
+            <root-list-icon />
+          </template>
+          热门歌单
+        </t-menu-item>
+        <t-menu-item value="/extra/search">
+          <template #icon>
+            <search-icon />
+          </template>
+          音乐搜索
+        </t-menu-item>
+        <t-menu-item value="/extra/download">
+          <template #icon>
+            <download-icon />
+          </template>
+          下载管理
+        </t-menu-item>
       </t-submenu>
       <t-menu-item value="/setting">
+        <template #icon>
+          <setting-icon />
+        </template>
         设置
+      </t-menu-item>
+      <t-menu-item value="/about">
+        <template #icon>
+          <info-circle-icon />
+        </template>
+        关于
       </t-menu-item>
     </t-menu>
   </div>
 </template>
 <script lang="ts" setup>
 import {MenuValue} from "tdesign-vue-next";
+import {
+  AppIcon,
+  DownloadIcon, ExtensionIcon,
+  FolderIcon, InfoCircleIcon,
+  MusicIcon,
+  RootListIcon,
+  SearchIcon,
+  SettingIcon
+} from "tdesign-icons-vue-next";
 
 const route = useRoute();
 const router = useRouter();

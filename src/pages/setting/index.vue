@@ -84,15 +84,11 @@
           </t-col>
         </t-row>
       </t-tab-panel>
-      <t-tab-panel label="关于" value="about" style="padding: 8px">
-        <about/>
-      </t-tab-panel>
     </t-tabs>
   </t-form>
 </template>
 <script lang="ts" setup>
 import {downloadFolder, globalSetting} from "@/store";
-import About from "@/pages/setting/about.vue";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 import {FileIcon} from 'tdesign-icons-vue-next';
 

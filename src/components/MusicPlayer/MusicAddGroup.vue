@@ -13,11 +13,13 @@ import {useAddMusicGroup} from "@/global/Event";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {isEmptyArray} from "@/utils/lang/FieldUtil";
+import {isNotEmptyString} from "@/utils/lang/StringUtil";
 
 const visible = ref(false);
 const groupIds = ref(new Array<number>());
 
-const musicGroups = computed(() => useMusicGroupStore().musicGroupItems);
+const musicGroups = computed(() => useMusicGroupStore().musicGroupItems
+  .filter(e => isNotEmptyString(e.nativeId)));
 
 function onAddMusicGroup() {
   groupIds.value = [];

@@ -20,12 +20,18 @@
                     <t-tag theme="primary" v-if="item.playCount">播放量：{{ item.playCount }}</t-tag>
                   </t-space>
                 </t-paragraph>
+                <t-paragraph>
+                  <t-space>
+                    <t-button theme="primary" size="small" :disabled="empty" @click="playAll">播放全部</t-button>
+                    <t-button theme="success" size="small" :disabled="true">下载全部</t-button>
+                    <t-button theme="warning" size="small" :disabled="empty" @click="collectionAll">收藏歌单</t-button>
+                  </t-space>
+                </t-paragraph>
               </div>
             </div>
           </t-col>
         </t-row>
         <div class="operator">
-          <t-button>下载全部</t-button>
           <t-input :clearable="true" style="width: 200px" placeholder="请输入关键字" v-model="keyword">
             <template #suffix-icon>
               <search-icon/>
@@ -45,14 +51,14 @@
 <script lang="ts" setup>
 import {IMusicItem, IMusicSheetItem} from "@/types/PluginInstance";
 import {BaseTableCol, RowEventContext, TableRowData} from "tdesign-vue-next";
-import {usePluginStore} from "@/store";
+import {useMusicGroupStore, usePluginStore} from "@/store";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
-import {buildFromIMusicItem} from "@/entity/MusicItem";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {useMusicPlay} from "@/global/Event";
-import {getMusicItemFromPlugin} from "@/plugin/music";
 import {SearchIcon} from "tdesign-icons-vue-next";
 import {useFuse} from "@vueuse/integrations/useFuse";
+import {MusicInstanceWeb} from "@/types/MusicInstance";
+import {MusicGroupType} from "@/entity/MusicGroup";
 
 const visible = defineModel({
   type: Boolean
@@ -81,6 +87,7 @@ const {results} = useFuse(keyword, items, {
 });
 
 const data = computed(() => results.value.map(e => e.item));
+const empty = computed(() => data.value.length === 0);
 
 const columns: Array<BaseTableCol> = [{
   colKey: 'title',
@@ -130,11 +137,11 @@ watch(visible, val => {
 
 
 async function handleRowDblclickWrap(context: RowEventContext<TableRowData>) {
-  const {item, url} = await getMusicItemFromPlugin(context, props.pluginId!);
+  let musicItem = context.row as IMusicItem;
   // 此处获取音频详情
   useMusicPlay.emit({
     index: 0,
-    views: [buildFromIMusicItem(item, url)]
+    views: [new MusicInstanceWeb(musicItem, props.pluginId!)]
   })
 }
 
@@ -144,6 +151,29 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
     .then(() => MessageUtil.success("开始试听"))
     .catch(e => MessageUtil.error("播放失败", e))
 }
+
+function playAll() {
+  useMusicPlay.emit({
+    index: 0,
+    views: data.value.map(e => new MusicInstanceWeb(e, props.pluginId!))
+  })
+}
+
+function collectionAll() {
+  console.log(props.item)
+  useMusicGroupStore().postMusicGroup({
+    pluginId: props.pluginId!,
+    type: MusicGroupType.WEB,
+    id: Date.now(),
+    name: props.item?.title || ('歌单-' + props.item?.id),
+    cover: props.item?.artwork,
+    author: props.item?.artist,
+    nativeId: '',
+    items: data.value
+  }).then(() => MessageUtil.success("收藏成功"))
+    .catch(e => MessageUtil.error("收藏失败", e))
+}
+
 </script>
 <style scoped lang="less">
 .song-list-item-drawer {
@@ -187,7 +217,7 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
       right: 0;
       bottom: 0;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
     }
   }
 }

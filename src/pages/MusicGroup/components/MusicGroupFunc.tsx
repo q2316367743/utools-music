@@ -7,7 +7,7 @@ import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {MusicItemSource} from "@/entity/MusicItem";
 import {saveOneByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
-import {MusicGroupContent, MusicGroupIndex} from "@/entity/MusicGroup";
+import {MusicGroupContent, MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
 
 export function addMusicGroup(): void {
   MessageBoxUtil.prompt("请输入歌单名称", "新建歌单", {
@@ -17,7 +17,9 @@ export function addMusicGroup(): void {
       useMusicGroupStore().postMusicGroupIndex({
         name: name,
         id: Date.now(),
-        nativeId: utools.getNativeId()
+        nativeId: utools.getNativeId(),
+        type: MusicGroupType.LOCAL,
+        pluginId: 0
       })
         .then(() => MessageUtil.success("新增成功"))
         .catch(e => MessageUtil.error("新增失败", e));
@@ -33,7 +35,9 @@ export function editMusicGroup(group: MusicGroupIndex): void {
       useMusicGroupStore().postMusicGroupIndex({
         name: name,
         id: group.id,
-        nativeId: group.nativeId
+        nativeId: group.nativeId,
+        type: MusicGroupType.LOCAL,
+        pluginId: 0
       })
         .then(() => MessageUtil.success("修改成功"))
         .catch(e => MessageUtil.error("修改失败", e));
