@@ -10,9 +10,8 @@ export function isNotNull(value?: any): boolean {
 }
 
 export function copyProperties<S extends Record<string, any>, T extends Record<string, any>>(source: S, target: T) {
-  const keys = Object.keys(target);
   listify(source, (k, v) => {
-    if (keys.includes(k) && isNotNull(v) && v) {
+    if (isNotNull(v) && v) {
       // @ts-ignore
       target[k] = v;
     }

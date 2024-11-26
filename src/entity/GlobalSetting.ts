@@ -9,6 +9,8 @@ export interface GlobalSetting {
   playError: GlobalSettingPlayErrorType;
   // 边听边存
   playDownload: boolean;
+  // 默认播放质量
+  playQuality: "low" | "standard" | "high" | "super";
 
   // 歌词字体大小
   lyricFontSize: number;
@@ -39,6 +41,7 @@ export function buildGlobalSetting(): GlobalSetting {
   return {
     playError: GlobalSettingPlayErrorType.NEXT,
     playDownload: false,
+    playQuality: "standard",
     lyricFontSize: 36,
     lyricColor: '#0052D9',
     lyricBorderColor: 'rgba(110, 110, 110, 0.8)',

@@ -114,7 +114,7 @@ function onError(m: MusicItem) {
   if (playError === GlobalSettingPlayErrorType.NEXT) {
     if (musics.value.length > 1) {
       MessageUtil.warning(`歌曲【${m.name}】不存在，自动切换下一曲`)
-      next();
+      setTimeout(next, 1500);
       return;
     }
   }
@@ -128,9 +128,9 @@ async function playWrapper() {
   }
   // 暂停音乐
   audio.pause()
+  currentTime.value = 0;
   const oldIndex = index.value;
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
-  console.log(music.value)
   const instance = await music.value.getInfo();
   let exist: boolean;
   if (/^https?:\/\//.test(instance.url)) {
@@ -173,7 +173,14 @@ async function playWrapper() {
 export function play() {
   playLoading.value = true;
   playWrapper()
-    .catch(e => MessageUtil.error("获取音乐播放信息失败", e))
+    .catch(e => {
+      MessageUtil.error("获取音乐播放信息失败", e);
+      // 数据重置
+      music.value = undefined;
+      lyricGroups.value = []
+      lyrics.value = [];
+      lyricIndex.value = 0;
+    })
     .finally(() => playLoading.value = false);
 }
 
@@ -217,7 +224,6 @@ export function switchIndex(idx: number) {
 export function removeIndex(idx: number, m: MusicInstance) {
   musics.value.splice(idx, 1);
   if (music.value?.id === m.id) {
-    console.log(index.value, musics.value.length)
     play();
   } else {
     index.value = musics.value.findIndex(v => {

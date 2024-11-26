@@ -8,7 +8,7 @@ import {IAudioMetadata, parseBuffer} from "music-metadata";
 import {isEmptyString, isNotEmptyString} from "@/utils/lang/StringUtil";
 import {copyProperties, isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {IMusicItem} from "@/types/PluginInstance";
-import {usePluginStore} from "@/store";
+import {globalSetting, usePluginStore} from "@/store";
 
 export interface MusicInstance {
   id: string;
@@ -231,16 +231,7 @@ export class MusicInstanceWeb implements MusicInstance {
     const {pluginInstances} = usePluginStore();
     for (let plugin of pluginInstances) {
       if (plugin.id === this.pluginId) {
-        try {
-          if (plugin.instance.getMediaSource) {
-            const mediaSource = await plugin.instance.getMediaSource(this.item, 'standard');
-            if (mediaSource) {
-              copyProperties(mediaSource, this.item);
-            }
-          }
-        } catch (e) {
-          console.error("获取音源失败", e);
-        }
+        // 先获取音乐详情
         try {
           if (plugin.instance.getMusicInfo) {
             const info = await plugin.instance.getMusicInfo(this.item);
@@ -251,9 +242,30 @@ export class MusicInstanceWeb implements MusicInstance {
         } catch (e) {
           console.error("获取音乐详情失败", e);
         }
+        // 不存在音乐，再获取音源
+        const qualities: Array<"low" | "standard" | "high" | "super"> = ["super", "high", "standard", "low"];
+        const {playQuality = "standard"} = toRaw(globalSetting.value);
+        qualities.splice(qualities.findIndex(e => e === playQuality), 1);
+        qualities.unshift(playQuality);
+        for (let quality of qualities) {
+          try {
+            if (plugin.instance.getMediaSource) {
+              const mediaSource = await plugin.instance.getMediaSource(this.item, quality);
+              if (mediaSource) {
+                copyProperties(mediaSource, this.item);
+              }
+            }
+          } catch (e) {
+            console.error("获取音源失败", e);
+          }
+          if (this.item.url) {
+            break;
+          }
+        }
         break;
       }
     }
+
     if (!this.item.url) {
       return Promise.reject(new Error("音乐链接不存在"));
     }

@@ -23,6 +23,14 @@
         <t-form-item label="边听边存" help="开启后，当播放网络音乐时，会自动将音乐下载">
           <t-switch v-model="globalSetting.playDownload"></t-switch>
         </t-form-item>
+        <t-form-item label="默认播放质量" help="优先获取默认播放质量的音乐，如果不存在，再获取其他质量的音乐">
+          <t-radio-group v-model="globalSetting.playQuality">
+            <t-radio value="low" label="低"/>
+            <t-radio value="standard" label="标准"/>
+            <t-radio value="high" label="高"/>
+            <t-radio value="super" label="极高"/>
+          </t-radio-group>
+        </t-form-item>
       </t-tab-panel>
       <t-tab-panel label="歌词" value="lyric" style="padding: 8px;overflow: auto">
         <t-form-item label="字体大小">

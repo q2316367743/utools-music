@@ -2,7 +2,7 @@
   <t-drawer v-model:visible="visible" attach=".ranking" :header="false" :footer="false" :close-btn="true"
             size="100%" class="slid">
     <t-loading :loading text="加载中..." style="height: 100%">
-      <div class="ranking-drawer" v-if="sheet">
+      <div class="ranking-drawer" v-if="sheet" @scroll="onScroll">
         <header class="ranking-drawer__header">
           <div class="artwork">
             <t-image :src="sheet.coverImg" v-if="sheet.coverImg" :alt="sheet.title"/>
@@ -29,7 +29,7 @@
         <main>
           <t-base-table row-key="id" :data="data" :columns="columns" :bordered="false" :loading
                         :hover="true" size="small" active-row-type="single"
-                        @row-dblclick="handleRowDblclick"></t-base-table>
+                        @row-dblclick="handleRowDblclick" />
         </main>
         <t-back-top container=".ranking-drawer"/>
       </div>
@@ -47,6 +47,7 @@ import {MusicIcon, SearchIcon} from "tdesign-icons-vue-next";
 import {useFuse} from "@vueuse/integrations/useFuse";
 import {MusicInstanceWeb} from "@/types/MusicInstance";
 import {MusicGroupType} from "@/entity/MusicGroup";
+import {isEmptyString} from "@/utils/lang/StringUtil";
 
 const visible = defineModel({
   type: Boolean
@@ -56,7 +57,8 @@ const props = defineProps({
     type: Object as PropType<IMusicSheetItem>
   },
   pluginId: {
-    type: Number
+    type: Number,
+    default: 0
   }
 });
 
@@ -113,7 +115,6 @@ watch(visible, val => {
           .then(res => {
             const {isEnd, musicList, topListItem} = res;
             sheet.value = Object.assign(item, topListItem);
-            console.log(sheet.value)
             items.value = musicList || [];
             isBottom.value = isEnd || true;
           })
@@ -149,18 +150,68 @@ function playAll() {
 }
 
 function collectionAll() {
-  console.log(props.item)
+  const plugin = usePluginStore().plugins.find(e => e.id === props.pluginId);
   useMusicGroupStore().postMusicGroup({
     pluginId: props.pluginId!,
     type: MusicGroupType.WEB,
     id: Date.now(),
-    name: props.item?.title || ('歌单-' + props.item?.id),
-    cover: props.item?.artwork,
+    name: `${plugin?.name}-${sheet.value?.title}`,
+    cover: props.item?.coverImg,
     author: props.item?.artist,
     nativeId: '',
     items: data.value
   }).then(() => MessageUtil.success("收藏成功"))
     .catch(e => MessageUtil.error("收藏失败", e))
+}
+
+
+
+
+async function onBottomWrap() {
+  const {pluginId, item} = props;
+  if (!item) {
+    return ;
+  }
+  const {pluginInstances} = usePluginStore();
+  for (let pluginInstance of pluginInstances) {
+    if (pluginInstance.id === pluginId) {
+      const {getTopListDetail} = pluginInstance.instance;
+      loading.value = true
+      getTopListDetail && getTopListDetail(item, page.value)
+        .then(res => {
+          const {isEnd, musicList, topListItem} = res;
+          sheet.value = Object.assign(item, topListItem);
+          items.value = musicList || [];
+          isBottom.value = isEnd || true;
+        })
+        .catch(e => MessageUtil.error("获取榜单数据失败", e))
+        .finally(() => loading.value = false);
+      return;
+    }
+  }
+  return Promise.reject(new Error("该插件不支持榜单"))
+}
+
+function onBottom() {
+  if (loading.value) return;
+  if (isBottom.value) return;
+  if (isEmptyString(keyword.value)) return;
+  loading.value = true;
+  page.value += 1;
+  onBottomWrap()
+    .then(() => MessageUtil.success("加载完成"))
+    .catch(e => {
+      MessageUtil.error("加载失败", e);
+      items.value = [];
+    })
+    .finally(() => loading.value = false)
+}
+
+function onScroll( e: WheelEvent ) {
+  const target = e.target as HTMLDivElement;
+  if (target.scrollHeight - target.scrollTop - target.offsetHeight < 20) {
+    onBottom();
+  }
 }
 
 </script>
