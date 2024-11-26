@@ -1,51 +1,39 @@
 <template>
-  <t-drawer v-model:visible="visible" attach=".song-list" :header="false" :footer="false" :close-btn="true"
+  <t-drawer v-model:visible="visible" attach=".ranking" :header="false" :footer="false" :close-btn="true"
             size="100%" class="slid">
-    <div class="song-list-item-drawer" v-if="sheet">
-      <header class="song-list-item-drawer__header">
-        <t-row>
-          <t-col flex="180px">
-            <div class="artwork">
-              <!-- TODO: 封面可能不存在 -->
-              <t-image :src="sheet.artwork"/>
-            </div>
-          </t-col>
-          <t-col flex="auto">
-            <div class="info">
-              <div>
-                <div class="title">{{ sheet.title }}</div>
-                <t-paragraph class="artist">
-                  <t-space>
-                    <t-tag theme="primary" v-if="sheet.artist">{{ sheet.artist }}</t-tag>
-                    <t-tag theme="primary" v-if="sheet.playCount">播放量：{{ sheet.playCount }}</t-tag>
-                  </t-space>
-                </t-paragraph>
-              </div>
-            </div>
-          </t-col>
-          <t-col :span="12">
-            <div class="operator">
-              <t-space>
-                <t-button theme="primary" size="small" :disabled="empty" @click="playAll">播放全部</t-button>
-                <t-button theme="success" size="small" :disabled="true">下载全部</t-button>
-                <t-button theme="warning" size="small" :disabled="empty" @click="collectionAll">收藏歌单</t-button>
-              </t-space>
-              <t-input :clearable="true" style="width: 200px" placeholder="请输入关键字" v-model="keyword">
-                <template #suffix-icon>
-                  <search-icon/>
-                </template>
-              </t-input>
-            </div>
-          </t-col>
-        </t-row>
-      </header>
-      <main>
-        <t-base-table row-key="id" :data="data" :columns="columns" :bordered="false" :loading
-                      :hover="true" size="small" active-row-type="single"
-                      @row-dblclick="handleRowDblclick"></t-base-table>
-      </main>
-      <t-back-top container=".song-list-item-drawer"/>
-    </div>
+    <t-loading :loading text="加载中..." style="height: 100%">
+      <div class="ranking-drawer" v-if="sheet">
+        <header class="ranking-drawer__header">
+          <div class="artwork">
+            <t-image :src="sheet.coverImg" v-if="sheet.coverImg" :alt="sheet.title"/>
+            <music-icon v-else/>
+          </div>
+          <div class="info">
+            <div class="title">{{ sheet.title }}</div>
+            <t-paragraph class="desc">歌曲数：{{ data.length }}</t-paragraph>
+            <t-paragraph class="desc ellipsis-3">{{ sheet.description }}</t-paragraph>
+          </div>
+        </header>
+        <div class="ranking-drawer__operator">
+          <t-space>
+            <t-button theme="primary" size="small" :disabled="empty" @click="playAll">播放全部</t-button>
+            <t-button theme="success" size="small" :disabled="true">下载全部</t-button>
+            <t-button theme="warning" size="small" :disabled="empty" @click="collectionAll">收藏榜单</t-button>
+          </t-space>
+          <t-input :clearable="true" style="width: 200px" placeholder="请输入关键字" v-model="keyword">
+            <template #suffix-icon>
+              <search-icon/>
+            </template>
+          </t-input>
+        </div>
+        <main>
+          <t-base-table row-key="id" :data="data" :columns="columns" :bordered="false" :loading
+                        :hover="true" size="small" active-row-type="single"
+                        @row-dblclick="handleRowDblclick"></t-base-table>
+        </main>
+        <t-back-top container=".ranking-drawer"/>
+      </div>
+    </t-loading>
   </t-drawer>
 </template>
 <script lang="ts" setup>
@@ -55,7 +43,7 @@ import {useMusicGroupStore, usePluginStore} from "@/store";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {useMusicPlay} from "@/global/Event";
-import {SearchIcon} from "tdesign-icons-vue-next";
+import {MusicIcon, SearchIcon} from "tdesign-icons-vue-next";
 import {useFuse} from "@vueuse/integrations/useFuse";
 import {MusicInstanceWeb} from "@/types/MusicInstance";
 import {MusicGroupType} from "@/entity/MusicGroup";
@@ -119,13 +107,14 @@ watch(visible, val => {
     const {pluginInstances} = usePluginStore();
     for (let pluginInstance of pluginInstances) {
       if (pluginInstance.id === pluginId) {
-        const {getMusicSheetInfo} = pluginInstance.instance;
+        const {getTopListDetail} = pluginInstance.instance;
         loading.value = true
-        getMusicSheetInfo && getMusicSheetInfo(item, page.value)
+        getTopListDetail && getTopListDetail(item, page.value)
           .then(res => {
-            const {isEnd, musicList, sheetItem} = res;
-            sheet.value = Object.assign(item, sheetItem);
-            items.value = musicList;
+            const {isEnd, musicList, topListItem} = res;
+            sheet.value = Object.assign(item, topListItem);
+            console.log(sheet.value)
+            items.value = musicList || [];
             isBottom.value = isEnd || true;
           })
           .catch(e => MessageUtil.error("获取歌单数据失败", e))
@@ -176,7 +165,7 @@ function collectionAll() {
 
 </script>
 <style scoped lang="less">
-.song-list-item-drawer {
+.ranking-drawer {
   position: relative;
   width: 100%;
   height: 100%;
@@ -185,7 +174,6 @@ function collectionAll() {
 
 
   &__header {
-    width: 100%;
     position: relative;
 
     .artwork {
@@ -193,30 +181,34 @@ function collectionAll() {
       height: 170px;
       border-radius: var(--td-radius-default);
       overflow: hidden;
+      position: relative;
     }
+
+    .info {
+      position: absolute;
+      top: 0;
+      left: 180px;
+    }
+
 
     .title {
       font-size: var(--td-font-size-title-large);
     }
 
-    .artist {
-      margin-top: 16px;
+    .desc {
+      color: var(--td-text-color-secondary);
+      font-size: var(--td-font-size-body-small);
     }
 
-    .info {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-    }
-
-    .operator {
-      margin-top: 8px;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-    }
   }
+
+  &__operator {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   main {
     margin-top: 8px;
   }

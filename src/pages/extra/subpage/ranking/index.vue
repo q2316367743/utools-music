@@ -1,22 +1,23 @@
 <template>
-  <div class="song-list">
+  <div class="ranking">
     <t-tabs v-model="active">
       <t-tab-panel v-for="p in plugins" :key="p.id" :label="p.name" :value="p.id" :lazy="false">
-        <song-list-item :plugin-id="p.id"/>
+        <ranking-item :plugin-id="p.id" />
       </t-tab-panel>
     </t-tabs>
+    <t-back-top container=".ranking .t-tab-panel" />
   </div>
 </template>
 <script lang="ts" setup>
 import {usePluginStore} from "@/store";
 import {isNotEmptyArray} from "@/utils/lang/FieldUtil";
-import SongListItem from "@/pages/extra/subpage/song-list/components/SongListItem.vue";
+import RankingItem from "@/pages/extra/subpage/ranking/components/RankingItem.vue";
 
 const active = ref(0);
 
 const plugins = computed(() => {
   const res = usePluginStore().pluginInstances
-    .filter(plugin => !!plugin.instance.getRecommendSheetTags && !!plugin.instance.getRecommendSheetsByTag);
+    .filter(plugin => !!plugin.instance.getTopLists && !!plugin.instance.getTopListDetail);
   if (isNotEmptyArray(res)) {
     active.value = res[0].id;
   }
@@ -24,7 +25,7 @@ const plugins = computed(() => {
 });
 </script>
 <style scoped lang="less">
-.song-list {
+.ranking {
   position: relative;
   width: 100%;
   height: 100%;
@@ -46,6 +47,7 @@ const plugins = computed(() => {
         position: relative;
         width: 100%;
         height: 100%;
+        overflow: auto;
       }
     }
   }

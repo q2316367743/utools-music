@@ -142,6 +142,12 @@ interface IGetSheetInfoResult {
 
 type ArtistMediaType = 'music' | 'album';
 
+/** 榜单分组信息 */
+export interface IMusicSheetGroupItem {
+  title?: string;
+  data: Array<IMusicSheetItem>;
+}
+
 interface ITopListInfoResult {
   isEnd?: boolean;
   topListItem?: IMusicSheetItem;
@@ -269,6 +275,11 @@ export interface PluginInstance {
    * @param urlLike 用户输入的文本，可能包含 url 或 id 等信息。
    */
   importMusicSheet?: (urlLike: string) => Promise<IMusicItem[]>;
+
+  /**
+   * 获取榜单列表
+   */
+  getTopLists?: () => Promise<IMusicSheetGroupItem[]>;
 
   /**
    * 获取榜单详情

@@ -1,19 +1,19 @@
 <template>
-  <div class="ranking-item">
+  <div class="song-list">
     <!-- 标签 -->
-    <header class="ranking-item__header">
+    <header class="song-list__header">
       <t-space>
         <t-popup trigger="click" placement="bottom-left" v-model:visible="popupVisible">
           <template #triggerElement>
             <t-button size="small" :theme="allTheme">
               <span>{{ allTag }}</span>
               <template #suffix>
-                <chevron-right-icon :class="{'ranking-item__icon': true, 'active': popupVisible}"/>
+                <chevron-right-icon :class="{'song-list__icon': true, 'active': popupVisible}"/>
               </template>
             </t-button>
           </template>
           <template #content>
-            <div class="ranking-item__popup">
+            <div class="song-list__popup">
               <t-divider align="left">全部</t-divider>
               <t-check-tag :checked="'' === tagId" @click="onTagChange('')">
                 全部
@@ -35,7 +35,7 @@
       </t-space>
     </header>
     <!-- 内容 -->
-    <div class="ranking-item__container">
+    <div class="song-list__container">
       <div class="ri-item" v-for="item in items" :key="item.id" @click="handleItemClick(item)">
         <div class="ri-item__cover">
           <!-- TODO: 封面可能不存在 -->
@@ -170,7 +170,7 @@ function handleItemClick(res: IMusicSheetItem) {
 }
 </script>
 <style scoped lang="less">
-.ranking-item {
+.song-list {
   position: relative;
   height: 100%;
   width: 100%;
@@ -234,14 +234,14 @@ function handleItemClick(res: IMusicSheetItem) {
   }
 }
 
-.ranking-item__popup {
+.song-list__popup {
   max-width: 400px;
   max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-@keyframes ranking-item-rotate {
+@keyframes song-list-rotate {
   0% {
     transform: rotate(0deg);
   }
@@ -250,7 +250,7 @@ function handleItemClick(res: IMusicSheetItem) {
   }
 }
 
-.ranking-item__icon {
+.song-list__icon {
   transform: rotate(0deg);
   transition: 0.5s;
 

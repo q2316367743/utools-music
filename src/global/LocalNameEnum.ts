@@ -44,4 +44,6 @@ export enum LocalNameEnum {
 
   KEY_DOWNLOAD_FOLDER = '/key/download-folder',
 
+  KEY_VERSION = '/key/version',
+
 }

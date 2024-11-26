@@ -4,7 +4,7 @@
       <div class="main-content">
         <router-view v-slot="{ Component }">
           <keep-alive>
-            <component :is="Component" />
+            <component :is="Component"/>
           </keep-alive>
         </router-view>
       </div>
@@ -27,6 +27,8 @@ import {useMainPush} from "@/hooks/MainPush";
 import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
 import MusicAddGroup from "@/components/MusicPlayer/MusicAddGroup.vue";
+import {versionCheck} from "@/components/UpdateLog";
+import MessageUtil from "@/utils/modal/MessageUtil";
 
 const route = useRoute();
 const router = useRouter();
@@ -60,6 +62,8 @@ utools.onMainPush<any>(onMainPush, onSelectCallback);
 
 // 插件初始刷
 usePluginStore().init();
+// 版本检查
+versionCheck().catch(e => MessageUtil.error("版本检查错误", e));
 
 </script>
 <style scoped lang="less">

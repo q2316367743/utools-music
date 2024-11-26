@@ -59,5 +59,6 @@ declare module 'vue' {
     TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTag: typeof import('tdesign-vue-next')['Tag']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+    UpdateLog: typeof import('./src/components/UpdateLog/UpdateLog.vue')['default']
   }
 }

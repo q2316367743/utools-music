@@ -23,6 +23,12 @@
           </template>
           插件管理
         </t-menu-item>
+        <t-menu-item value="/extra/ranking">
+          <template #icon>
+            <chart-combo-icon />
+          </template>
+          排行榜
+        </t-menu-item>
         <t-menu-item value="/extra/song-list">
           <template #icon>
             <root-list-icon />
@@ -60,7 +66,7 @@
 <script lang="ts" setup>
 import {MenuValue} from "tdesign-vue-next";
 import {
-  AppIcon,
+  AppIcon, ChartComboIcon,
   DownloadIcon, ExtensionIcon,
   FolderIcon, InfoCircleIcon,
   MusicIcon,
