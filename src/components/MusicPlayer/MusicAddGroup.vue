@@ -35,9 +35,12 @@ function onConfirm() {
   if (isEmptyArray(groupIds.value)) {
     return;
   }
-  useMusicGroupStore().appendMusicGroup(groupIds.value, music.value)
-    .then(() => MessageUtil.success("新增成功"))
-    .catch(e => MessageUtil.error("新增失败", e));
+  music.value.getInfo().then(item => {
+    useMusicGroupStore().appendMusicGroup(groupIds.value, item)
+      .then(() => MessageUtil.success("新增成功"))
+      .catch(e => MessageUtil.error("新增失败", e));
+  })
+    .catch(e => MessageUtil.error("获取音乐信息失败", e));
 }
 
 onMounted(() => useAddMusicGroup.on(onAddMusicGroup));

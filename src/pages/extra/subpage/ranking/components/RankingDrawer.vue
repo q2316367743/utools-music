@@ -29,7 +29,7 @@
         <main>
           <t-base-table row-key="id" :data="data" :columns="columns" :bordered="false" :loading
                         :hover="true" size="small" active-row-type="single"
-                        @row-dblclick="handleRowDblclick" />
+                        @row-dblclick="handleRowDblclick"/>
         </main>
         <t-back-top container=".ranking-drawer"/>
       </div>
@@ -165,12 +165,10 @@ function collectionAll() {
 }
 
 
-
-
 async function onBottomWrap() {
   const {pluginId, item} = props;
   if (!item) {
-    return ;
+    return;
   }
   const {pluginInstances} = usePluginStore();
   for (let pluginInstance of pluginInstances) {
@@ -207,7 +205,7 @@ function onBottom() {
     .finally(() => loading.value = false)
 }
 
-function onScroll( e: WheelEvent ) {
+function onScroll(e: Event) {
   const target = e.target as HTMLDivElement;
   if (target.scrollHeight - target.scrollTop - target.offsetHeight < 20) {
     onBottom();

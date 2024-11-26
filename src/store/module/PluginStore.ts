@@ -96,7 +96,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
     if (isEmptyString(plugin.author)) plugin.author = '未知作者';
     // 查询插件名称和作者是否存在
     const oldIndex = plugins.value.findIndex(e =>
-      e.name === plugin.name && e.author === instance.author);
+      e.name === plugin.name && e.author === plugin.author);
 
     // 校验版本是否过高、判断升级1
     if (oldIndex === -1) {
