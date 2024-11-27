@@ -31,17 +31,17 @@
 </template>
 <script lang="ts" setup>
 import {usePluginStore} from "@/store";
-import {BaseTableCol, Button, Popconfirm} from "tdesign-vue-next";
+import {BaseTableCol} from "tdesign-vue-next";
 import {installFromLocal, installFromUrl} from "@/pages/extra/subpage/plugin/func";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
-import {isEmptyString} from "@/utils/lang/StringUtil";
 import {QuestionnaireIcon} from 'tdesign-icons-vue-next';
 import {
   openPluginSubscribeDialog,
   updatePluginSubscribe,
   updatePluginSubscribeLoading
 } from "@/pages/extra/subpage/plugin/subscribe";
+import {buildPluginTableColumns} from "@/pages/extra/subpage/plugin/table";
 
 const size = useWindowSize();
 
@@ -50,70 +50,7 @@ const operatorLoading = ref(false);
 
 const data = computed(() => usePluginStore().plugins);
 const maxHeight = computed(() => size.height.value - 100);
-const columns: Array<BaseTableCol> = [{
-  colKey: 'name',
-  title: '名称',
-  ellipsis: true
-}, {
-  colKey: 'author',
-  title: '作者',
-  width: 140,
-  ellipsis: true
-}, {
-  colKey: 'version',
-  title: '版本',
-  width: 80,
-  ellipsis: true
-}, {
-  colKey: 'operator',
-  title: '操作',
-  width: 140,
-  cell: (h, {row}) => {
-    return h('div', {}, [
-      h(Button, {
-        theme: 'primary',
-        variant: 'text',
-        shape: 'circle',
-        disabled: isEmptyString(row.srcUrl) || operatorLoading.value,
-        onClick() {
-          operatorLoading.value = true
-          usePluginStore().downloadPlugin(row.id)
-            .then(() => MessageUtil.success("下载成功"))
-            .catch(e => MessageUtil.error("下载失败", e))
-            .finally(() => operatorLoading.value = false)
-        }
-      }, () => '下'),
-      h(Button, {
-        theme: 'primary',
-        variant: 'text',
-        shape: 'circle',
-        disabled: isEmptyString(row.srcUrl) || operatorLoading.value,
-        onClick() {
-          operatorLoading.value = true
-          usePluginStore().updatePlugin(row.id)
-            .then(() => MessageUtil.success("更新成功"))
-            .catch(e => MessageUtil.error("更新失败", e))
-            .finally(() => operatorLoading.value = false)
-        }
-      }, () => '更'),
-      h(Popconfirm, {
-        content: '是否卸载插件',
-        onConfirm: () => {
-          operatorLoading.value = true
-          usePluginStore().removePlugin(row.id)
-            .then(() => MessageUtil.success("卸载成功"))
-            .catch(e => MessageUtil.error("卸载失败", e))
-            .finally(() => operatorLoading.value = false)
-        }
-      }, () => h(Button, {
-        theme: 'danger',
-        variant: 'text',
-        shape: 'circle',
-        disabled: operatorLoading.value
-      }, () => '卸'))
-    ])
-  }
-}];
+const columns: Array<BaseTableCol> = buildPluginTableColumns(operatorLoading);
 
 function installFromLocalWrap() {
   installLoading.value = true;

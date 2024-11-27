@@ -46,4 +46,6 @@ export enum LocalNameEnum {
 
   KEY_VERSION = '/key/version',
 
+  DATA_PLUGIN =  '/data/plugin'
+
 }

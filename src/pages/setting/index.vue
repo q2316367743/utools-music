@@ -24,7 +24,7 @@
           <t-switch v-model="globalSetting.playDownload"></t-switch>
         </t-form-item>
         <t-form-item label="默认播放质量" help="优先获取默认播放质量的音乐，如果不存在，再获取其他质量的音乐">
-          <t-radio-group v-model="globalSetting.playQuality">
+          <t-radio-group v-model="globalSetting.playQuality" default-value="super">
             <t-radio value="low" label="低"/>
             <t-radio value="standard" label="标准"/>
             <t-radio value="high" label="高"/>

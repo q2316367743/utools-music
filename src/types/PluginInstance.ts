@@ -216,6 +216,8 @@ export interface PluginInstance {
     importMusicItem: Array<string>,
     importMusicSheet: Array<string>,
   },
+  // 用户变量
+  userVariables?: Array<{ key: string, name: string }>
 
   search?: PluginInstanceSearch;
   /**

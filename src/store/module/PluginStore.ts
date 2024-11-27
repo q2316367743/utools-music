@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {PluginEntity, PluginEntityView, PluginInstanceView} from "@/entity/PluginEntity";
 import {PluginInstance} from "@/types/PluginInstance";
-import {listRecordByAsync, removeOneByAsync, saveOneByAsync} from "@/utils/utools/DbStorageUtil";
+import {getFromOneByAsync, listRecordByAsync, removeOneByAsync, saveOneByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {getPluginInstance} from "@/components/PluginManage/PluginFunc";
 import MessageUtil from "@/utils/modal/MessageUtil";
@@ -10,6 +10,12 @@ import {versionCompare} from "@/utils/lang/FieldUtil";
 import {getForText} from "@/plugin/http";
 import {globalSetting} from "@/store";
 import {stringToBase64} from "@/utils/file/CovertUtil";
+
+
+export function getPluginVarSync(id: number): Record<string, string> {
+  const res = utools.db.get(`${LocalNameEnum.DATA_PLUGIN}/${id}`);
+  return res?.value || {}
+}
 
 export const usePluginStore = defineStore('plugin-store', () => {
   const plugins = ref(new Array<PluginEntityView>());
@@ -21,7 +27,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
       try {
         let instance = instanceMap.get(p.id);
         if (!instance) {
-          instance = getPluginInstance(p.content)
+          instance = getPluginInstance(p.content, p.id)
           instanceMap.set(p.id, instance);
         }
         list.push({
@@ -65,24 +71,25 @@ export const usePluginStore = defineStore('plugin-store', () => {
   }
 
 
-  async function getInstance(id: number): Promise<PluginInstance> {
+  function getInstance(id: number): PluginInstance {
     const idx = plugins.value.findIndex(e => e.id === id);
     if (idx === -1) {
-      return Promise.reject(new Error(`插件[${id}]不存在`))
+      throw new Error(`插件[${id}]不存在`);
     }
     const plugin = plugins.value[idx];
     let instance = instanceMap.get(id);
     if (!instance) {
-      instance = getPluginInstance(plugin.content);
+      instance = getPluginInstance(plugin.content, plugin.id);
       instanceMap.set(id, instance);
     }
     return instance;
   }
 
   async function installPlugin(content: string, url?: string, ignoreVersion?: boolean): Promise<void> {
-    const instance = getPluginInstance(content);
+    const id = Date.now();
+    const instance = getPluginInstance(content, id);
     const plugin: PluginEntity = {
-      id: Date.now(),
+      id,
       content,
       author: instance.author,
       name: instance.platform,
@@ -177,11 +184,18 @@ export const usePluginStore = defineStore('plugin-store', () => {
       `${target.name.replace(/\s+/, '_')}.js`);
   }
 
+  async function getPluginVar(id: number): Promise<Record<string, string>> {
+    const res = await getFromOneByAsync<Record<string, string>>(`${LocalNameEnum.DATA_PLUGIN}/${id}`);
+    return res.record || {};
+  }
+
+  async function setPluginVar(id: number, data: Record<string, string>): Promise<void> {
+    await saveOneByAsync(`${LocalNameEnum.DATA_PLUGIN}/${id}`, data);
+  }
 
   return {
     plugins, instanceMap, pluginInstances,
-    init, getInstance, installPlugin, removePlugin, updatePlugin, downloadPlugin
+    init, getInstance, installPlugin, removePlugin, updatePlugin, downloadPlugin,
+    getPluginVar, setPluginVar
   }
-
-
 })

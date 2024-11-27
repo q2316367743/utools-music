@@ -7,6 +7,7 @@ import he from 'he';
 import * as cheerio from 'cheerio';
 import * as webdav from 'webdav';
 import {getAxiosInstance} from "@/plugin/http";
+import {getPluginVarSync} from "@/store";
 
 
 
@@ -28,23 +29,29 @@ const _require = (packageName: string) => {
 }
 
 
-export function getPluginInstance(content: string): PluginInstance {
+export function getPluginInstance(content: string, id: number): PluginInstance {
   // 初始化模块信息
   const _module = {
     exports: { } as any
   };
   const _exports = _module.exports;
 
+  const _env = {
+    getUserVariables: (): Record<string, string> => {
+      return getPluginVarSync(id)
+    }
+  }
+
   const pluginInstance = Function(`
         'use strict';
         try {
-            return function(require, module, exports) {
+            return function(require, module, exports, env) {
                 ${content}
             }
         } catch (e) {
             return () => {};
         }
-    `)()(_require, _module, _exports);
+    `)()(_require, _module, _exports, _env);
 
   const exports = _module.exports || pluginInstance;
   if (exports.default) {
