@@ -57,6 +57,9 @@ function padStartNumber(num: number, maxLength: number, fillString?: string): st
 }
 
 export function prettyDateTime(date: number) {
+  if (date <= 0) {
+    return '00:00';
+  }
   let minute = Math.floor(date / 60);
   let second = Math.floor(date % 60);
   return `${padStartNumber(minute, 2, '0')}:${padStartNumber(second, 2, '0')}`;

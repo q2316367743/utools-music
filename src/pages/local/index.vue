@@ -9,25 +9,47 @@
         </t-input>
         <music-scanner/>
       </div>
-      <t-table row-key="id" :data="data" :columns="columns" :bordered="false" :height="maxHeight"
-               :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }" active-row-type="single"
-               :active-row-keys="activeRowKeys" @row-dblclick="handleRowDblclick">
-      </t-table>
+      <vxe-table :data="data" row-key :border="false" :height="maxHeight" empty-text="空空如也"
+                 :scroll-y="{enabled: true, gt: 0}"
+                 :menu-config="menuConfig" @menu-click="menuClickEvent" :row-config="{isCurrent: false, isHover: true}"
+                 @cell-dblclick="handleRowDblclick">
+        <vxe-column field="name" title="歌曲名" show-overflow="tooltip"/>
+        <vxe-column field="artist" title="演唱者" show-overflow="tooltip"/>
+        <vxe-column field="album" title="专辑" show-overflow="tooltip">
+          <template #default="{ row }">
+            {{ row.album || '-' }}
+          </template>
+        </vxe-column>
+        <vxe-column field="duration" title="时长" :width="70">
+          <template #default="{ row }">
+            {{ prettyDateTime(row.duration) }}
+          </template>
+        </vxe-column>
+        <vxe-column field="source" title="来源" :width="60">
+          <template #default="{ row }">
+            <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
+            <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
+          </template>
+        </vxe-column>
+      </vxe-table>
     </div>
-    <t-back-top container=".local-music .container .t-table__content" style="bottom: 24px;right: 24px"/>
+    <t-back-top container=".local-music .container .vxe-table--body-wrapper" style="bottom: 24px;right: 24px"/>
   </div>
 </template>
 <script lang="tsx" setup>
 import MusicScanner from "@/pages/local/components/MusicScanner/MusicScanner.vue";
-import {useMusicStore} from "@/store";
-import {BaseTableCol, RowEventContext, TableRowData} from "tdesign-vue-next";
+import {useMusicGroupStore, useMusicStore} from "@/store";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {useFuse} from "@vueuse/integrations/useFuse";
-import {useMusicPlay} from "@/global/Event";
+import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
 import {SearchIcon} from 'tdesign-icons-vue-next';
 import {MusicInstanceLocal} from "@/types/MusicInstance";
+import {VxeTableEvents, VxeTablePropTypes} from "vxe-table";
+import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
+import {MusicGroupType} from "@/entity/MusicGroup";
+import MessageUtil from "@/utils/modal/MessageUtil";
 
 const size = useWindowSize();
 
@@ -43,48 +65,22 @@ const {results} = useFuse<MusicItemView>(keyword, musics, {
     keys: ["name", "artist", "album"]
   }
 });
-const data = computed(() => results.value.map(e => e.item))
+const data = computed(() => results.value.map(e => e.item));
 
-const columns: Array<BaseTableCol> = [{
-  colKey: 'name',
-  title: '歌曲名',
-  ellipsis: true,
-}, {
-  colKey: 'artist',
-  title: '演唱者',
-  ellipsis: true,
-}, {
-  colKey: 'album',
-  title: '专辑',
-  ellipsis: true,
-  cell: (h, {row}) => {
-    return row.album || '-';
-  }
-}, {
-  colKey: 'duration',
-  title: '时长',
-  width: 70,
-  cell: (h, {row}) => {
-    return prettyDateTime(row.duration);
-  }
-}, {
-  colKey: 'source',
-  title: '来源',
-  width: 60,
-  cell: (h, {row}) => {
-    const {source} = row;
-    let text = '';
-    if (source === MusicItemSource.LOCAL) {
-      text = '本地';
-    } else if (source === MusicItemSource.WEBDAV) {
-      text = 'WebDAV';
-    }
-    return <t-tag size="small" theme="primary">
-      <span>{text}</span>
-    </t-tag>
 
-  }
-}];
+const menuConfig = reactive<VxeTablePropTypes.MenuConfig<MusicItemView>>({
+  className: 'local-music-menu',
+  body: {
+    options: [
+      [
+        {code: 'next', name: '下一首播放'},
+        {code: 'music-group', name: '添加到歌单'},
+        {code: 'folder', name: '打开歌曲所在文件夹'}
+      ],
+    ]
+  },
+})
+
 
 watch(music, val => {
   if (val) {
@@ -92,7 +88,7 @@ watch(music, val => {
   }
 }, {immediate: true});
 
-function handleRowDblclick(context: RowEventContext<TableRowData>) {
+function handleRowDblclick(context: { row: MusicItemView }) {
   const {row} = context;
   const list = data.value;
   const index = data.value.findIndex(e => e.url === row.url);
@@ -102,6 +98,26 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
   });
 }
 
+const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) => {
+  switch (menu.code) {
+    case 'next':
+      useMusicAppend.emit(new MusicInstanceLocal(row));
+      break
+    case 'music-group':
+      musicGroupChoose([MusicGroupType.LOCAL])
+        .then(id => {
+          if (id > 0) {
+            useMusicGroupStore().appendMusicGroup([id], row)
+              .then(() => MessageUtil.success("添加成功"))
+              .catch(e => MessageUtil.error("添加失败", e));
+          }
+        })
+      break
+    case 'folder':
+      utools.shellShowItemInFolder(row.url)
+      break
+  }
+}
 </script>
 <style scoped lang="less">
 .local-music {

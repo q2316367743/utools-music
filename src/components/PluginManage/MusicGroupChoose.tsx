@@ -1,7 +1,6 @@
 import {MusicGroupType} from "@/entity/MusicGroup";
 import {DialogPlugin} from "tdesign-vue-next";
 import {useMusicGroupStore} from "@/store";
-import {isEmptyArray} from "@/utils/lang/FieldUtil";
 import {MusicIcon, PlusIcon} from "tdesign-icons-vue-next";
 import './MusicGroupChoose.less';
 import {addMusicGroup} from "@/pages/MusicGroup/components/MusicGroupFunc";
@@ -19,9 +18,6 @@ export function musicGroupChoose(
 
   const groups = computed(() => useMusicGroupStore().musicGroupItems.filter(e =>
     types.includes(e.type || MusicGroupType.LOCAL)));
-  if (isEmptyArray(groups.value)) {
-    return Promise.resolve(0);
-  }
 
   return new Promise<number>(resolve => {
     const onConfirm = (id: number) => {

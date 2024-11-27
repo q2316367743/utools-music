@@ -5,6 +5,7 @@ import {defineConfig} from "vite";
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import {TDesignResolver} from 'unplugin-vue-components/resolvers';
+import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 // @ts-ignore
 import path from "path";
 
@@ -32,6 +33,13 @@ export default defineConfig({
         library: 'vue-next'
       })],
     }),
+    lazyImport({
+      resolvers: [
+        VxeResolver({
+          libraryName: 'vxe-table'
+        }),
+      ]
+    })
   ],
   base: "./",
   build: {

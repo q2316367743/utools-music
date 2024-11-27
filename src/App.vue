@@ -27,6 +27,7 @@ import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
 import {versionCheck} from "@/components/UpdateLog";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {VXETable} from 'vxe-table'
 
 const route = useRoute();
 const router = useRouter();
@@ -40,13 +41,15 @@ watch(() => route.path, value => {
   }
 })
 
-useDark({
+const isDark = useDark({
   selector: 'html',
   attribute: 'theme-mode',
   valueDark: 'dark',
   valueLight: 'light',
   storage: utools.dbStorage
-})
+});
+
+watch(isDark, val => VXETable.setTheme(val ? 'dark' : 'light'), {immediate: true});
 
 utools.onPluginEnter(action => {
   console.log(action);
