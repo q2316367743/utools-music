@@ -8,7 +8,7 @@ async function setUserVar(id: number) {
   const instance = getInstance(id);
   const {userVariables} = instance;
   if (!userVariables) {
-    return;
+    return Promise.reject(new Error("此插件不需要设置变量"));
   }
   const res = await getPluginVar(id);
   console.log(id, res);
@@ -70,6 +70,7 @@ export const buildPluginTableColumns = (
 
       function onSetUserVar() {
         setUserVar(row.id)
+          .catch(e => MessageUtil.error("设置变量失败", e));
       }
 
       function onDownload() {
