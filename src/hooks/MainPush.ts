@@ -28,10 +28,10 @@ export interface MainPushResult<T = any> {
 export function useMainPush(): MainPushResult<string> {
   return {
     onMainPush: action => {
-      const {musicGroups} = useMusicGroupStore();
+      const {musicGroupItems} = useMusicGroupStore();
       const {code, payload} = action;
       if (code === 'music-group') {
-        const fuse = new Fuse(musicGroups, {
+        const fuse = new Fuse(musicGroupItems, {
           keys: [{
             name: 'name'
           }]

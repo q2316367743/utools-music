@@ -41,7 +41,7 @@ export function buildGlobalSetting(): GlobalSetting {
   return {
     playError: GlobalSettingPlayErrorType.NEXT,
     playDownload: false,
-    playQuality: "standard",
+    playQuality: "super",
     lyricFontSize: 36,
     lyricColor: '#0052D9',
     lyricBorderColor: 'rgba(110, 110, 110, 0.8)',

@@ -38,6 +38,7 @@
       "mainPush": true,
       "cmds": [{
         "type": "over",
+        "label": "歌单搜索",
         "minLength": 1,
         "maxLength": 9999
       }]

@@ -244,7 +244,7 @@ export class MusicInstanceWeb implements MusicInstance {
         }
         // 不存在音乐，再获取音源
         const qualities: Array<"low" | "standard" | "high" | "super"> = ["super", "high", "standard", "low"];
-        const {playQuality = "standard"} = toRaw(globalSetting.value);
+        const {playQuality = "super"} = toRaw(globalSetting.value);
         qualities.splice(qualities.findIndex(e => e === playQuality), 1);
         qualities.unshift(playQuality);
         for (let quality of qualities) {
