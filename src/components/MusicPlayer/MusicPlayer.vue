@@ -3,7 +3,7 @@
     <div class="container">
       <div class="image" @click="switchDisplay">
         <img v-if="music && music.cover" :src="music.cover" :alt="music.name"/>
-        <t-avatar v-else-if="music" shape="round" size="42px">{{ music.name.substring(0, 1) }}</t-avatar>
+        <t-avatar v-else-if="music" shape="round" size="42px">{{ music.name?.substring(0, 1) || '' }}</t-avatar>
         <t-avatar v-else shape="round" size="42px">无</t-avatar>
         <div class="mask">
           <chevron-down-double-icon v-if="displayVisible" size="32px" color="#fff"/>

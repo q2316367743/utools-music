@@ -34,7 +34,7 @@ export const useMusicGroupStore = defineStore('music-group', () => {
     .then(() => console.log("歌单初始化成功"))
     .catch(e => console.error("歌单初始化失败", e));
 
-  async function loadMusicItems(id: number): Promise<Array<MusicItem>> {
+  async function loadMusicItems(id: number): Promise<Array<any>> {
     const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`);
     if (!res.record) {
       return [];
