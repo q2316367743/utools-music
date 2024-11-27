@@ -2,7 +2,6 @@ import {
   BaseTableCol,
   Button,
   DialogPlugin,
-  Divider,
   Dropdown,
   DropdownOption,
   Form,
@@ -10,14 +9,12 @@ import {
   Input,
   Popup
 } from "tdesign-vue-next";
-import {useMusicGroupStore, usePluginStore} from "@/store";
+import {usePluginStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import {MoreIcon} from "tdesign-icons-vue-next";
-import {PluginInstance} from "@/types/PluginInstance";
 import {PluginEntity} from "@/entity/PluginEntity";
-import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
-import {MusicGroupType} from "@/entity/MusicGroup";
+import {importMusicFromPlugin, importSheetFromPlugin} from "@/pages/extra/subpage/plugin/PluginMusicImport";
 
 async function setUserVar(id: number) {
   const {getInstance, getPluginVar, setPluginVar} = usePluginStore();
@@ -56,60 +53,6 @@ async function setUserVar(id: number) {
     }
   });
 
-}
-
-async function importMusic(id: number, entity: PluginEntity, instance: PluginInstance) {
-  const {importMusicItem} = instance;
-  if (!importMusicItem) {
-    return Promise.reject(new Error("插件不支持导入歌曲"))
-  }
-}
-
-async function importSheet(id: number, entity: PluginEntity, instance: PluginInstance) {
-  const {importMusicSheet, hints} = instance;
-  if (!importMusicSheet) {
-    return Promise.reject(new Error("插件不支持导入歌单"))
-  }
-  const func = importMusicSheet;
-  const lines = hints?.importMusicSheet || [];
-  const url = ref('');
-  const loading = ref(false);
-
-  function onConfirm() {
-    // 开始加载
-    loading.value = true
-    func(url.value)
-      .then(musicItems => {
-        // 关闭弹窗
-        dialogInstance.destroy();
-        // TODO：选择混合歌单
-        musicGroupChoose([MusicGroupType.MIX])
-          .then(ids => {
-            const {appendMixGroup} = useMusicGroupStore();
-            ids.map(id => appendMixGroup(id, musicItems))
-          })
-
-      })
-      .catch(e => MessageUtil.error("导入失败", e))
-      .finally(() => loading.value = false);
-  }
-
-  const dialogInstance = DialogPlugin({
-    header: '导入歌单',
-    top: '10vh',
-    default: () => <div>
-      <Input v-model={url.value} clearable={true} placeholder={`请输入 ${entity.name} 歌单链接`}/>
-      <Divider/>
-      <ul>
-        {lines.map(line => <li key={line}>{line}</li>)}
-      </ul>
-    </div>,
-    footer: () => <>
-      <Button theme={'default'} onClick={() => dialogInstance.destroy()}>取消</Button>
-      <Button theme={'primary'} loading={loading.value} onClick={onConfirm}>导入</Button>
-    </>,
-
-  });
 }
 
 export const buildPluginTableColumns = (
@@ -174,12 +117,12 @@ export const buildPluginTableColumns = (
       }
 
       function onImportMusic() {
-        importMusic(row.id, row as PluginEntity, instance)
+        importMusicFromPlugin(row.id, row as PluginEntity, instance)
           .catch(e => MessageUtil.error("导入歌曲失败", e));
       }
 
       function onImportSheet() {
-        importSheet(row.id, row as PluginEntity, instance)
+        importSheetFromPlugin(row.id, row as PluginEntity, instance)
           .catch(e => MessageUtil.error("导入歌单失败", e));
       }
 

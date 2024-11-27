@@ -15,6 +15,7 @@
         <t-space>
           <div class="about__label">软件作者</div>
           <t-link theme="primary" @click="openUrl(Constants.website)">{{ Constants.author }}</t-link>
+          <t-link theme="success" @click="openReward">赏赞作者</t-link>
         </t-space>
       </t-paragraph>
       <t-paragraph>
@@ -48,6 +49,7 @@
 </template>
 <script lang="ts" setup>
 import {Constants} from "@/global/Constant";
+import {openReward} from "@/pages/about/func";
 
 
 function openUrl(url: string) {

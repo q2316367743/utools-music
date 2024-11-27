@@ -116,7 +116,7 @@ import {
   PlayIcon,
   PreviousIcon
 } from 'tdesign-icons-vue-next';
-import {useAddMusicGroup, useMusicAppend, useMusicPlay} from "@/global/Event";
+import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
   audioControl,
   currentTime,
@@ -146,7 +146,9 @@ import {isNull} from "@/utils/lang/FieldUtil";
 import {MusicItemSource} from "@/entity/MusicItem";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {useDownloadStore} from "@/store";
+import {useDownloadStore, useMusicGroupStore} from "@/store";
+import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
+import {MusicGroupType} from "@/entity/MusicGroup";
 
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');
@@ -201,7 +203,22 @@ function onChange(value: number | Array<number>) {
 }
 
 function onAddMusicGroup() {
-  useAddMusicGroup.emit();
+  // useAddMusicGroup.emit();
+  musicGroupChoose([MusicGroupType.LOCAL])
+    .then(id => {
+      if (id > 0) {
+        if (!music.value) {
+          MessageUtil.warning("没有正在播放的音乐，无法加入到歌单")
+          return;
+        }
+        music.value.getInfo().then(item => {
+          useMusicGroupStore().appendMusicGroup([id], item)
+            .then(() => MessageUtil.success("新增成功"))
+            .catch(e => MessageUtil.error("新增失败", e));
+        })
+          .catch(e => MessageUtil.error("获取音乐信息失败", e));
+      }
+    })
 }
 
 function onDownload() {

@@ -1,5 +1,10 @@
 import {defineStore} from "pinia";
-import {MusicGroup, MusicGroupContent, MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
+import {
+  MusicGroup,
+  MusicGroupContent,
+  MusicGroupIndex,
+  MusicGroupType
+} from "@/entity/MusicGroup";
 import {
   getFromOneByAsync,
   listByAsync,
@@ -19,7 +24,7 @@ export const useMusicGroupStore = defineStore('music-group', () => {
 
   const musicGroupItems = computed(() =>
     musicGroups.value.filter(e => {
-      if (e.type === MusicGroupType.WEB) {
+      if (e.type === MusicGroupType.WEB || e.type === MusicGroupType.MIX) {
         return true;
       }
       return e.nativeId === nativeId
@@ -116,13 +121,39 @@ export const useMusicGroupStore = defineStore('music-group', () => {
   }
 
   /**
-   * TODO: 追加音乐到混合组
-   * @param id
-   * @param musicItems
+   * 追加音乐到混合组
+   * @param id 歌单ID
+   * @param musicItems 歌曲列表
+   * @param pluginId 插件ID
    */
-  async function appendMixGroup(id: number, musicItems: Array<IMusicItem>): Promise<void> {
+  async function appendMixGroup(id: number, musicItems: Array<IMusicItem>, pluginId: number): Promise<void> {
+
+    const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`);
+    const {record, rev} = res;
+
+    const musicGroupMixContents = musicItems.map(e => ({
+      ...e,
+      pluginId,
+    }));
+
+    if (record) {
+      // 更新
+      const index = record.items.findIndex((e) => e.id === id);
+      if (index === -1) {
+        // 不存在，新增
+        record.items.push(...musicGroupMixContents);
+        await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, record, rev);
+      }
+    } else {
+      // 新增
+      await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, {
+        id,
+        items: musicGroupMixContents,
+      });
+    }
 
   }
+
   return {
     musicGroups, musicGroupItems,
     loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup,

@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     FolderInput: typeof import('./src/components/FolderInput/FolderInput.vue')['default']
     MenuSide: typeof import('./src/components/MenuSide/MenuSide.vue')['default']
-    MusicAddGroup: typeof import('./src/components/MusicPlayer/MusicAddGroup.vue')['default']
     MusicDisplay: typeof import('./src/components/MusicPlayer/MusicDisplay.vue')['default']
     MusicLyricSearch: typeof import('./src/components/MusicPlayer/MusicLyricSearch.vue')['default']
     MusicPlayer: typeof import('./src/components/MusicPlayer/MusicPlayer.vue')['default']

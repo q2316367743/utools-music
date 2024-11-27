@@ -30,6 +30,7 @@ export const lyrics = ref(new Array<LyricLine>());
 export const lyricIndex = ref(0);
 
 export const playLoading = ref(false);
+const errorCount = ref(0);
 
 watch(volume, val => {
   audio.volume = val / 100
@@ -110,6 +111,11 @@ export function loopControl() {
 }
 
 function onError(m: MusicItem) {
+  errorCount.value += 1;
+  if (errorCount.value > 4) {
+    MessageUtil.warning("已经超过4次播放错误，播放暂停。")
+    return;
+  }
   const {playError} = toRaw(globalSetting.value);
   if (playError === GlobalSettingPlayErrorType.NEXT) {
     if (musics.value.length > 1) {
@@ -168,6 +174,8 @@ async function playWrapper() {
   if (lyricGroups.value.length > 0) {
     lyrics.value = lyricGroups.value[0].lines;
   }
+  // 播放成功，清空
+  errorCount.value = 0;
 }
 
 export function play() {

@@ -7,4 +7,3 @@ export interface MusicPlayEvent {
 
 export const useMusicPlay = useEventBus<MusicPlayEvent>('music-play');
 export const useMusicAppend = useEventBus<MusicInstance>('music-append');
-export const useAddMusicGroup = useEventBus('add-music-group');

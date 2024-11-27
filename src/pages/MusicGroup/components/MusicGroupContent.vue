@@ -1,17 +1,6 @@
 <template>
   <t-drawer v-model:visible="visible" @close="onClose" attach=".music-group" size="100%" :footer="false"
-            :close-btn="true">
-    <template #header>
-      <t-space>
-        <div>{{ header }}</div>
-        <t-button theme="primary" variant="outline" size="small" @click="musicGroupAppendWrap"
-                  v-if="musicGroup && musicGroup.type !== MusicGroupType.WEB">
-          <template #icon>
-            <edit-icon/>
-          </template>
-        </t-button>
-      </t-space>
-    </template>
+            :close-btn="true" :header>
     <div class="music-group-content">
       <t-base-table row-key="id" :data="data" :columns="columns" :bordered="false" :height="maxHeight"
                     :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }"
@@ -29,7 +18,6 @@ import {BaseTableCol, RowEventContext, TableRowData} from "tdesign-vue-next";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {useMusicPlay} from "@/global/Event";
 import {musicGroupAppend} from "@/pages/MusicGroup/components/MusicGroupFunc";
-import {EditIcon} from 'tdesign-icons-vue-next';
 import {MusicInstanceLocal, MusicInstanceWeb} from "@/types/MusicInstance";
 
 const size = useWindowSize();
@@ -112,9 +100,16 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
   const list = data.value;
   const index = data.value.findIndex(e => e.id === row.id);
   useMusicPlay.emit({
-    views: list.map(e => musicGroup && musicGroup.type === MusicGroupType.WEB ?
-      new MusicInstanceWeb(e, musicGroup.pluginId) :
-      new MusicInstanceLocal(e)),
+    views: list.map(e => {
+      if (musicGroup) {
+        if (musicGroup.type === MusicGroupType.WEB) {
+          return new MusicInstanceWeb(e, musicGroup.pluginId)
+        } else if (musicGroup.type === MusicGroupType.MIX) {
+          return new MusicInstanceWeb(e, e.pluginId)
+        }
+      }
+      return new MusicInstanceLocal(e);
+    }),
     index: Math.max(index, 0)
   });
 }

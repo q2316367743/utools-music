@@ -14,7 +14,6 @@
     <div class="main-player">
       <music-player/>
     </div>
-    <music-add-group/>
   </div>
 </template>
 <script lang="ts" setup>
@@ -26,7 +25,6 @@ import {usePluginStore} from "@/store";
 import {useMainPush} from "@/hooks/MainPush";
 import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
-import MusicAddGroup from "@/components/MusicPlayer/MusicAddGroup.vue";
 import {versionCheck} from "@/components/UpdateLog";
 import MessageUtil from "@/utils/modal/MessageUtil";
 

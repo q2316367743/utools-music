@@ -1,17 +1,7 @@
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import {useMusicGroupStore} from "@/store/module/MusicGroupStore";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {
-  DialogPlugin,
-  Form,
-  FormItem,
-  Input,
-  Radio,
-  RadioGroup,
-  Table,
-  TableCol,
-  Tag
-} from "tdesign-vue-next";
+import {DialogPlugin, Form, FormItem, Input, Radio, RadioGroup, Table, TableCol, Tag} from "tdesign-vue-next";
 import {useMusicStore} from "@/store";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {MusicItemSource} from "@/entity/MusicItem";
@@ -23,14 +13,24 @@ export function addMusicGroup(): void {
   const form = ref({
     name: '',
     type: MusicGroupType.LOCAL,
-  })
+  });
+
+  function renderTypeHelp(type: MusicGroupType) {
+    if (type === MusicGroupType.LOCAL) {
+      return "只能添加本地歌曲";
+    }else if (type === MusicGroupType.MIX) {
+      return "只能添加网络歌曲"
+    }else if (type === MusicGroupType.WEB) {
+      return "收藏的网络歌单，无法修改与新增"
+    }
+  }
   const dialogInstance = DialogPlugin({
     header: "新建歌单",
     default: () => <Form labelAlign={'top'}>
       <FormItem label={'歌单名称'}>
         <Input v-model={form.value.name} clearable={true}></Input>
       </FormItem>
-      <FormItem label={'歌单类型'}>
+      <FormItem label={'歌单类型'} help={renderTypeHelp(form.value.type)}>
         <RadioGroup v-model={form.value.type}>
           <Radio value={MusicGroupType.LOCAL}>本地</Radio>
           <Radio value={MusicGroupType.MIX}>混合</Radio>

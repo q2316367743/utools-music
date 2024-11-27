@@ -251,6 +251,7 @@ export class MusicInstanceWeb implements MusicInstance {
           try {
             if (plugin.instance.getMediaSource) {
               const mediaSource = await plugin.instance.getMediaSource(this.item, quality);
+              console.log(quality, mediaSource)
               if (mediaSource) {
                 copyProperties(mediaSource, this.item);
               }

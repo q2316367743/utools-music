@@ -1,7 +1,6 @@
 <template>
   <div class="mg-item" v-if="item">
     <div class="mg-item__cover">
-      <!-- TODO: 封面可能不存在 -->
       <img :src="item.cover" :alt="item.name" v-if="item.cover"/>
       <music-icon v-else size="80px"/>
     </div>
