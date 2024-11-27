@@ -1,9 +1,19 @@
+import {IMusicItem} from "@/types/PluginInstance";
+import {MusicItem} from "@/entity/MusicItem";
+
 export enum MusicGroupType {
   /**
-   * 默认
+   * 本地，默认类型
    */
   LOCAL = 1,
-  WEB = 2
+  /**
+   * 纯网络
+   */
+  WEB = 2,
+  /**
+   * 混合
+   */
+  MIX = 3
 }
 
 export interface MusicGroupBase {
@@ -30,6 +40,19 @@ export interface MusicGroupIndex extends MusicGroupBase {
    */
   pluginId: number;
 }
+
+/**
+ * 混合内容，其实是网络混合
+ */
+export interface MusicGroupMixContent {
+  pluginId: number;
+  item: IMusicItem
+}
+
+/**
+ * 歌单内容类型
+ */
+export type MusicGroupContentItem = MusicItem | IMusicItem | MusicGroupMixContent;
 
 export interface MusicGroupContent {
   id: number;

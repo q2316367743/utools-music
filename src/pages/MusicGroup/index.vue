@@ -67,6 +67,7 @@ function onClose() {
   align-items: flex-start;
   overflow: auto;
   contain: strict;
+  align-content: flex-start;
 
   .music-group-item {
     padding: 8px;

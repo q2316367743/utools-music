@@ -14,6 +14,12 @@
     <div class="mg-item__web" v-if="item.type === MusicGroupType.WEB">
       <t-tag theme="primary">Web</t-tag>
     </div>
+    <div class="mg-item__web" v-else-if="item.type === MusicGroupType.MIX">
+      <t-tag theme="success">混合</t-tag>
+    </div>
+    <div class="mg-item__web" v-else>
+      <t-tag theme="warning">本地</t-tag>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>

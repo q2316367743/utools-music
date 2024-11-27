@@ -10,6 +10,7 @@ import {
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {MusicItem} from "@/entity/MusicItem";
 import {isEmptyString} from "@/utils/lang/StringUtil";
+import {IMusicItem} from "@/types/PluginInstance";
 
 export const useMusicGroupStore = defineStore('music-group', () => {
   const musicGroups = ref(new Array<MusicGroupIndex>());
@@ -114,9 +115,18 @@ export const useMusicGroupStore = defineStore('music-group', () => {
     }
   }
 
+  /**
+   * TODO: 追加音乐到混合组
+   * @param id
+   * @param musicItems
+   */
+  async function appendMixGroup(id: number, musicItems: Array<IMusicItem>): Promise<void> {
+
+  }
   return {
     musicGroups, musicGroupItems,
-    loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup, appendMusicGroup
+    loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup,
+    appendMusicGroup, appendMixGroup
   }
 
 })

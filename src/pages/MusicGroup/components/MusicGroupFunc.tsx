@@ -1,7 +1,17 @@
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import {useMusicGroupStore} from "@/store/module/MusicGroupStore";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {DialogPlugin, Table, TableCol, Tag} from "tdesign-vue-next";
+import {
+  DialogPlugin,
+  Form,
+  FormItem,
+  Input,
+  Radio,
+  RadioGroup,
+  Table,
+  TableCol,
+  Tag
+} from "tdesign-vue-next";
 import {useMusicStore} from "@/store";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {MusicItemSource} from "@/entity/MusicItem";
@@ -10,20 +20,41 @@ import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {MusicGroupContent, MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
 
 export function addMusicGroup(): void {
-  MessageBoxUtil.prompt("请输入歌单名称", "新建歌单", {
-    confirmButtonText: "新建"
+  const form = ref({
+    name: '',
+    type: MusicGroupType.LOCAL,
   })
-    .then(name => {
+  const dialogInstance = DialogPlugin({
+    header: "新建歌单",
+    default: () => <Form labelAlign={'top'}>
+      <FormItem label={'歌单名称'}>
+        <Input v-model={form.value.name} clearable={true}></Input>
+      </FormItem>
+      <FormItem label={'歌单类型'}>
+        <RadioGroup v-model={form.value.type}>
+          <Radio value={MusicGroupType.LOCAL}>本地</Radio>
+          <Radio value={MusicGroupType.MIX}>混合</Radio>
+        </RadioGroup>
+      </FormItem>
+    </Form>,
+    confirmBtn: {
+      default: '新建'
+    },
+    onConfirm() {
       useMusicGroupStore().postMusicGroupIndex({
-        name: name,
+        name: form.value.name,
         id: Date.now(),
         nativeId: utools.getNativeId(),
-        type: MusicGroupType.LOCAL,
+        type: form.value.type,
         pluginId: 0
       })
-        .then(() => MessageUtil.success("新增成功"))
+        .then(() => {
+          MessageUtil.success("新增成功");
+          dialogInstance.destroy();
+        })
         .catch(e => MessageUtil.error("新增失败", e));
-    })
+    }
+  });
 }
 
 export function editMusicGroup(group: MusicGroupIndex): void {
@@ -36,7 +67,7 @@ export function editMusicGroup(group: MusicGroupIndex): void {
         name: name,
         id: group.id,
         nativeId: group.nativeId,
-        type: MusicGroupType.LOCAL,
+        type: group.type,
         pluginId: 0
       })
         .then(() => MessageUtil.success("修改成功"))

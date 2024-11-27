@@ -217,7 +217,9 @@ export interface PluginInstance {
     importMusicSheet: Array<string>,
   },
   // 用户变量
-  userVariables?: Array<{ key: string, name: string }>
+  userVariables?: Array<{ key: string, name: string }>;
+  // 支持的搜索类型
+  supportedSearchType: Array<"music" | "album" | "sheet" | "artist" | "lyric">
 
   search?: PluginInstanceSearch;
   /**

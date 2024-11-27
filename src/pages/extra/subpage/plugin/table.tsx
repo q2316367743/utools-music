@@ -1,7 +1,23 @@
-import {BaseTableCol, Button, DialogPlugin, Form, FormItem, Input, Popconfirm} from "tdesign-vue-next";
-import {isEmptyString} from "@/utils/lang/StringUtil";
-import {usePluginStore} from "@/store";
+import {
+  BaseTableCol,
+  Button,
+  DialogPlugin,
+  Divider,
+  Dropdown,
+  DropdownOption,
+  Form,
+  FormItem,
+  Input,
+  Popup
+} from "tdesign-vue-next";
+import {useMusicGroupStore, usePluginStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
+import {MoreIcon} from "tdesign-icons-vue-next";
+import {PluginInstance} from "@/types/PluginInstance";
+import {PluginEntity} from "@/entity/PluginEntity";
+import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
+import {MusicGroupType} from "@/entity/MusicGroup";
 
 async function setUserVar(id: number) {
   const {getInstance, getPluginVar, setPluginVar} = usePluginStore();
@@ -42,6 +58,60 @@ async function setUserVar(id: number) {
 
 }
 
+async function importMusic(id: number, entity: PluginEntity, instance: PluginInstance) {
+  const {importMusicItem} = instance;
+  if (!importMusicItem) {
+    return Promise.reject(new Error("插件不支持导入歌曲"))
+  }
+}
+
+async function importSheet(id: number, entity: PluginEntity, instance: PluginInstance) {
+  const {importMusicSheet, hints} = instance;
+  if (!importMusicSheet) {
+    return Promise.reject(new Error("插件不支持导入歌单"))
+  }
+  const func = importMusicSheet;
+  const lines = hints?.importMusicSheet || [];
+  const url = ref('');
+  const loading = ref(false);
+
+  function onConfirm() {
+    // 开始加载
+    loading.value = true
+    func(url.value)
+      .then(musicItems => {
+        // 关闭弹窗
+        dialogInstance.destroy();
+        // TODO：选择混合歌单
+        musicGroupChoose([MusicGroupType.MIX])
+          .then(ids => {
+            const {appendMixGroup} = useMusicGroupStore();
+            ids.map(id => appendMixGroup(id, musicItems))
+          })
+
+      })
+      .catch(e => MessageUtil.error("导入失败", e))
+      .finally(() => loading.value = false);
+  }
+
+  const dialogInstance = DialogPlugin({
+    header: '导入歌单',
+    top: '10vh',
+    default: () => <div>
+      <Input v-model={url.value} clearable={true} placeholder={`请输入 ${entity.name} 歌单链接`}/>
+      <Divider/>
+      <ul>
+        {lines.map(line => <li key={line}>{line}</li>)}
+      </ul>
+    </div>,
+    footer: () => <>
+      <Button theme={'default'} onClick={() => dialogInstance.destroy()}>取消</Button>
+      <Button theme={'primary'} loading={loading.value} onClick={onConfirm}>导入</Button>
+    </>,
+
+  });
+}
+
 export const buildPluginTableColumns = (
   loading: Ref<boolean>
 ): Array<BaseTableCol> => {
@@ -62,11 +132,13 @@ export const buildPluginTableColumns = (
   }, {
     colKey: 'operator',
     title: '操作',
-    width: 160,
+    width: 100,
     align: 'right',
     cell: (_h, {row}) => {
-      const instance = usePluginStore().instanceMap.get(row.id);
-      const hasUserVar = !!instance?.userVariables
+      const instance = usePluginStore().getInstance(row.id);
+      const hasUserVar = !!instance?.userVariables;
+      const hasImportMusic = !!instance?.importMusicItem
+      const hasImportSheet = !!instance?.importMusicSheet
 
       function onSetUserVar() {
         setUserVar(row.id)
@@ -90,32 +162,71 @@ export const buildPluginTableColumns = (
       }
 
       function onUninstall() {
-        loading.value = true
-        usePluginStore().removePlugin(row.id)
-          .then(() => MessageUtil.success("卸载成功"))
-          .catch(e => MessageUtil.error("卸载失败", e))
-          .finally(() => loading.value = false)
+        MessageBoxUtil.alert("是否卸载插件，卸载后将无法恢复", "卸载插件", {
+          confirmButtonText: '卸载'
+        }).then(() => {
+          loading.value = true
+          usePluginStore().removePlugin(row.id)
+            .then(() => MessageUtil.success("卸载成功"))
+            .catch(e => MessageUtil.error("卸载失败", e))
+            .finally(() => loading.value = false)
+        })
       }
 
+      function onImportMusic() {
+        importMusic(row.id, row as PluginEntity, instance)
+          .catch(e => MessageUtil.error("导入歌曲失败", e));
+      }
+
+      function onImportSheet() {
+        importSheet(row.id, row as PluginEntity, instance)
+          .catch(e => MessageUtil.error("导入歌单失败", e));
+      }
+
+      const options: Array<DropdownOption> = [{
+        content: '下载',
+        onClick: onDownload
+      }, {
+        content: '更新',
+        onClick: onUpdate
+      }, {
+        content: '卸载',
+        theme: 'error',
+        onClick: onUninstall,
+      }];
+      const importOptions = new Array<DropdownOption>();
+      if (hasImportMusic) {
+        importOptions.push({
+          content: '导入歌曲',
+          onClick: onImportMusic
+        });
+      }
+      if (hasImportSheet) {
+        importOptions.push({
+          content: '导入歌单',
+          onClick: onImportSheet
+        });
+      }
+
+
       return <div>
-        {hasUserVar && <Button theme={'primary'} variant={'text'} shape={'circle'}
-                               disabled={loading.value}
-                               onClick={onSetUserVar}
-        >设</Button>}
-        <Button theme={'primary'} variant={'text'} shape={'circle'}
-                disabled={loading.value}
-                onClick={onDownload}
-        >下</Button>
-        <Button theme={'primary'} variant={'text'} shape={'circle'}
-                disabled={isEmptyString(row.srcUrl) || loading.value}
-                onClick={onUpdate}
-        >更</Button>
-        <Popconfirm content={'是否卸载插件'} onConfirm={onUninstall}>
-          <Button theme={'danger'} variant={'text'} shape={'circle'}
-                  disabled={loading.value}
-                  onClick={onUpdate}
-          >卸</Button>
-        </Popconfirm>
+        {(hasImportMusic || hasImportSheet) &&
+            <Dropdown options={importOptions} trigger={'click'}>
+                <Button theme={'success'} variant={'text'} shape={'circle'}
+                        disabled={loading.value}>导</Button>
+            </Dropdown>}
+        {hasUserVar && <Popup content={'设置变量'}>
+            <Button theme={'primary'} variant={'text'} shape={'circle'}
+                    disabled={loading.value}
+                    onClick={onSetUserVar}
+            >设</Button>
+        </Popup>}
+        <Dropdown options={options} trigger={'click'}>
+          <Button theme={'primary'} variant={'text'} shape={'circle'}
+                  disabled={loading.value}>{{
+            icon: () => h(MoreIcon)
+          }}</Button>
+        </Dropdown>
       </div>
     }
   }]
