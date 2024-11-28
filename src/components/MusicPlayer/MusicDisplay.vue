@@ -1,94 +1,79 @@
 <template>
   <div class="music-display" :class="{show: displayVisible}">
-    <div class="list">
-      <div v-for="(m, i) in musics" :key="m.id" class="item" :class="{active: music?.id === m.id}"
-           @dblclick="switchIndex(i)">
-        <t-row :gutter="8">
-          <t-col :span="5">
-            <div class="name ellipsis" :title="m.name">{{ m.name }}</div>
-          </t-col>
-          <t-col :span="5">
-            <div class="artist ellipsis" :title="m.artist">{{ m.artist }}</div>
-          </t-col>
-          <t-col :span="2">
-            <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
-              <template #icon>
-                <DeleteIcon/>
-              </template>
-            </t-button>
-          </t-col>
-        </t-row>
-      </div>
-    </div>
-    <div class="container">
-      <div class="title">{{ name }}</div>
-      <div class="subtitle">
-        <t-tag theme="primary">{{ artist }}</t-tag>
-        <span v-if="album"> - </span>
-        <span v-if="album">{{ album }}</span>
-      </div>
-      <div class="lyric">
-        <div class="lyric-empty" v-if="lyrics.length === 0">
-          <p>暂无歌词</p>
-          <music-lyric-search/>
+    <t-layout class="w-full h-full">
+      <t-aside class="list" :width="collapsed ? '0px' : '300px'">
+        <div v-for="(m, i) in musics" :key="m.id" class="item" :class="{active: music?.id === m.id}"
+             @dblclick="switchIndex(i)">
+          <t-row :gutter="8">
+            <t-col :span="5">
+              <div class="name ellipsis" :title="m.name">{{ m.name }}</div>
+            </t-col>
+            <t-col :span="5">
+              <div class="artist ellipsis" :title="m.artist">{{ m.artist }}</div>
+            </t-col>
+            <t-col :span="2">
+              <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
+                <template #icon>
+                  <DeleteIcon/>
+                </template>
+              </t-button>
+            </t-col>
+          </t-row>
         </div>
-        <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
-             :class="{active: lyricIndex === i}" @click="handleLyricClick(lyric)">
-          <span>{{ lyric.text }}</span>
-          <play-icon class="play" size="1.5rem"/>
+      </t-aside>
+      <t-content class="container">
+        <div class="title">{{ name }}</div>
+        <div class="subtitle">
+          <t-tag theme="primary">{{ artist }}</t-tag>
+          <span v-if="album"> - </span>
+          <span v-if="album">{{ album }}</span>
         </div>
-      </div>
-      <div class="setting" v-if="lyricGroups.length > 1">
-        <t-dropdown :options trigger="click" placement="top-right" @click="clickHandler">
-          <t-button theme="primary" variant="text" shape="circle">
+        <div class="lyric">
+          <div class="lyric-empty" v-if="lyrics.length === 0">
+            <p>暂无歌词</p>
+            <music-lyric-search/>
+          </div>
+          <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
+               :class="{active: lyricIndex === i}" @click="handleLyricClick(lyric)">
+            <span>{{ lyric.text }}</span>
+            <play-icon class="play" size="1.5rem"/>
+          </div>
+        </div>
+        <div class="close">
+          <t-button theme="primary" variant="text" size="large" shape="circle" @click="collapsed=!collapsed">
             <template #icon>
-              <adjustment-icon/>
+              <view-list-icon/>
             </template>
           </t-button>
-        </t-dropdown>
-      </div>
-      <div class="close">
-        <t-button theme="primary" variant="text" size="large" shape="circle" @click="displayVisible=false">
-          <template #icon>
-            <chevron-down-icon/>
-          </template>
-        </t-button>
-      </div>
-    </div>
+          <t-button theme="primary" variant="text" size="large" shape="circle" @click="displayVisible=false">
+            <template #icon>
+              <chevron-down-icon/>
+            </template>
+          </t-button>
+        </div>
+      </t-content>
+    </t-layout>
   </div>
 </template>
 <script lang="ts" setup>
 import {
   audio,
-  displayVisible, lyricGroups, lyricIndex,
+  displayVisible, lyricIndex,
   lyrics,
   music,
   musics, played,
   removeIndex, switchCurrentTime,
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
-import {DropdownOption} from "tdesign-vue-next";
-import {DeleteIcon, AdjustmentIcon, PlayIcon, ChevronDownIcon} from 'tdesign-icons-vue-next';
+import {DeleteIcon, PlayIcon, ChevronDownIcon, ViewListIcon} from 'tdesign-icons-vue-next';
 import {LyricLine} from "@/types/LyricLine";
 import MusicLyricSearch from "@/components/MusicPlayer/MusicLyricSearch.vue";
 
+const collapsed = ref(false);
 
 const name = computed(() => music.value?.name || '无歌曲');
 const artist = computed(() => music.value?.artist || '无演唱家');
 const album = computed(() => music.value?.album || '');
-
-const options = computed<Array<DropdownOption>>(() => lyricGroups.value.map(e => ({
-  content: `歌词${e.id}`,
-  id: e.id,
-})));
-
-const clickHandler = (data: DropdownOption) => {
-  const idx = lyricGroups.value.findIndex(e => e.id === data.id);
-  if (idx > -1) {
-    lyrics.value = lyricGroups.value[idx].lines;
-  }
-};
-
 
 function handleLyricClick(value: LyricLine) {
   switchCurrentTime(value.start + 1);
@@ -116,7 +101,6 @@ function handleLyricClick(value: LyricLine) {
   }
 
   .list {
-    flex: 0 0 300px;
     border-right: 1px solid var(--td-border-level-1-color);
     overflow: auto;
 
@@ -158,8 +142,26 @@ function handleLyricClick(value: LyricLine) {
   }
 
   .container {
-    flex: 1 1 auto;
     position: relative;
+
+    .mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      .mask-inner {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 50vh;
+        .canvas {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
 
     .title {
       font-size: var(--td-font-size-headline-medium);
@@ -203,7 +205,7 @@ function handleLyricClick(value: LyricLine) {
         }
 
         &:hover {
-          background-color: var(--td-bg-color-component-hover);
+          background-color: var(--td-mask-active);
 
           .play {
             display: block;
@@ -225,12 +227,6 @@ function handleLyricClick(value: LyricLine) {
         text-align: center;
         user-select: none;
       }
-    }
-
-    .setting {
-      position: absolute;
-      right: 16px;
-      bottom: 16px;
     }
 
     .close {
