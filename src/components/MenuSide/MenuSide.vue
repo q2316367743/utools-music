@@ -7,7 +7,7 @@
         </template>
         本地音乐
       </t-menu-item>
-      <t-menu-item value="/music-group">
+      <t-menu-item value="/music-group/list">
         <template #icon>
           <music-icon />
         </template>

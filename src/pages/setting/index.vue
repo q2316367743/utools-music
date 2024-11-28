@@ -1,6 +1,15 @@
 <template>
   <t-form :data="globalSetting" label-align="top" class="global-setting">
     <t-tabs v-model="active">
+      <t-tab-panel label="全局" value="guide" style="padding: 8px">
+        <t-form-item label="颜色模式">
+          <t-radio-group v-model="colorMode">
+            <t-radio value="auto">跟随系统</t-radio>
+            <t-radio value="dark">暗黑</t-radio>
+            <t-radio value="light">明亮</t-radio>
+          </t-radio-group>
+        </t-form-item>
+      </t-tab-panel>
       <t-tab-panel label="下载" value="download" style="padding: 8px">
         <t-form-item label="音乐下载目录">
           <t-input-group style="min-width: 400px">
@@ -99,8 +108,9 @@
 import {downloadFolder, globalSetting} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 import {FileIcon} from 'tdesign-icons-vue-next';
+import {colorMode} from "@/store/AppStore";
 
-const active = ref('download');
+const active = ref('guide');
 
 function updateDownloadFolder() {
   const paths = utools.showOpenDialog({

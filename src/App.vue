@@ -3,7 +3,7 @@
     <div class="main-container">
       <div class="main-content">
         <router-view v-slot="{ Component }">
-          <keep-alive>
+          <keep-alive :exclude>
             <component :is="Component"/>
           </keep-alive>
         </router-view>
@@ -19,7 +19,6 @@
 <script lang="ts" setup>
 import {ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {useDark} from "@vueuse/core";
 import {detach} from "@/store/AppStore";
 import {usePluginStore} from "@/store";
 import {useMainPush} from "@/hooks/MainPush";
@@ -27,11 +26,12 @@ import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
 import {versionCheck} from "@/components/UpdateLog";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {VXETable} from 'vxe-table'
 
 const route = useRoute();
 const router = useRouter();
 const selectedKeys = ref(['/home']);
+
+const exclude = ref(['MusicGroupInfo'])
 
 watch(() => selectedKeys.value, value => router.push(value[0]));
 
@@ -40,16 +40,6 @@ watch(() => route.path, value => {
     selectedKeys.value[0] = value;
   }
 })
-
-const isDark = useDark({
-  selector: 'html',
-  attribute: 'theme-mode',
-  valueDark: 'dark',
-  valueLight: 'light',
-  storage: utools.dbStorage
-});
-
-watch(isDark, val => VXETable.setTheme(val ? 'dark' : 'light'), {immediate: true});
 
 utools.onPluginEnter(action => {
   console.log(action);
@@ -61,7 +51,7 @@ utools.onPluginEnter(action => {
 const {onMainPush, onSelectCallback} = useMainPush();
 utools.onMainPush<any>(onMainPush, onSelectCallback);
 
-// 插件初始刷
+// 插件初始化
 usePluginStore().init();
 // 版本检查
 versionCheck().catch(e => MessageUtil.error("版本检查错误", e));

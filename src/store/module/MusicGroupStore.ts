@@ -16,6 +16,7 @@ import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {MusicItem} from "@/entity/MusicItem";
 import {isEmptyString} from "@/utils/lang/StringUtil";
 import {IMusicItem} from "@/types/PluginInstance";
+import {isEmptyArray} from "@/utils/lang/FieldUtil";
 
 export const useMusicGroupStore = defineStore('music-group', () => {
   const musicGroups = ref(new Array<MusicGroupIndex>());
@@ -154,10 +155,21 @@ export const useMusicGroupStore = defineStore('music-group', () => {
 
   }
 
+  async function removeContentItem(id: number, index: number): Promise<void> {
+
+    const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`);
+    const {record, rev} = res;
+    if (!record || isEmptyArray(record.items)) {
+      return;
+    }
+    record.items.splice(index, 1);
+    await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, record, rev);
+  }
+
   return {
     musicGroups, musicGroupItems,
     loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup,
-    appendMusicGroup, appendMixGroup
+    appendMusicGroup, appendMixGroup,removeContentItem
   }
 
 })

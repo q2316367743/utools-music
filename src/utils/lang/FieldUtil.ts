@@ -83,3 +83,10 @@ export function isVersionUpdate(newVersion: string, oldVersion: string, minVersi
   // 新版本必须大于等于最小版本，旧版本必须小于最小版本
   return versionCompare(newVersion, minVersion) >= 0 && versionCompare(oldVersion, minVersion) < 0;
 }
+
+export function subStr(str: string, len: number): string {
+  if (isEmptyString(str)) {
+    return '';
+  }
+  return str.substring(0, len);
+}

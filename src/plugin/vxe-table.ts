@@ -5,9 +5,9 @@ import {
   VxeGrid,
   VxeToolbar, VxeTableMenuModule
 } from 'vxe-table'
+import {App} from "vue";
 
 // 导入主题变量，也可以重写主题变量
-import {App} from "vue";
 import 'vxe-table/lib/style.css'
 
 // 导入默认的语言

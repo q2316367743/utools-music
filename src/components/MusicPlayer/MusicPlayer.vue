@@ -27,7 +27,7 @@
         </t-space>
       </div>
       <div class="operator">
-        <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="disableAddGroup">
+        <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="!music">
           加
         </t-button>
         <t-popup trigger="click">
@@ -186,12 +186,6 @@ const enableDownload = computed(() => {
   }
   return music.value.source != MusicItemSource.LOCAL;
 });
-const disableAddGroup = computed(() => {
-  if (!music.value) {
-    return true;
-  }
-  return music.value.source === MusicItemSource.WEB;
-})
 
 function onLabel(h: any, props: { value: number }) {
   return `${prettyDateTime(props.value)} / ${prettyDateTime(duration.value)}`
@@ -203,20 +197,27 @@ function onChange(value: number | Array<number>) {
 }
 
 function onAddMusicGroup() {
-  // useAddMusicGroup.emit();
-  musicGroupChoose([MusicGroupType.LOCAL])
+  if (!music.value) {
+    return;
+  }
+  const current = music.value;
+  const isWeb = current.source === MusicItemSource.WEB;
+  musicGroupChoose(isWeb ? [MusicGroupType.MIX] : [MusicGroupType.LOCAL])
     .then(id => {
       if (id > 0) {
-        if (!music.value) {
-          MessageUtil.warning("没有正在播放的音乐，无法加入到歌单")
-          return;
-        }
-        music.value.getInfo().then(item => {
-          useMusicGroupStore().appendMusicGroup([id], item)
+        const {appendMusicGroup, appendMixGroup} = useMusicGroupStore();
+        if (isWeb) {
+          appendMixGroup(id, [current.self], current.pluginId)
             .then(() => MessageUtil.success("新增成功"))
             .catch(e => MessageUtil.error("新增失败", e));
-        })
-          .catch(e => MessageUtil.error("获取音乐信息失败", e));
+        } else {
+          current.getInfo().then(item => {
+            appendMusicGroup([id], item)
+              .then(() => MessageUtil.success("新增成功"))
+              .catch(e => MessageUtil.error("新增失败", e));
+          })
+            .catch(e => MessageUtil.error("获取音乐信息失败", e));
+        }
       }
     })
 }

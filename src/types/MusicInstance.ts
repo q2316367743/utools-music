@@ -39,6 +39,16 @@ export interface MusicInstance {
   source: MusicItemSource;
 
   /**
+   * 插件ID
+   */
+  pluginId: number;
+
+  /**
+   * 自身数据
+   */
+  self: any;
+
+  /**
    * 实际的详情
    */
   getInfo: () => Promise<MusicItem>;
@@ -120,6 +130,14 @@ export class MusicInstanceLocal implements MusicInstance {
     return this.item.source;
   }
 
+  get pluginId(): number {
+    return 0;
+  }
+
+  get self(): any {
+    return this.item;
+  }
+
   private async getMetadata(): Promise<IAudioMetadata> {
     if (this.metadata) {
       return this.metadata;
@@ -191,11 +209,11 @@ export class MusicInstanceLocal implements MusicInstance {
 export class MusicInstanceWeb implements MusicInstance {
 
   private readonly item: IMusicItem;
-  private readonly pluginId: number;
+  private readonly pId: number;
 
   constructor(item: IMusicItem, pluginId: number) {
     this.item = item;
-    this.pluginId = pluginId;
+    this.pId = pluginId;
   }
 
 
@@ -225,6 +243,14 @@ export class MusicInstanceWeb implements MusicInstance {
 
   destroy(): Promise<void> {
     return Promise.resolve(undefined);
+  }
+
+  get pluginId(): number {
+    return this.pId;
+  }
+
+  get self(): any {
+    return this.item;
   }
 
   async getInfo(): Promise<MusicItem> {

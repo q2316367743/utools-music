@@ -14,8 +14,12 @@ const router = createRouter({
     component: () => import('@/pages/local/index.vue')
   }, {
     name: "我的歌单",
-    path: '/music-group',
-    component: () => import('@/pages/MusicGroup/index.vue')
+    path: '/music-group/list',
+    component: () => import('@/pages/music-group/list/index.vue')
+  }, {
+    name: "歌单详情",
+    path: '/music-group/info/:id',
+    component: () => import('@/pages/music-group/info/MusicGroupInfo.vue')
   }, {
     name: "拓展工具",
     path: '/extra',

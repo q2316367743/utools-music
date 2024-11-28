@@ -6,8 +6,7 @@
         <t-row>
           <t-col flex="180px">
             <div class="artwork">
-              <!-- TODO: 封面可能不存在 -->
-              <t-image :src="sheet.artwork"/>
+              <t-image :src="sheet.artwork || MusicGroupImage" :alt="sheet.title"/>
             </div>
           </t-col>
           <t-col flex="auto">
@@ -59,6 +58,7 @@ import {SearchIcon} from "tdesign-icons-vue-next";
 import {useFuse} from "@vueuse/integrations/useFuse";
 import {MusicInstanceWeb} from "@/types/MusicInstance";
 import {MusicGroupType} from "@/entity/MusicGroup";
+import MusicGroupImage from '@/assets/image/music-group.png';
 
 const visible = defineModel({
   type: Boolean

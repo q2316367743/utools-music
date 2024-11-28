@@ -1,8 +1,7 @@
 <template>
   <div class="mg-item" v-if="item">
     <div class="mg-item__cover">
-      <img :src="item.cover" :alt="item.name" v-if="item.cover"/>
-      <music-icon v-else size="80px"/>
+      <img :src="item.cover || MusicGroupImage" :alt="item.name"/>
     </div>
     <div class="mg-item__title ellipsis-2">
       {{ item.name }}
@@ -23,7 +22,7 @@
 </template>
 <script lang="ts" setup>
 import {MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
-import {MusicIcon} from "tdesign-icons-vue-next";
+import MusicGroupImage from "@/assets/image/music-group.png";
 
 defineProps({
   item: Object as PropType<MusicGroupIndex>

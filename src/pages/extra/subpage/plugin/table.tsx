@@ -105,9 +105,12 @@ export const buildPluginTableColumns = (
       }
 
       function onUninstall() {
-        MessageBoxUtil.alert("是否卸载插件，卸载后将无法恢复", "卸载插件", {
-          confirmButtonText: '卸载'
-        }).then(() => {
+        MessageBoxUtil.alert(
+          "是否卸载插件，卸载后，基于此插件新增的歌曲将无法收听，并且卸载后造成的数据问题也将无法恢复",
+          "卸载插件",
+          {
+            confirmButtonText: '卸载'
+          }).then(() => {
           loading.value = true
           usePluginStore().removePlugin(row.id)
             .then(() => MessageUtil.success("卸载成功"))

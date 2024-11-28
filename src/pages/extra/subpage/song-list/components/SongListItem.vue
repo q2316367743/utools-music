@@ -38,8 +38,7 @@
     <div class="song-list__container">
       <div class="ri-item" v-for="item in items" :key="item.id" @click="handleItemClick(item)">
         <div class="ri-item__cover">
-          <!-- TODO: 封面可能不存在 -->
-          <img :src="item.artwork" :alt="item.title"/>
+          <img :src="item.artwork || MusicGroupImage" :alt="item.title"/>
         </div>
         <div class="ri-item__title ellipsis-2">
           {{ item.title }}
@@ -49,7 +48,7 @@
         </div>
       </div>
     </div>
-    <song-list-item-drawer v-model="songListItemDrawer.visible" :item="songListItemDrawer.value" :plugin-id="pluginId" />
+    <song-list-item-drawer v-model="songListItemDrawer.visible" :item="songListItemDrawer.value" :plugin-id="pluginId"/>
   </div>
 </template>
 <script lang="ts" setup>
@@ -58,6 +57,7 @@ import {IMusicSheetItem, ITag, ITagGroup} from "@/types/PluginInstance";
 import {ChevronRightIcon} from "tdesign-icons-vue-next";
 import {map} from "@/utils/lang/ArrayUtil";
 import SongListItemDrawer from "@/pages/extra/subpage/song-list/components/SongListItemDrawer.vue";
+import MusicGroupImage from '@/assets/image/music-group.png';
 
 const props = defineProps({
   pluginId: {

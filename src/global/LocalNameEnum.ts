@@ -46,6 +46,8 @@ export enum LocalNameEnum {
 
   KEY_VERSION = '/key/version',
 
+  KEY_COLOR_MODE = '/key/color-mode',
+
   DATA_PLUGIN =  '/data/plugin'
 
 }

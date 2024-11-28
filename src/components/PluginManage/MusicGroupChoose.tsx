@@ -3,10 +3,10 @@ import {DialogPlugin} from "tdesign-vue-next";
 import {useMusicGroupStore} from "@/store";
 import {MusicIcon, PlusIcon} from "tdesign-icons-vue-next";
 import './MusicGroupChoose.less';
-import {addMusicGroup} from "@/pages/MusicGroup/components/MusicGroupFunc";
+import {addMusicGroup} from "@/pages/music-group/list/components/MusicGroupFunc";
 
 /**
- * TODO: 歌单选择器
+ * 歌单选择器
  * @param types 什么类型的歌单
  * @param header 标题
  * @return 歌单ID

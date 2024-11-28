@@ -196,7 +196,7 @@ export function pre() {
   if (loop.value === 1) {
     return;
   }
-  if (index.value === 3) {
+  if (loop.value === 3) {
     index.value = random(0, musics.value.length - 1)
   } else {
     if (index.value === 0) {
@@ -212,7 +212,7 @@ export function next() {
   if (loop.value === 1) {
     return;
   }
-  if (index.value === 3) {
+  if (loop.value === 3) {
     index.value = random(0, musics.value.length - 1)
   } else {
     if (index.value === musics.value.length - 1) {

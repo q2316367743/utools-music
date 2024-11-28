@@ -57,6 +57,9 @@ function padStartNumber(num: number, maxLength: number, fillString?: string): st
 }
 
 export function prettyDateTime(date: number) {
+  if (!date) {
+    return '--:--';
+  }
   if (date <= 0) {
     return '00:00';
   }

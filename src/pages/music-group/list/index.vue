@@ -10,30 +10,28 @@
       </div>
     </div>
   </div>
-  <music-group-content :music-group="musicGroup" @close="onClose"/>
 </template>
 <script lang="ts" setup>
 import {useMusicGroupStore} from "@/store/module/MusicGroupStore";
-import {addMusicGroup, editMusicGroup} from "@/pages/MusicGroup/components/MusicGroupFunc";
+import {addMusicGroup, editMusicGroup} from "@/pages/music-group/list/components/MusicGroupFunc";
 import {MusicGroupIndex} from "@/entity/MusicGroup";
-import MusicGroupContent from "@/pages/MusicGroup/components/MusicGroupContent.vue";
 import {DropdownOption} from "tdesign-vue-next";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {PlusIcon} from 'tdesign-icons-vue-next'
-import MusicGroupItem from "@/pages/MusicGroup/components/MusicGroupItem.vue";
+import MusicGroupItem from "@/pages/music-group/list/components/MusicGroupItem.vue";
+
+const router = useRouter();
 
 const options: Array<DropdownOption> = [
   {content: '重命名', value: 1},
   {content: '删除', value: 2, theme: 'error'},
 ];
 
-const musicGroup = shallowRef<MusicGroupIndex>();
-
 const musicGroups = computed(() => useMusicGroupStore().musicGroupItems);
 
 function onClick(res: MusicGroupIndex) {
-  musicGroup.value = res;
+  router.push(`/music-group/info/${res.id}`);
 }
 
 function onContextMenu(group: MusicGroupIndex, value: DropdownOption) {
@@ -48,10 +46,6 @@ function onContextMenu(group: MusicGroupIndex, value: DropdownOption) {
           .catch(e => MessageUtil.error("删除失败", e));
       })
   }
-}
-
-function onClose() {
-  musicGroup.value = undefined;
 }
 
 </script>
