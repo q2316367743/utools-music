@@ -3,60 +3,60 @@
     <t-menu width="200px" :value="active" @change="handleChange">
       <t-menu-item value="/local">
         <template #icon>
-          <folder-icon />
+          <folder-icon/>
         </template>
         本地音乐
       </t-menu-item>
       <t-menu-item value="/music-group/list">
         <template #icon>
-          <music-icon />
+          <music-icon/>
         </template>
         我的歌单
       </t-menu-item>
-      <t-submenu value="/extra" title="拓展工具">
+      <t-submenu value="/extra" title="在线音乐">
         <template #icon>
-          <extension-icon />
+          <internet-icon/>
         </template>
         <t-menu-item value="/extra/plugin">
           <template #icon>
-            <app-icon />
+            <app-icon/>
           </template>
           插件管理
         </t-menu-item>
         <t-menu-item value="/extra/ranking">
           <template #icon>
-            <chart-combo-icon />
+            <chart-combo-icon/>
           </template>
           排行榜
         </t-menu-item>
         <t-menu-item value="/extra/song-list">
           <template #icon>
-            <root-list-icon />
+            <root-list-icon/>
           </template>
           热门歌单
         </t-menu-item>
         <t-menu-item value="/extra/search">
           <template #icon>
-            <search-icon />
+            <search-icon/>
           </template>
           音乐搜索
         </t-menu-item>
         <t-menu-item value="/extra/download">
           <template #icon>
-            <download-icon />
+            <download-icon/>
           </template>
           下载管理
         </t-menu-item>
       </t-submenu>
       <t-menu-item value="/setting">
         <template #icon>
-          <setting-icon />
+          <setting-icon/>
         </template>
         设置
       </t-menu-item>
       <t-menu-item value="/about">
         <template #icon>
-          <info-circle-icon />
+          <info-circle-icon/>
         </template>
         关于
       </t-menu-item>
@@ -67,8 +67,8 @@
 import {MenuValue} from "tdesign-vue-next";
 import {
   AppIcon, ChartComboIcon,
-  DownloadIcon, ExtensionIcon,
-  FolderIcon, InfoCircleIcon,
+  DownloadIcon,
+  FolderIcon, InfoCircleIcon, InternetIcon,
   MusicIcon,
   RootListIcon,
   SearchIcon,
@@ -78,7 +78,13 @@ import {
 const route = useRoute();
 const router = useRouter();
 
-const active = computed(() => route.path);
+const active = computed(() => {
+  const {path} = route
+  if (`${path}`.startsWith("/music-group")) {
+    return '/music-group/list'
+  }
+  return path;
+});
 
 function handleChange(e: MenuValue) {
   router.push(e + '');

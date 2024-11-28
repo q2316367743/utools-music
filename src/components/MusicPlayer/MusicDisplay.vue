@@ -38,7 +38,6 @@
           <play-icon class="play" size="1.5rem"/>
         </div>
       </div>
-      <!-- TODO: 存在多选时显示，那么是否可以额外搜索歌词并下载？ -->
       <div class="setting" v-if="lyricGroups.length > 1">
         <t-dropdown :options trigger="click" placement="top-right" @click="clickHandler">
           <t-button theme="primary" variant="text" shape="circle">
@@ -47,6 +46,13 @@
             </template>
           </t-button>
         </t-dropdown>
+      </div>
+      <div class="close">
+        <t-button theme="primary" variant="text" size="large" shape="circle" @click="displayVisible=false">
+          <template #icon>
+            <chevron-down-icon/>
+          </template>
+        </t-button>
       </div>
     </div>
   </div>
@@ -62,7 +68,7 @@ import {
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
 import {DropdownOption} from "tdesign-vue-next";
-import {DeleteIcon, AdjustmentIcon, PlayIcon} from 'tdesign-icons-vue-next';
+import {DeleteIcon, AdjustmentIcon, PlayIcon, ChevronDownIcon} from 'tdesign-icons-vue-next';
 import {LyricLine} from "@/types/LyricLine";
 import MusicLyricSearch from "@/components/MusicPlayer/MusicLyricSearch.vue";
 
@@ -225,6 +231,12 @@ function handleLyricClick(value: LyricLine) {
       position: absolute;
       right: 16px;
       bottom: 16px;
+    }
+
+    .close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
     }
   }
 

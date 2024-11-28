@@ -38,11 +38,18 @@
         <t-link theme="primary" @click="openUrl('https://musicfree.catcat.work/')">MusicFree</t-link>
         <span>项目对本插件的启发</span>
       </t-alert>
+      <h2>免责声明</h2>
       <t-paragraph>
-        本地音乐播放器，构建属于你的音乐库。
+        本插件只用作个人学习研究，禁止用于商业及非法用途，如产生法律纠纷与本人无关
       </t-paragraph>
       <t-paragraph>
-        开通uTools会员，插件数据可同步。
+        拓展内容来自于用户自行安装的插件，本软件不提供任何音频存储服务，如需下载音频，请支持正版！。
+      </t-paragraph>
+      <t-paragraph>
+        音乐版权归各网站所有，本站不承担任何法律责任和连带责任。如果已经涉及到您的版权，请速与本站管理员联系，我们将第一时间为你处理。
+      </t-paragraph>
+      <t-paragraph>
+        本插件 并不是一个破解软件，不提供下载付费歌曲！
       </t-paragraph>
     </div>
   </div>
@@ -71,9 +78,9 @@ function openFeedback() {
 <style scoped lang="less">
 .about {
   position: relative;
-  height: 100%;
-  width: 100%;
+  height: calc(100% - 16px);
   padding: 16px;
+  overflow: auto;
 
   &__label {
     width: 60px;

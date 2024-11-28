@@ -15,16 +15,14 @@
           </t-select>
         </t-input-group>
       </div>
-      <t-base-table :data :columns :bordered="false" :height="maxHeight" row-key="id" :loading
+      <t-base-table v-if="data.length>0" :data :columns :bordered="false" :height="maxHeight" row-key="id" :loading
                     :loading-props="{ text: '正在搜索中' }"
                     :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }"
                     @row-dblclick="handleRowDblclick" @scroll="onScroll">
-        <template #empty>
-          <t-empty title="空空如也" style="margin-top: 25vh"></t-empty>
-        </template>
       </t-base-table>
+      <t-empty v-else title="搜你所想(￣▽￣)／" style="margin-top: 27vh"></t-empty>
     </t-loading>
-    <t-back-top container=".music-search .t-table__content" style="bottom: 24px;right: 24px"/>
+    <t-back-top v-if="data.length>0" container=".music-search .t-table__content" style="bottom: 24px;right: 24px"/>
   </div>
 </template>
 <script lang="ts" setup>
@@ -59,7 +57,18 @@ const operatorLoading = ref(false);
 
 
 const plugins = computed<Array<PluginInstanceView>>(() => {
-  return usePluginStore().pluginInstances.filter(e => !!e.instance.search);
+  return usePluginStore().pluginInstances.filter(e => {
+    const {supportedSearchType, search} = e.instance;
+    if (!search) {
+      // 没有搜索方法是一定不行的
+      return false;
+    }
+    if (supportedSearchType) {
+      // 如果指定了支持的搜索类型，就要去判断
+      return supportedSearchType.indexOf('music') !== -1;
+    }
+    return true
+  });
 });
 
 const maxHeight = computed(() => size.height.value - 108);
@@ -236,7 +245,6 @@ function onBottom() {
 function onScroll(params: { e: WheelEvent }) {
   const {e} = params;
   const target = e.target as HTMLDivElement;
-  console.log(target.scrollTop, target.offsetHeight, target.scrollHeight);
 
   if (target.scrollHeight - target.scrollTop - target.offsetHeight < 20) {
     onBottom();

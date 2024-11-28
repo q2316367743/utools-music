@@ -131,10 +131,13 @@ export const useMusicGroupStore = defineStore('music-group', () => {
 
     const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`);
     const {record, rev} = res;
+    let now = Date.now();
 
     const musicGroupMixContents = musicItems.map(e => ({
       ...e,
       pluginId,
+      // 确保一定有ID
+      id: e.id || (now ++)
     }));
 
     if (record) {
