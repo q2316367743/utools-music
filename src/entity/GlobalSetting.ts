@@ -11,6 +11,8 @@ export interface GlobalSetting {
   playDownload: boolean;
   // 默认播放质量
   playQuality: "low" | "standard" | "high" | "super";
+  // 播放本地音乐，自动匹配词图
+  playAttachment: boolean;
 
   // 歌词字体大小
   lyricFontSize: number;
@@ -42,6 +44,7 @@ export function buildGlobalSetting(): GlobalSetting {
     playError: GlobalSettingPlayErrorType.NEXT,
     playDownload: false,
     playQuality: "super",
+    playAttachment: false,
     lyricFontSize: 36,
     lyricColor: '#0052D9',
     lyricBorderColor: 'rgba(110, 110, 110, 0.8)',

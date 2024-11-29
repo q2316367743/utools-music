@@ -1,7 +1,7 @@
 <template>
   <div class="music-lyric-search">
     <t-link theme="primary" @click="openDialog">立即搜素</t-link>
-    <t-dialog v-model:visible="visible" :close-btn="true" width="700px" attach="body" :footer="false">
+    <t-dialog v-model:visible="visible" :close-btn="true" width="700px" attach="body" :footer="false" top="10vh">
       <template #header>
         <div class="w-full">
           <t-input-adornment class="w-full">
@@ -20,13 +20,17 @@
           </t-input-adornment>
         </div>
       </template>
-      <t-loading :loading content="歌词搜索中">
-        <div class="music-lyric-container">
-          <t-empty title="暂无歌词" v-if="lyrics.length === 0" style="margin-top: 16px"></t-empty>
-          <div class="lyric-line" v-for="(lyric, i) in items" :key="lyric.start"
-               :class="{active: index === i}">
-            <span>{{ lyric.text }}</span>
-          </div>
+      <t-loading :loading text="歌词搜索中">
+        <div class="music-lyric-container" :style="{height: height + 'px'}">
+          <t-list v-if="items.length > 0" :split="true">
+            <t-list-item v-for="i in items" :key="i.id" :value="i.id">
+              <t-list-item-meta :title="i.title" :description="i.artist"/>
+              <template #action>
+                <t-button theme="primary" variant="text" @click="handleLyric(i)">查看歌词</t-button>
+              </template>
+            </t-list-item>
+          </t-list>
+          <t-empty v-else title="空空如也(；′⌒`)" style="padding-top: 20vh"></t-empty>
         </div>
       </t-loading>
     </t-dialog>
@@ -36,22 +40,35 @@
 import {usePluginStore} from "@/store";
 import {isEmptyArray, isNotEmptyArray} from "@/utils/lang/FieldUtil";
 import {SearchIcon} from "tdesign-icons-vue-next";
-import {currentTime, lyrics, music} from "@/components/MusicPlayer/MusicPlayer";
+import {currentTime, music} from "@/components/MusicPlayer/MusicPlayer";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {LyricLine} from "@/types/LyricLine";
 import {isEmptyString} from "@/utils/lang/StringUtil";
-import {transferTextToLyric} from "@/plugin/music";
+import {IMusicItem} from "@/types/PluginInstance";
+import {showLyric} from "@/components/MusicPlayer/MusicLyricSearch";
+
+const size = useWindowSize();
 
 const visible = ref(false);
 const active = ref(0);
 const keyword = ref('');
-const items = ref<Array<LyricLine>>([]);
+const items = ref<Array<IMusicItem>>([]);
 const loading = ref(false);
-const index = ref(0)
+const index = ref(0);
+
+const height = computed(() => size.height.value - size.height.value / 5 - 130);
 
 const plugins = computed(() => {
   const res = usePluginStore().pluginInstances
-    .filter(plugin => !!plugin.instance.getLyric);
+    .filter(plugin => {
+      const {supportedSearchType, search} = plugin.instance;
+      if (!search) {
+        return false;
+      }
+      if (!supportedSearchType) {
+        return true;
+      }
+      return supportedSearchType.includes('lyric');
+    });
   if (isNotEmptyArray(res)) {
     active.value = res[0].id;
   }
@@ -82,13 +99,6 @@ watch(currentTime, val => {
   if (isEmptyArray(items.value)) {
     return;
   }
-  for (let i = 0; i < items.value.length; i++) {
-    const ly = items.value[i];
-    if (ly.start <= val && val <= ly.end) {
-      index.value = i;
-      return;
-    }
-  }
 })
 
 function openDialog() {
@@ -116,22 +126,14 @@ async function searchWrap() {
   const {name, artist} = music.value;
   for (let plugin of plugins.value) {
     if (active.value === plugin.id) {
-      const {getLyric} = plugin.instance;
-      if (getLyric) {
-        const lyric = await getLyric({
-          title: name,
-          artist,
-          id: '',
-          platform: plugin.instance.platform,
-        });
-        if (!lyric) {
+      const {search} = plugin.instance;
+      if (search) {
+        const res = await search(name, 1, 'lyric');
+        const {data} = res;
+        if (isEmptyArray(data)) {
           continue;
         }
-        const {rawLrc} = lyric;
-        if (!rawLrc) {
-          continue;
-        }
-        items.value = transferTextToLyric(rawLrc)
+        items.value = data
       }
       return true;
     }
@@ -147,19 +149,11 @@ function search() {
     .finally(() => loading.value = false);
 }
 
+function handleLyric(i: IMusicItem) {
+  loading.value = true;
+  showLyric(active.value, i, () => loading.value = false);
+}
+
 </script>
 <style scoped lang="less">
-.music-lyric-container {
-  max-height: 500px;
-  width: 100%;
-  text-align: center;
-  overflow: auto;
-
-  .lyric-line {
-    padding: 8px 0;
-    font-size: 1.5rem;
-    cursor: pointer;
-    position: relative;
-  }
-}
 </style>

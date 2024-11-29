@@ -83,6 +83,7 @@ function handleLyricClick(value: LyricLine) {
 }
 </script>
 <style scoped lang="less">
+
 .music-display {
   position: fixed;
   top: 100vh;
@@ -90,11 +91,16 @@ function handleLyricClick(value: LyricLine) {
   right: 0;
   height: calc(100vh - 60px);
 
-  background-color: var(--td-bg-color-container);
+  background: linear-gradient(-135deg, #F902FF, #00DBDE);
   color: var(--td-text-color-primary);
   transition: top 0.5s;
 
   display: flex;
+
+  :deep(.t-layout) {
+    background-color: transparent;
+
+  }
 
   &.show {
     top: 0;
@@ -103,6 +109,7 @@ function handleLyricClick(value: LyricLine) {
   .list {
     border-right: 1px solid var(--td-border-level-1-color);
     overflow: auto;
+    background-color: var(--music-bg-color-3);
 
     .item {
       padding: 4px 8px;
@@ -118,7 +125,7 @@ function handleLyricClick(value: LyricLine) {
       }
 
       &.active {
-        background-color: var(--td-bg-color-container-hover);
+        background-color: var(--music-bg-color-4);
         color: var(--td-text-color-link);
 
         .name, .artist {
@@ -127,7 +134,7 @@ function handleLyricClick(value: LyricLine) {
       }
 
       &:hover {
-        background-color: var(--td-bg-color-container-hover);
+        background-color: var(--music-bg-color-4);
         color: var(--td-text-color-link);
 
         .name, .artist {
@@ -143,25 +150,6 @@ function handleLyricClick(value: LyricLine) {
 
   .container {
     position: relative;
-
-    .mask {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      .mask-inner {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 50vh;
-        .canvas {
-          width: 100%;
-          height: 100%;
-        }
-      }
-    }
 
     .title {
       font-size: var(--td-font-size-headline-medium);
@@ -205,7 +193,7 @@ function handleLyricClick(value: LyricLine) {
         }
 
         &:hover {
-          background-color: var(--td-mask-active);
+          background-color: var(--music-bg-color-3);
 
           .play {
             display: block;

@@ -1,2 +1,12 @@
 @import url('./scroll.css');
 @import "customer";
+
+html {
+  --music-bg-color-3: rgba(255, 255, 255, 0.3);
+  --music-bg-color-4: rgba(255, 255, 255, 0.4);
+}
+
+html[theme-mode="dark"] {
+  --music-bg-color-3: rgba(0, 0, 0, 0.3);
+  --music-bg-color-4: rgba(0, 0, 0, 0.4);
+}

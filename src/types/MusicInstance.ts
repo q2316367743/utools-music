@@ -65,7 +65,6 @@ export interface MusicInstance {
 
 }
 
-
 function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItem) {
   if (isNotEmptyString(m.cover)) {
     return '';
@@ -124,6 +123,10 @@ export class MusicInstanceLocal implements MusicInstance {
 
   get cover(): string {
     return this.item.cover;
+  }
+
+  set cover(res: string) {
+    this.item.cover = res;
   }
 
   get source(): MusicItemSource {
@@ -185,14 +188,6 @@ export class MusicInstanceLocal implements MusicInstance {
         lines: t
       })
     })
-
-
-    for (let lyricContent of items) {
-      const {lines} = lyricContent;
-      for (let i = 0; i < lines.length; i++) {
-        lines[i].end = lines[i + 1]?.start || 9999999999;
-      }
-    }
 
     return items;
   }
@@ -322,13 +317,6 @@ export class MusicInstanceWeb implements MusicInstance {
           console.error("获取歌词失败", e);
         }
         break;
-      }
-    }
-
-    for (let lyricContent of items) {
-      const {lines} = lyricContent;
-      for (let i = 0; i < lines.length; i++) {
-        lines[i].end = lines[i + 1]?.start || 9999999999;
       }
     }
 

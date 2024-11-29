@@ -9,8 +9,6 @@
             <t-radio value="light">明亮</t-radio>
           </t-radio-group>
         </t-form-item>
-      </t-tab-panel>
-      <t-tab-panel label="下载" value="download" style="padding: 8px">
         <t-form-item label="音乐下载目录">
           <t-input-group style="min-width: 400px">
             <t-input :disabled="true" v-model="downloadFolder"/>
@@ -23,14 +21,17 @@
         </t-form-item>
       </t-tab-panel>
       <t-tab-panel label="播放" value="play" style="padding: 8px;overflow: auto">
+        <t-paragraph>
+          <t-checkbox v-model="globalSetting.playDownload">边听边存</t-checkbox>
+        </t-paragraph>
+        <t-paragraph>
+          <t-checkbox v-model="globalSetting.playAttachment">播放本地音乐自动匹配词图并下载</t-checkbox>
+        </t-paragraph>
         <t-form-item label="播放失败时">
           <t-radio-group v-model="globalSetting.playError" :default-value="GlobalSettingPlayErrorType.NEXT">
             <t-radio label="下一曲" :value="GlobalSettingPlayErrorType.NEXT"></t-radio>
             <t-radio label="暂停" :value="GlobalSettingPlayErrorType.PAUSE"></t-radio>
           </t-radio-group>
-        </t-form-item>
-        <t-form-item label="边听边存" help="开启后，当播放网络音乐时，会自动将音乐下载">
-          <t-switch v-model="globalSetting.playDownload"></t-switch>
         </t-form-item>
         <t-form-item label="默认播放质量" help="优先获取默认播放质量的音乐，如果不存在，再获取其他质量的音乐">
           <t-radio-group v-model="globalSetting.playQuality" default-value="super">

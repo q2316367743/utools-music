@@ -1,12 +1,12 @@
 import {defineStore} from "pinia";
-import {PluginEntity, PluginEntityView, PluginInstanceView} from "@/entity/PluginEntity";
+import {PluginData, PluginEntity, PluginEntityView, PluginInstanceView} from "@/entity/PluginEntity";
 import {PluginInstance} from "@/types/PluginInstance";
 import {getFromOneByAsync, listRecordByAsync, removeOneByAsync, saveOneByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {getPluginInstance} from "@/components/PluginManage/PluginFunc";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {isEmptyString, isNotEmptyString} from "@/utils/lang/StringUtil";
-import {versionCompare} from "@/utils/lang/FieldUtil";
+import {copyProperties, versionCompare} from "@/utils/lang/FieldUtil";
 import {getForText} from "@/plugin/http";
 import {globalSetting} from "@/store";
 import {stringToBase64} from "@/utils/file/CovertUtil";
@@ -193,9 +193,21 @@ export const usePluginStore = defineStore('plugin-store', () => {
     await saveOneByAsync(`${LocalNameEnum.DATA_PLUGIN}/${id}`, data);
   }
 
+  // 更新插件数据
+  async function updateData(id: number, data: PluginData) {
+    const key = `${LocalNameEnum.ITEM_PLUGIN}/${id}`;
+    const {record, rev} = await getFromOneByAsync(key);
+    if (!record) return;
+    // 值拷贝
+    copyProperties(data, record);
+    // 保存数据
+    await saveOneByAsync(key, record, rev);
+  }
+
   return {
     plugins, instanceMap, pluginInstances,
     init, getInstance, installPlugin, removePlugin, updatePlugin, downloadPlugin,
-    getPluginVar, setPluginVar
+    getPluginVar, setPluginVar,
+    updateData
   }
 })

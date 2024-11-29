@@ -9,6 +9,7 @@ import {headForExist} from "@/plugin/http";
 import {globalSetting, useDownloadStore} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 import {MusicInstance} from "@/types/MusicInstance";
+import {matchMusicAttachment} from "@/components/MusicPlayer/MusicAttachment";
 
 export const musics = ref(new Array<MusicInstance>());
 export const index = ref(0);
@@ -176,6 +177,7 @@ async function playWrapper() {
   }
   // 播放成功，清空
   errorCount.value = 0;
+  matchMusicAttachment(instance, music.value);
 }
 
 export function play() {

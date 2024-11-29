@@ -1,6 +1,12 @@
 import {PluginInstance} from "@/types/PluginInstance";
 
-export interface PluginEntity {
+
+export interface PluginData {
+  cover?: number;
+  lyric?: string;
+}
+
+export interface PluginEntity extends PluginData{
   id: number;
   /**
    * 插件名称
