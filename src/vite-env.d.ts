@@ -47,26 +47,35 @@ interface StatsBase<T> {
 
 interface Window {
   preload: {
-    /**
-     * 打开一个文件，并返回File对象
-     * @param options 参数
-     * @return 返回File对象
-     */
-    openFile(options: OpenFileOption): Promise<File>,
-    /**
-     * 从url下载一个文件到指定目录
-     * @param url 链接
-     * @param path 要保存的文件路径，包含文件名
-     */
-    downloadFileFromUrl(url: string, path: string): Promise<void>,
-    /**
-     * 下载一个文件
-     * @param data 文件内容，可以使blob(file)或ArrayBuffer或者链接或者DATA URL
-     * @param name 文件名
-     * @param folder 所在目录
-     * @return 文件保存的路径
-     */
-    downloadFile(data: string | Blob | ArrayBuffer, name: string, folder?: string): Promise<string>,
+    customer: {
+      /**
+       * 打开一个文件，并返回File对象
+       * @param options 参数
+       * @return 返回File对象
+       */
+      openFile(options: OpenFileOption): Promise<File>,
+      /**
+       * 从url下载一个文件到指定目录
+       * @param url 链接
+       * @param path 要保存的文件路径，包含文件名
+       */
+      downloadFileFromUrl(url: string, path: string): Promise<void>,
+      /**
+       * 下载一个文件
+       * @param data 文件内容，可以使blob(file)或ArrayBuffer或者链接或者DATA URL
+       * @param name 文件名
+       * @param folder 所在目录
+       * @return 文件保存的路径
+       */
+      downloadFile(data: string | Blob | ArrayBuffer, name: string, folder?: string): Promise<string>,
+      /**
+       * 创建服务器
+       * @param port 端口
+       * @param successCallback 成功回调
+       * @param errorCallback 失败回调
+       */
+      createServer(port: number, successCallback: () => void, errorCallback: (e: Error) => void): void
+    },
     fs: {
       existsSync(path: string): boolean;
       readdir(path: string, callback: (e: Error, names: Array<string>) => void): void;

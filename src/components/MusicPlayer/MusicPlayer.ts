@@ -131,7 +131,7 @@ function onError(m: MusicItem) {
 async function playWrapper() {
   if (music.value) {
     // 销毁旧的封面
-    await music.value.destroy()
+    // await music.value.destroy()
   }
   // 暂停音乐
   audio.pause()
@@ -139,7 +139,6 @@ async function playWrapper() {
   const oldIndex = index.value;
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
   const instance = await music.value.getInfo();
-  console.log(instance)
   let exist: boolean;
   if (/^https?:\/\//.test(instance.url)) {
     // 网络音乐
@@ -171,10 +170,14 @@ async function playWrapper() {
   audio.play()
     .then(() => console.log('播放成功'))
     .catch(e => MessageUtil.error("播放失败", e));
-  lyricGroups.value = await music.value.getLyric();
-  lyricIndex.value = 0
-  if (lyricGroups.value.length > 0) {
-    lyrics.value = lyricGroups.value[0].lines;
+  try {
+    lyricGroups.value = await music.value.getLyric();
+    lyricIndex.value = 0
+    if (lyricGroups.value.length > 0) {
+      lyrics.value = lyricGroups.value[0].lines;
+    }
+  }catch (e) {
+    MessageUtil.warning("获取歌词失败", e);
   }
   // 播放成功，清空
   errorCount.value = 0;

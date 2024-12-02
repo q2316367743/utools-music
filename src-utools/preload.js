@@ -16,6 +16,7 @@ const http = require("node:http");
 const {atob} = require('node:buffer')
 const {ipcRenderer} = require("electron");
 const axios = require('axios');
+const {createServer} = require('./src/server');
 
 /**
  * 获取一个文件
@@ -155,7 +156,6 @@ function sendLyric(ids, content) {
 
 
 window.preload = {
-    openFile, downloadFileFromUrl, downloadFile,
     fs: {
         existsSync,
         readdir,
@@ -171,5 +171,9 @@ window.preload = {
     },
     lib: {
         axios
+    },
+    customer: {
+        openFile, downloadFileFromUrl, downloadFile,
+        createServer,
     }
 }

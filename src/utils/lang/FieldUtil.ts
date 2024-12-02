@@ -90,3 +90,22 @@ export function subStr(str: string, len: number): string {
   }
   return str.substring(0, len);
 }
+
+export function extnameWeb(str: string): string {
+  if (isEmptyString(str)) {
+    return '';
+  }
+  const ext = str.split('.').pop() || '';
+  return ext ? '.' + ext : '';
+}
+
+export function basenameWeb(str: string): string {
+  if (isEmptyString(str)) {
+    return '';
+  }
+  const items = str.split('.');
+  if (items.length > 1) {
+    items.pop();
+  }
+  return items.join('.');
+}

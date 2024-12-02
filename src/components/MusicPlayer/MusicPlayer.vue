@@ -184,7 +184,7 @@ const enableDownload = computed(() => {
   if (!music.value) {
     return false;
   }
-  return music.value.source != MusicItemSource.LOCAL;
+  return music.value.source === MusicItemSource.WEB;
 });
 
 function onLabel(h: any, props: { value: number }) {

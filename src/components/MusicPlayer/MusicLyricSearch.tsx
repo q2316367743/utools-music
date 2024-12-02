@@ -30,7 +30,7 @@ async function downloadLrc(lrcLines: Array<LyricLine>, source: MusicInstance) {
     await unlinkAsync(target);
   }
 
-  await window.preload.downloadFile(
+  await window.preload.customer.downloadFile(
     `data:text/plain;base64,${stringToBase64(transferLyricToText(lrcLines))}`,
     lrcName,
     dirname)

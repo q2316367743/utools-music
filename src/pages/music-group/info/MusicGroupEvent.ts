@@ -1,12 +1,14 @@
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
-import {MusicInstanceLocal, MusicInstanceWeb} from "@/types/MusicInstance";
+import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
 import {VxeTablePropTypes} from "vxe-table";
-import {MusicItemView} from "@/entity/MusicItem";
+import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {useDownloadStore, useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {VxeTableDefines} from "vxe-table/types/table";
+import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
+import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 
 function renderMusicInstance(info: MusicGroupIndex, e: any) {
   if (info) {
@@ -16,7 +18,7 @@ function renderMusicInstance(info: MusicGroupIndex, e: any) {
       return new MusicInstanceWeb(e, e.pluginId)
     }
   }
-  return new MusicInstanceLocal(e);
+  return e.source === MusicItemSource.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e);
 }
 
 export function handleMusicGroupDblclick(info: MusicGroupIndex, rowIndex: number, data: Array<any>) {

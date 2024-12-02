@@ -1,6 +1,7 @@
 import {AxiosRequestConfig, AxiosProxyConfig, AxiosInstance} from "axios";
 import {globalSetting} from "@/store";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
+import {stringToBase64} from "@/utils/file/CovertUtil";
 
 
 export function getAxiosInstance(): AxiosInstance {
@@ -54,8 +55,22 @@ export async function getForJSON<T>(url: string): Promise<T> {
   return rsp.data;
 }
 
-export function headForExist(url: string): Promise<boolean> {
-  return getAxiosInstance().head(url)
-    .then(() => true)
-    .catch(() => false)
+export async function headForExist(url: string): Promise<boolean> {
+  const u = new URL(url);
+  const str = u.origin + u.pathname + u.search;
+  let headers = undefined;
+  if (u.username || u.password) {
+    headers = {
+      Authorization: stringToBase64(`${u.username}:${u.password}`),
+    }
+  }
+  try {
+    await getAxiosInstance().head(str, {
+      headers
+    });
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 }

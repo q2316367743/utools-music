@@ -25,7 +25,7 @@
             {{ prettyDateTime(row.duration) }}
           </template>
         </vxe-column>
-        <vxe-column field="source" title="来源" :width="60">
+        <vxe-column field="source" title="来源" :width="90" align="right">
           <template #default="{ row }">
             <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
             <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
@@ -45,11 +45,12 @@ import {useFuse} from "@vueuse/integrations/useFuse";
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
 import {SearchIcon} from 'tdesign-icons-vue-next';
-import {MusicInstanceLocal} from "@/types/MusicInstance";
+import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
 import {VxeTableEvents, VxeTablePropTypes} from "vxe-table";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {MusicGroupType} from "@/entity/MusicGroup";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 
 const size = useWindowSize();
 
@@ -93,7 +94,7 @@ function handleRowDblclick(context: { row: MusicItemView }) {
   const list = data.value;
   const index = data.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
-    views: list.map(e => new MusicInstanceLocal(e)),
+    views: list.map(e => e.source === MusicItemSource.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e)),
     index: Math.max(index, 0)
   });
 }

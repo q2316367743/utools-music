@@ -10,7 +10,7 @@ function renderContent(form: Ref<Repository>) {
     <FormItem label={'仓库类型'}>
       <RadioGroup v-model={form.value.type}>
         <Radio label={'本地'} value={RepositoryType.LOCAL}></Radio>
-        <Radio label={'WebDAV'} value={RepositoryType.WEBDAV} disabled={true}></Radio>
+        <Radio label={'WebDAV'} value={RepositoryType.WEBDAV}></Radio>
       </RadioGroup>
     </FormItem>
 

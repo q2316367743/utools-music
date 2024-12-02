@@ -45,7 +45,7 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {useMusicPlay} from "@/global/Event";
 import {MusicIcon, SearchIcon} from "tdesign-icons-vue-next";
 import {useFuse} from "@vueuse/integrations/useFuse";
-import {MusicInstanceWeb} from "@/types/MusicInstance";
+import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
 import {MusicGroupType} from "@/entity/MusicGroup";
 import {isEmptyString} from "@/utils/lang/StringUtil";
 

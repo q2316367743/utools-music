@@ -179,7 +179,7 @@ export const usePluginStore = defineStore('plugin-store', () => {
     }
     const target = plugins.value[idx];
     // 下载
-    await window.preload.downloadFile(
+    await window.preload.customer.downloadFile(
       `data:text/plain;base64,${stringToBase64(target.content)}`,
       `${target.name.replace(/\s+/, '_')}.js`);
   }

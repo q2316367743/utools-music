@@ -71,7 +71,7 @@ export const useDownloadStore = defineStore('download', () => {
     }
 
     try {
-      const mainPath = await window.preload.downloadFile(url, `${basename}${extname ? extname[0] : '.mp3'}`, downloadFolder.value);
+      const mainPath = await window.preload.customer.downloadFile(url, `${basename}${extname ? extname[0] : '.mp3'}`, downloadFolder.value);
       for (let i = 0; i < items.value.length; i++) {
         const r = items.value[i];
         if (r.id === item.id) {
@@ -106,7 +106,7 @@ export const useDownloadStore = defineStore('download', () => {
       if (isNotEmptyString(cover) && cover) {
         const c = new URL(cover);
         const coverExtname = c.pathname.match(/\.[a-zA-Z]*$/);
-        await window.preload.downloadFile(cover, `${basename}${coverExtname ? coverExtname[0] : '.png'}`, downloadFolder.value)
+        await window.preload.customer.downloadFile(cover, `${basename}${coverExtname ? coverExtname[0] : '.png'}`, downloadFolder.value)
       }
     } catch (e) {
       NotificationUtil.error("封面下载失败", '下载管理器');
@@ -115,7 +115,7 @@ export const useDownloadStore = defineStore('download', () => {
       if (isNotEmptyString(lyric) && lyric) {
         const l = new URL(lyric);
         const lyricExtname = l.pathname.match(/\.[a-zA-Z]*$/);
-        await window.preload.downloadFile(lyric, `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`, downloadFolder.value)
+        await window.preload.customer.downloadFile(lyric, `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`, downloadFolder.value)
       }
     } catch (e) {
       NotificationUtil.error("歌词下载失败", '下载管理器');
@@ -149,7 +149,7 @@ export const useDownloadStore = defineStore('download', () => {
         );
         if (!window.preload.fs.existsSync(coverPath)) {
           // 不存在，则下载
-          await window.preload.downloadFile(cover, coverFileName, downloadFolder.value)
+          await window.preload.customer.downloadFile(cover, coverFileName, downloadFolder.value)
         }
       }
     } catch (e) {
@@ -165,7 +165,7 @@ export const useDownloadStore = defineStore('download', () => {
           lyricFilename
         );
         if (!window.preload.fs.existsSync(lyricPath)) {
-          await window.preload.downloadFile(lyric, lyricFilename, downloadFolder.value)
+          await window.preload.customer.downloadFile(lyric, lyricFilename, downloadFolder.value)
         }
       }
     } catch (e) {
@@ -207,7 +207,7 @@ export const useDownloadStore = defineStore('download', () => {
       await updateList();
       try {
         // 开始下载
-        await window.preload.downloadFile(url, fileName, downloadFolder.value);
+        await window.preload.customer.downloadFile(url, fileName, downloadFolder.value);
         for (let i = 0; i < items.value.length; i++) {
           const r = items.value[i];
           if (r.id === downloadItem.id) {

@@ -2,8 +2,9 @@ import {useMusicGroupStore} from "@/store";
 import Fuse from "fuse.js";
 import {isEmptyArray} from "@/utils/lang/FieldUtil";
 import {useMusicPlay} from "@/global/Event";
-import {MusicInstanceLocal, MusicInstanceWeb} from "@/types/MusicInstance";
 import {MusicGroupType} from "@/entity/MusicGroup";
+import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
+import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
 
 interface MainPushResultItem {
   icon?: string,

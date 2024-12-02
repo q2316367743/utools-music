@@ -14,7 +14,7 @@
     <t-card style="height: 200px;overflow: auto">
       <t-loading :loading="loading" text="正在扫描音乐中...">
         <div class="repo-item" v-for="repo in repositories" :key="repo.id"
-             :class="{disabled: repo.nativeId !== nativeId || repo.type !== RepositoryType.LOCAL}">
+             :class="{disabled: repo.nativeId !== nativeId}">
           <t-space>
             <t-tag size="small" theme="primary">
               <span v-if="repo.type === RepositoryType.LOCAL">本地</span>
@@ -25,7 +25,6 @@
             </t-tooltip>
             <span v-else class="ellipsis">{{ repo.name }}</span>
           </t-space>
-
           <t-popconfirm content="确认删除吗？" @confirm="handleDelete(repo)">
             <t-button size="small" theme="danger" variant="text" :loading>
               <template #icon>

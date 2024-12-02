@@ -36,7 +36,7 @@ import {buildFromIMusicItem} from "@/entity/MusicItem";
 import {PluginInstanceView} from "@/entity/PluginEntity";
 import {getMusicItemFromPlugin} from "@/plugin/music";
 import {isEmptyString} from "@/utils/lang/StringUtil";
-import {MusicInstanceWeb} from "@/types/MusicInstance";
+import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
 
 interface IMusicItemWrap extends IMusicItem {
   keyword: string;

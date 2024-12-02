@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {MusicItem, MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {MusicItem, MusicItemView} from "@/entity/MusicItem";
 import {listByAsync, listRecordByAsync, removeOneByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {listRepositories, scanRepository} from "@/store";
@@ -28,10 +28,7 @@ export const useMusicStore = defineStore('music', () => {
       const musicItems = musicMap.get(`${LocalNameEnum.LIST_MUSIC}/${repo.id}`);
       if (musicItems) {
         musicItems.record.forEach(item => {
-          // 只显示本地的和WebDAV的
-          if (item.source !== MusicItemSource.LOCAL ||
-            item.nativeId === nativeId
-          ) {
+          if (item.nativeId === nativeId) {
             musicList.push({
               ...item,
               repositoryId: repo.id,

@@ -2,12 +2,14 @@ import {listByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {Repository, RepositoryType} from "@/entity/Repository";
 import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
-import {parseFileToMusic, readFileList} from "@/utils/file/FileUtil";
+import {FileItem, parseFileToMusic, readFileList} from "@/utils/file/FileUtil";
 import {group} from "@/utils/lang/ArrayUtil";
 import {IMAGE_EXTNAME, LYRIC_EXTNAME, MUSIC_EXTNAME} from "@/global/Constant";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
-import {copyProperties, parseMusicName} from "@/utils/lang/FieldUtil";
+import {basenameWeb, copyProperties, extnameWeb, parseMusicName} from "@/utils/lang/FieldUtil";
 import {KeyValue} from "@/types/KeyValue";
+import {AuthType, createClient} from "webdav";
+import {FileStat} from "webdav/dist/node/types";
 
 const nativeId = utools.getNativeId();
 
@@ -27,12 +29,7 @@ export function saveRepositories(val: Array<Repository>, rev?: string) {
   return saveListByAsync<Repository>(LocalNameEnum.LIST_REPOSITORY, val, rev);
 }
 
-/**
- * 扫描本地音乐
- * @param repo 本地仓库
- */
-async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
-  const files = await readFileList(repo.path);
+async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicItemSource): Promise<Array<MusicItem>> {
   const musicItems = new Array<MusicItem>();
   // 文件分组，用于处理封面和歌词
   const fileMap = group(files, 'basename');
@@ -45,7 +42,7 @@ async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
       id: start++,
       name,
       nativeId,
-      source: MusicItemSource.LOCAL,
+      source,
 
       url: '',
       cover: '',
@@ -66,16 +63,67 @@ async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
     });
     if (isNotEmptyString(musicItem.url)) {
       // 获取歌曲元信息
-      try {
-        const meta = await parseFileToMusic(musicItem.url);
-        copyProperties(meta, musicItem);
-      } catch (e) {
-        console.error("元数据解析失败", e)
+      if (!/https?:\/\//.test(musicItem.url)) {
+        // 链接，跳过
+        try {
+          const meta = await parseFileToMusic(musicItem.url);
+          copyProperties(meta, musicItem);
+        } catch (e) {
+          console.error("元数据解析失败", e)
+        }
       }
       musicItems.push(musicItem);
     }
   }
   return musicItems;
+}
+
+/**
+ * 扫描本地音乐
+ * @param repo 本地仓库
+ */
+async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
+  const files = await readFileList(repo.path);
+  return parseMusicItemFromFileItem(files, MusicItemSource.LOCAL);
+}
+
+function renderFileFromWebDAV(stat: FileStat): FileItem {
+  const basename = basenameWeb(stat.basename);
+  const extname = extnameWeb(stat.basename);
+
+  return {
+    name: stat.basename,
+    basename,
+    extname,
+    path: stat.filename
+  }
+}
+
+/**
+ * 扫描本地音乐
+ * @param repo 本地仓库
+ */
+async function scanWebDAV(repo: Repository): Promise<Array<MusicItem>> {
+  const client = createClient(repo.url, {
+    username: repo.username,
+    password: repo.password,
+    authType: AuthType.Auto
+  });
+  let directoryContents = await client.getDirectoryContents(repo.path || '/');
+  let list: Array<FileStat>;
+  if (Array.isArray(directoryContents)) {
+    list = directoryContents
+  } else {
+    list = directoryContents.data;
+  }
+  const files = new Array<FileItem>();
+  for (const file of list) {
+    if (file.type === 'directory') {
+      continue;
+    }
+    files.push(renderFileFromWebDAV(file));
+  }
+  return parseMusicItemFromFileItem(files, MusicItemSource.WEBDAV);
 }
 
 /**
@@ -86,24 +134,28 @@ export async function scanRepository(): Promise<Array<KeyValue<Array<MusicItem> 
   const items = new Array<KeyValue<Array<MusicItem> | null, number>>();
 
   for (let repository of list) {
+    if (repository.nativeId !== nativeId) {
+      items.push({
+        key: repository.id,
+        value: null
+      })
+      continue;
+    }
     if (repository.type === RepositoryType.LOCAL) {
-      if (repository.nativeId !== nativeId) {
-        items.push({
-          key: repository.id,
-          value: null
-        })
-        continue;
-      }
       const temp = await scanLocal(repository);
       items.push({
         key: repository.id,
         value: temp
       });
-
     } else if (repository.type === RepositoryType.WEBDAV) {
       // WebDAV
-      console.log('WebDAV敬请期待')
+      const temp = await scanWebDAV(repository);
+      items.push({
+        key: repository.id,
+        value: temp
+      });
     }
   }
+  console.log(items);
   return items
 }
