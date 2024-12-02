@@ -1,7 +1,8 @@
 <template>
   <div class="music-display" :class="{show: displayVisible}">
+    <div class="mask" />
     <t-layout class="w-full h-full">
-      <t-aside class="list" :width="collapsed ? '0px' : '300px'">
+      <t-aside class="list" :width="listVisible ? '300px' : '0px'">
         <div v-for="(m, i) in musics" :key="m.id" class="item" :class="{active: music?.id === m.id}"
              @dblclick="switchIndex(i)">
           <t-row :gutter="8">
@@ -41,13 +42,8 @@
         </div>
         <div class="close">
           <t-tooltip placement="bottom" content="搜索歌词" v-if="lyrics.length > 0">
-            <music-lyric-search :icon="true" />
+            <music-lyric-search :icon="true"/>
           </t-tooltip>
-          <t-button theme="primary" variant="text" size="large" shape="circle" @click="collapsed=!collapsed">
-            <template #icon>
-              <view-list-icon/>
-            </template>
-          </t-button>
           <t-button theme="primary" variant="text" size="large" shape="circle" @click="displayVisible=false">
             <template #icon>
               <chevron-down-icon/>
@@ -61,18 +57,17 @@
 <script lang="ts" setup>
 import {
   audio,
-  displayVisible, lyricIndex,
+  displayVisible, listVisible, lyricIndex,
   lyrics,
   music,
   musics, played,
   removeIndex, switchCurrentTime,
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
-import {DeleteIcon, PlayIcon, ChevronDownIcon, ViewListIcon} from 'tdesign-icons-vue-next';
+import {DeleteIcon, PlayIcon, ChevronDownIcon} from 'tdesign-icons-vue-next';
 import {LyricLine} from "@/types/LyricLine";
 import MusicLyricSearch from "@/components/MusicPlayer/MusicLyricSearch.vue";
 
-const collapsed = ref(false);
 
 const name = computed(() => music.value?.name || '无歌曲');
 const artist = computed(() => music.value?.artist || '无演唱家');
@@ -94,8 +89,40 @@ function handleLyricClick(value: LyricLine) {
   right: 0;
   height: calc(100vh - 60px);
 
-  background: linear-gradient(-135deg, #F902FF, #00DBDE);
-  color: var(--td-text-color-primary);
+  .mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    //background: linear-gradient(-135deg, #F902FF, #00DBDE);
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.6); /* 60%的黑色遮罩 */
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("https://www.hhlqilongzhu.cn/api/tu_yitu.php");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: blur(5px); /* 调整模糊程度，单位为像素 */
+    }
+
+  }
+
   transition: top 0.5s;
 
   display: flex;
@@ -181,9 +208,10 @@ function handleLyricClick(value: LyricLine) {
 
       .lyric-line {
         padding: 8px 0;
-        font-size: 1.5rem;
         cursor: pointer;
         position: relative;
+        font-size: 2rem;
+        line-height: 2.5rem;
 
         .play {
           display: none;
@@ -205,7 +233,7 @@ function handleLyricClick(value: LyricLine) {
 
         &.active {
           color: var(--td-text-color-link);
-          font-size: 1.5rem;
+          font-size: 2rem;
           margin: 8px 0;
         }
       }

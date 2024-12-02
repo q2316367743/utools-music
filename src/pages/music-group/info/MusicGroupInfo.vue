@@ -112,9 +112,9 @@ function init() {
 onMounted(init);
 
 
-function handleRowDblclick(context: { row: any }) {
-  const {row} = context;
-  handleMusicGroupDblclick(info.value!, row, data.value);
+function handleRowDblclick(context: { row: any, rowIndex: number }) {
+  const {rowIndex} = context;
+  handleMusicGroupDblclick(info.value!, rowIndex, data.value);
 }
 
 const menuClickEvent: VxeTableEvents.MenuClick = (params) => {

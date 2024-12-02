@@ -19,11 +19,10 @@ function renderMusicInstance(info: MusicGroupIndex, e: any) {
   return new MusicInstanceLocal(e);
 }
 
-export function handleMusicGroupDblclick(info: MusicGroupIndex, row: any, data: Array<any>) {
-  const index = data.findIndex(e => e.id === row.id);
+export function handleMusicGroupDblclick(info: MusicGroupIndex, rowIndex: number, data: Array<any>) {
   useMusicPlay.emit({
     views: data.map(e => renderMusicInstance(info, e)),
-    index: Math.max(index, 0)
+    index: rowIndex
   });
 }
 

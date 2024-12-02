@@ -284,18 +284,12 @@ export function onMusicAppend(e: MusicInstance) {
 
 export function switchDisplay() {
   displayVisible.value = !displayVisible.value;
-  if (displayVisible.value) {
-    if (listVisible.value) {
-      listVisible.value = false;
-    }
+  if (listVisible.value) {
+    listVisible.value = false;
   }
 }
 
 export function switchList() {
-  if (displayVisible.value) {
-    listVisible.value = false;
-    return;
-  }
   listVisible.value = !listVisible.value;
 }
 
