@@ -48,6 +48,8 @@ export enum LocalNameEnum {
 
   KEY_COLOR_MODE = '/key/color-mode',
 
+  KEY_COLLAPSED = '/key/collapsed',
+
   DATA_PLUGIN =  '/data/plugin'
 
 }

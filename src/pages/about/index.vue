@@ -21,7 +21,11 @@
       <t-paragraph>
         <t-space>
           <div class="about__label">源代码</div>
-          <div>插件基于Apache-2.0协议开源</div>
+          <div style="display: flex;">
+            <div>插件基于</div>
+            <license/>
+            <div>协议开源</div>
+          </div>
           <t-link theme="primary" @click="openUrl(Constants.repo)">
             Github地址
           </t-link>
@@ -57,6 +61,7 @@
 <script lang="ts" setup>
 import {Constants} from "@/global/Constant";
 import {openReward} from "@/pages/about/func";
+import License from "@/pages/about/license.vue";
 
 
 function openUrl(url: string) {
@@ -119,18 +124,16 @@ function openFeedback() {
 
   .reward:before {
     content: "";
-    background: linear-gradient(
-      45deg,
-      #ff0000,
-      #ff7300,
-      #fffb00,
-      #48ff00,
-      #00ffd5,
-      #002bff,
-      #7a00ff,
-      #ff00c8,
-      #ff0000
-    );
+    background: linear-gradient(45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000);
     position: absolute;
     top: -2px;
     left: -2px;

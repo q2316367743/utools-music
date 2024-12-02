@@ -1,6 +1,6 @@
 <template>
-  <div class="menu-side">
-    <t-menu width="200px" :value="active" @change="handleChange">
+  <t-aside class="menu-side" :width="collapsed ? '70px' : '270px'">
+    <t-menu width="200px" :value="active" @change="handleChange" :collapsed>
       <t-menu-item value="/local">
         <template #icon>
           <folder-icon/>
@@ -60,8 +60,15 @@
         </template>
         关于
       </t-menu-item>
+      <template #operations>
+        <t-button class="t-demo-collapse-btn" variant="text" shape="square" @click="changeCollapsed">
+          <template #icon>
+            <view-list-icon />
+          </template>
+        </t-button>
+      </template>
     </t-menu>
-  </div>
+  </t-aside>
 </template>
 <script lang="ts" setup>
 import {MenuValue} from "tdesign-vue-next";
@@ -72,8 +79,9 @@ import {
   MusicIcon,
   RootListIcon,
   SearchIcon,
-  SettingIcon
+  SettingIcon, ViewListIcon
 } from "tdesign-icons-vue-next";
+import {collapsed} from "@/store/AppStore";
 
 const route = useRoute();
 const router = useRouter();
@@ -90,14 +98,10 @@ function handleChange(e: MenuValue) {
   router.push(e + '');
 }
 
+function changeCollapsed() {
+  collapsed.value = !collapsed.value;
+}
+
 </script>
 <style scoped lang="less">
-.menu-side {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-right: 1px solid var(--td-component-border);
-  overflow: auto;
-  z-index: 1;
-}
 </style>

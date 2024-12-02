@@ -1,15 +1,17 @@
 <template>
   <div class="main">
-    <div class="main-container">
-      <div class="main-content">
-        <router-view v-slot="{ Component }">
-          <keep-alive :exclude>
-            <component :is="Component"/>
-          </keep-alive>
-        </router-view>
-      </div>
+    <t-layout class="main-container">
       <menu-side class="main-side"></menu-side>
-    </div>
+      <t-content class="main-content-wrapper">
+        <div class="main-content">
+          <router-view v-slot="{ Component }">
+            <keep-alive :exclude>
+              <component :is="Component"/>
+            </keep-alive>
+          </router-view>
+        </div>
+      </t-content>
+    </t-layout>
     <music-display/>
     <div class="main-player">
       <music-player/>
@@ -75,22 +77,19 @@ versionCheck().catch(e => MessageUtil.error("版本检查错误", e));
     bottom: 60px;
     contain: strict;
 
-    .main-side {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 200px
+    .main-content-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      .main-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
     }
 
-    .main-content {
-      position: absolute;
-      top: 0;
-      left: 200px;
-      right: 0;
-      bottom: 0;
-
-    }
   }
 
   .main-player {

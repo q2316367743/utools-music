@@ -2,8 +2,10 @@ import {ref, watch} from "vue";
 import {VXETable} from "vxe-table";
 import {useColorMode} from "@/hooks/ColorMode";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
+import {useUtoolsDbAsync} from "@/hooks/UtoolsDbAsync";
 
-export const detach = ref(utools.getWindowType() !== 'main')
+export const detach = ref(utools.getWindowType() !== 'main');
+export const collapsed =  useUtoolsDbAsync(LocalNameEnum.KEY_COLLAPSED, false);
 
 export const colorMode = useColorMode({
   key: LocalNameEnum.KEY_COLOR_MODE,
