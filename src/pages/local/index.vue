@@ -142,6 +142,7 @@ const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) =>
       justify-content: space-between;
       align-items: center;
     }
+
   }
 }
 </style>

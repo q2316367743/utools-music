@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+    <div class="main-mask"/>
     <t-layout class="main-container">
       <menu-side class="main-side"></menu-side>
       <t-content class="main-content-wrapper">
@@ -67,7 +68,7 @@ versionCheck().catch(e => MessageUtil.error("版本检查错误", e));
   right: 0;
   bottom: 0;
   color: var(--td-text-color-primary);
-  background-color: var(--td-bg-color-container);
+
 
   .main-container {
     position: absolute;
@@ -76,17 +77,29 @@ versionCheck().catch(e => MessageUtil.error("版本检查错误", e));
     right: 0;
     bottom: 60px;
     contain: strict;
+    background-color: transparent;
+
+    .main-side {
+      background-color: var(--music-bg-color-3);
+
+      :deep(.t-default-menu) {
+        background-color: transparent;
+      }
+    }
 
     .main-content-wrapper {
       position: relative;
       width: 100%;
       height: 100%;
+      background-color: transparent;
+
       .main-content {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+        background-color: transparent;
       }
     }
 
@@ -98,7 +111,6 @@ versionCheck().catch(e => MessageUtil.error("版本检查错误", e));
     right: 0;
     bottom: 0;
     height: 60px;
-    background-color: var(--td-bg-color-container);
     color: var(--td-text-color-primary);
   }
 }

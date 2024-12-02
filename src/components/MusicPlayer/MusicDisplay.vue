@@ -1,8 +1,8 @@
 <template>
   <div class="music-display" :class="{show: displayVisible}">
-    <div class="mask" />
-    <t-layout class="w-full h-full">
-      <t-aside class="list" :width="listVisible ? '300px' : '0px'">
+    <div class="main-mask"/>
+    <t-layout class="music-display__container">
+      <t-aside class="list" :width="listVisible ? '300px' : '0px'" :style="{opacity: listVisible? 1 : 0, overflowX: 'hidden'}">
         <div v-for="(m, i) in musics" :key="m.id" class="item" :class="{active: music?.id === m.id}"
              @dblclick="switchIndex(i)">
           <t-row :gutter="8">
@@ -81,46 +81,19 @@ function handleLyricClick(value: LyricLine) {
 }
 </script>
 <style scoped lang="less">
-
 .music-display {
   position: fixed;
-  top: 100vh;
+  top: 105vh;
   left: 0;
   right: 0;
-  height: calc(100vh - 60px);
+  height: 100vh;
 
-  .mask {
+  &__container {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    //background: linear-gradient(-135deg, #F902FF, #00DBDE);
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.6); /* 60%的黑色遮罩 */
-    }
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url("https://www.hhlqilongzhu.cn/api/tu_yitu.php");
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-      filter: blur(5px); /* 调整模糊程度，单位为像素 */
-    }
-
+    bottom: 60px;
   }
 
   transition: top 0.5s;

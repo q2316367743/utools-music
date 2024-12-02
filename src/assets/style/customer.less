@@ -6,7 +6,7 @@
   }
 }
 
-body[arco-theme='dark'] {
+body[theme-mode='dark'] {
   .bg-color {
     background-color: #303133;
 
@@ -52,4 +52,37 @@ body[arco-theme='dark'] {
 
 .t-drawer__close-btn {
   z-index: 1;
+}
+
+.t-tabs, .t-card {
+  background-color: transparent !important;
+}
+
+.t-table, .t-tabs__operations, .t-tabs__btn--right, .t-tabs__btn--left {
+  background-color: var(--music-bg-color-3);
+}
+
+.t-tabs__btn--right, .t-tabs__btn--left {
+  &:hover {
+    background-color: var(--music-bg-color-6);
+  }
+}
+
+// 默认主题
+html[data-vxe-ui-theme="light"] {
+  --vxe-ui-font-color: var(--td-text-color-primary);
+  --vxe-ui-font-primary-color: var(--td-text-color-link);
+  --vxe-ui-layout-background-color: rgba(0, 0, 0, 0.3);
+}
+
+// 暗黑主题
+html[data-vxe-ui-theme="dark"] {
+  --vxe-ui-font-color: var(--td-text-color-primary);
+  --vxe-ui-font-primary-color: var(--td-text-color-link);
+  --vxe-ui-layout-background-color: rgba(255, 255, 255, 0.3);
+  --vxe-ui-table-menu-background-color: var(--td-bg-color-component);
+}
+
+.vxe-table--context-menu-wrapper {
+  background-color: var(--td-bg-color-component);
 }
