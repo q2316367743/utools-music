@@ -88,3 +88,12 @@ export async function parseFileToMusic(path: string): Promise<Partial<MusicItemM
     duration: format.duration
   }
 }
+
+export function unlinkAsync(path: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    window.preload.fs.unlink(path, e => {
+      if (e) {return reject(e);}
+      resolve();
+    });
+  })
+}

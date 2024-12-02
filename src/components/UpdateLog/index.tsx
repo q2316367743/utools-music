@@ -2,6 +2,7 @@ import {Constants} from "@/global/Constant";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {DialogPlugin, Link, Paragraph} from "tdesign-vue-next";
 import {getUpdateLogs} from "@/global/UpdateLog";
+import {isEmptyArray} from "@/utils/lang/FieldUtil";
 
 function openUrl(url: string) {
   utools.shellOpenExternal(url);
@@ -32,10 +33,13 @@ function welcome() {
 function showUpdateLog(newVersion: string, oldVersion: string) {
   return new Promise<void>(resolve => {
     const updateLogs = getUpdateLogs(newVersion, oldVersion);
+    if (isEmptyArray(updateLogs)) {
+      return;
+    }
     const dialogInstance = DialogPlugin({
       header: `恭喜你更新到${newVersion}`,
       top: '8vh',
-      default: () => <div>
+      default: () => <div style={{maxHeight: '45vh', overflowY: 'auto'}}>
         <Paragraph>本次更新了一下内容</Paragraph>
         {updateLogs.map(log => <div>
           <h3>{log.version}</h3>
@@ -55,8 +59,9 @@ function showUpdateLog(newVersion: string, oldVersion: string) {
 
 export async function versionCheck() {
   const newVersion = Constants.version;
-  const oldVersion = utools.dbStorage.getItem(LocalNameEnum.KEY_VERSION);
+  let oldVersion = utools.dbStorage.getItem(LocalNameEnum.KEY_VERSION);
   if (!oldVersion) {
+    oldVersion = '0.0.0'
     // 欢迎
     await welcome();
   }

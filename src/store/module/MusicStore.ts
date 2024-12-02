@@ -1,10 +1,11 @@
 import {defineStore} from "pinia";
 import {MusicItem, MusicItemSource, MusicItemView} from "@/entity/MusicItem";
-import {listRecordByAsync, removeOneByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
+import {listByAsync, listRecordByAsync, removeOneByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {listRepositories, scanRepository} from "@/store";
 import {map} from "@/utils/lang/ArrayUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {copyProperties} from "@/utils/lang/FieldUtil";
 
 const LIST_KEY = `${LocalNameEnum.LIST_MUSIC}/`;
 
@@ -93,9 +94,26 @@ export const useMusicStore = defineStore('music', () => {
     await init();
   }
 
+  async function updateById(res: Partial<MusicItemView> & {id: number}) {
+    for (const music of musics.value) {
+      if (music.id === res.id) {
+        const old = await listByAsync<MusicItemView>(`${LocalNameEnum.LIST_MUSIC}/${music.repositoryId}`);
+        if (old.list && old.list.length > 0) {
+          const index = old.list.findIndex(e => e.id === res.id);
+          if (index >= 0) {
+            old.list[index] = Object.assign(old.list[index], res);
+            await saveListByAsync(`${LocalNameEnum.LIST_MUSIC}/${music.repositoryId}`, old.list, old.rev);
+            copyProperties(res, music);
+            return;
+          }
+        }
+      }
+    }
+  }
+
   return {
     musics,
-    init, scan, removeMusic
+    init, scan, removeMusic, updateById
   }
 
 })

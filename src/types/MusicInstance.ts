@@ -1,4 +1,4 @@
-import {buildFromIMusicItem, MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {buildFromIMusicItem, MusicItem, MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {getForText} from "@/plugin/http";
 import {base64ToString} from "@/utils/file/CovertUtil";
 import {readFile, readFileAsString} from "@/utils/file/FileUtil";
@@ -98,10 +98,10 @@ function renderLyricFromMeta(meta: IAudioMetadata): Array<Array<LyricLine>> {
 
 export class MusicInstanceLocal implements MusicInstance {
 
-  private readonly item: MusicItem;
+  private readonly item: MusicItemView;
   private metadata: IAudioMetadata | null = null;
 
-  constructor(item: MusicItem) {
+  constructor(item: MusicItemView) {
     this.item = item;
   }
 

@@ -29,9 +29,9 @@
           <span v-if="album">{{ album }}</span>
         </div>
         <div class="lyric">
-          <div class="lyric-empty" v-if="lyrics.length === 0">
+          <div class="lyric-empty" v-if="lyrics.length === 0 && music">
             <p>暂无歌词</p>
-            <music-lyric-search/>
+            <music-lyric-search :icon="false"/>
           </div>
           <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
                :class="{active: lyricIndex === i}" @click="handleLyricClick(lyric)">
@@ -40,6 +40,9 @@
           </div>
         </div>
         <div class="close">
+          <t-tooltip placement="bottom" content="搜索歌词" v-if="lyrics.length > 0">
+            <music-lyric-search :icon="true" />
+          </t-tooltip>
           <t-button theme="primary" variant="text" size="large" shape="circle" @click="collapsed=!collapsed">
             <template #icon>
               <view-list-icon/>
@@ -221,6 +224,7 @@ function handleLyricClick(value: LyricLine) {
       position: absolute;
       top: 16px;
       right: 16px;
+      display: flex;
     }
   }
 

@@ -20,22 +20,34 @@ export function transferTextToLyric(text: string): Array<LyricLine> {
             lyricLines.push({
               text: text.trim(),
               start: timeInSeconds,
-              end: 0
+              end: 0,
+              time: t
             })
           });
+        } else {
+          lyricLines.push({
+            text: lrc,
+            start: -1,
+            end: -1,
+            time: ''
+          })
         }
       }
     }
   }
 
-
   for (let i = 0; i < lyricLines.length; i++) {
-    lyricLines[i].end = lyricLines[i + 1]?.start || 9999999999;
+    if (lyricLines[i].time) {
+      lyricLines[i].end = lyricLines[i + 1]?.start || 9999999999;
+    }
   }
 
   return lyricLines;
 }
 
+export function transferLyricToText(lyric: Array<LyricLine>): string {
+  return lyric.map(l => l.time ? `${l.time} ${l.text}` : l.text).join("\n");
+}
 
 interface MusicInfo {
   item: IMusicItem,

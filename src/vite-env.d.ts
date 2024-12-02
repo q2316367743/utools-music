@@ -73,11 +73,13 @@ interface Window {
       statSync(path: string): StatsBase<number>;
       readFile(path: string, callback: (e: Error, file: Uint8Array) => void): void;
       readFile(path: string, encode: 'utf8', callback: (e: Error, file: string) => void): void;
+      unlink(path: string, callback: (e: Error) => void): void;
     },
     path: {
       join(...paths: Array<string>): string;
       basename(path: string): string;
       extname(path: string): string;
+      dirname(path: string): string;
     },
     ipcRenderer: {
       sendLyric(ids: Array<number>, content: any): void

@@ -1,6 +1,11 @@
 <template>
   <div class="music-lyric-search">
-    <t-link theme="primary" @click="openDialog">立即搜素</t-link>
+    <t-button theme="primary" variant="text" size="large" shape="circle" @click="openDialog" v-if="icon">
+      <template #icon>
+        <search-icon/>
+      </template>
+    </t-button>
+    <t-link theme="primary" @click="openDialog" v-else>立即搜索</t-link>
     <t-dialog v-model:visible="visible" :close-btn="true" width="700px" attach="body" :footer="false" top="10vh">
       <template #header>
         <div class="w-full">
@@ -17,14 +22,23 @@
                 <search-icon/>
               </template>
             </t-input>
+            <template #append>
+              <t-button theme="primary" :disabled="isEmptyArray(plugins) || !music || loading" @click="search">
+                搜索
+              </t-button>
+            </template>
           </t-input-adornment>
         </div>
       </template>
       <t-loading :loading text="歌词搜索中">
         <div class="music-lyric-container" :style="{height: height + 'px'}">
           <t-list v-if="items.length > 0" :split="true">
-            <t-list-item v-for="i in items" :key="i.id" :value="i.id">
-              <t-list-item-meta :title="i.title" :description="i.artist"/>
+            <t-list-item v-for="i in items" :key="i.item.id" :value="i.item.id">
+              <t-space>
+                <span>{{i.item.title}}</span>
+                <span>-</span>
+                <span style="color: var(--td-text-color-secondary)">{{i.item.artist}}</span>
+              </t-space>
               <template #action>
                 <t-button theme="primary" variant="text" @click="handleLyric(i)">查看歌词</t-button>
               </template>
@@ -43,15 +57,18 @@ import {SearchIcon} from "tdesign-icons-vue-next";
 import {currentTime, music} from "@/components/MusicPlayer/MusicPlayer";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {isEmptyString} from "@/utils/lang/StringUtil";
-import {IMusicItem} from "@/types/PluginInstance";
-import {showLyric} from "@/components/MusicPlayer/MusicLyricSearch";
+import {IMusicItemLyric, showLyric} from "@/components/MusicPlayer/MusicLyricSearch";
+
+defineProps({
+  icon: Boolean
+});
 
 const size = useWindowSize();
 
 const visible = ref(false);
 const active = ref(0);
 const keyword = ref('');
-const items = ref<Array<IMusicItem>>([]);
+const items = ref<Array<IMusicItemLyric>>([]);
 const loading = ref(false);
 const index = ref(0);
 
@@ -123,7 +140,8 @@ async function searchWrap() {
   if (!music.value) {
     return;
   }
-  const {name, artist} = music.value;
+  const source = music.value;
+  const {name} = source
   for (let plugin of plugins.value) {
     if (active.value === plugin.id) {
       const {search} = plugin.instance;
@@ -133,7 +151,10 @@ async function searchWrap() {
         if (isEmptyArray(data)) {
           continue;
         }
-        items.value = data
+        items.value = data.map(item => ({
+          item,
+          source
+        }))
       }
       return true;
     }
@@ -149,9 +170,12 @@ function search() {
     .finally(() => loading.value = false);
 }
 
-function handleLyric(i: IMusicItem) {
+function handleLyric(i: IMusicItemLyric) {
   loading.value = true;
-  showLyric(active.value, i, () => loading.value = false);
+  showLyric(active.value, i, () => {
+    visible.value = false;
+    loading.value = false
+  });
 }
 
 </script>

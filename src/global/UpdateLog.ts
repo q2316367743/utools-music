@@ -8,9 +8,10 @@ interface UpdateLogGroup {
 export const getUpdateLogs = (newVersion: string, oldVersion: string): Array<UpdateLogGroup> => {
   const list = new Array<UpdateLogGroup>();
   UPDATE_LOG.forEach(log => {
-    if (versionCompare(newVersion, log.version) >= 0) {
-      list.push(log);
-    }else if (versionCompare(oldVersion, log.version) < 0) {
+    console.log(newVersion, log.version, oldVersion);
+    console.log(versionCompare(newVersion, log.version))
+    console.log(versionCompare(oldVersion, log.version));
+    if (versionCompare(newVersion, log.version) >= 0 && versionCompare(oldVersion, log.version) < 0) {
       list.push(log);
     }
   })

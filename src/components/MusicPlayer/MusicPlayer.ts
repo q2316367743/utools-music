@@ -139,6 +139,7 @@ async function playWrapper() {
   const oldIndex = index.value;
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
   const instance = await music.value.getInfo();
+  console.log(instance)
   let exist: boolean;
   if (/^https?:\/\//.test(instance.url)) {
     // 网络音乐

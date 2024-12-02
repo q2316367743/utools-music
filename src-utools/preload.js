@@ -1,8 +1,15 @@
 const {
-    readFile, readdir, statSync, writeFile
-    , existsSync, createWriteStream
+    readFile, readdir, statSync,
+    writeFile,
+    unlink,
+    existsSync,
+    createWriteStream
 } = require('node:fs');
-const {join, basename, extname} = require('node:path');
+const {join,
+    basename,
+    extname,
+    dirname
+} = require('node:path');
 const {URL} = require("node:url");
 const https = require("node:https");
 const http = require("node:http");
@@ -153,10 +160,11 @@ window.preload = {
         existsSync,
         readdir,
         statSync,
-        readFile
+        readFile,
+        unlink
     },
     path: {
-        join, basename, extname
+        join, basename, extname, dirname
     },
     ipcRenderer: {
         sendLyric
