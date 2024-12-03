@@ -12,6 +12,7 @@ import {Repository} from "@/entity/Repository";
 import {listRepositories} from "@/store";
 import {renderPreviewUrl} from "@/plugin/server";
 import {createClient} from "webdav";
+import {clone} from "radash";
 
 function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItem) {
   if (isNotEmptyString(m.cover)) {
@@ -59,7 +60,7 @@ export class MusicInstanceWebDAV implements MusicInstance {
   private repository: Repository | null = null;
 
   constructor(item: MusicItemView) {
-    this.item = item;
+    this.item = clone(item);
   }
 
   get album(): string {

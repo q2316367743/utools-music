@@ -31,10 +31,11 @@
           </t-link>
         </t-space>
       </t-paragraph>
-      <t-paragraph label="问题反馈">
+      <t-paragraph>
         <t-space>
-          <div class="about__label">问题反馈</div>
-          <t-link theme="primary" @click="openFeedback">打开反馈</t-link>
+          <div class="about__label">更多</div>
+          <t-link theme="primary" @click="openFeedback">问题反馈</t-link>
+          <t-link theme="primary" @click="showLog">更新日志</t-link>
         </t-space>
       </t-paragraph>
       <t-alert theme="success">
@@ -62,6 +63,7 @@
 import {Constants} from "@/global/Constant";
 import {openReward} from "@/pages/about/func";
 import License from "@/pages/about/license.vue";
+import {showLog} from "@/components/UpdateLog";
 
 
 function openUrl(url: string) {

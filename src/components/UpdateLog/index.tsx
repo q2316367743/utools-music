@@ -38,8 +38,9 @@ function showUpdateLog(newVersion: string, oldVersion: string) {
     }
     const dialogInstance = DialogPlugin({
       header: `恭喜你更新到${newVersion}`,
-      top: '8vh',
-      default: () => <div style={{maxHeight: '45vh', overflowY: 'auto'}}>
+      top: '10vh',
+      width: '600px',
+      default: () => <div style={{maxHeight: '50vh', overflowY: 'auto'}}>
         <Paragraph>本次更新了一下内容</Paragraph>
         {updateLogs.map(log => <div>
           <h3>{log.version}</h3>
@@ -70,4 +71,31 @@ export async function versionCheck() {
   }
   utools.dbStorage.setItem(LocalNameEnum.KEY_VERSION, newVersion);
   await showUpdateLog(newVersion, oldVersion);
+}
+
+export function showLog() {
+  return new Promise<void>(resolve => {
+    const updateLogs = getUpdateLogs(Constants.version, '0.0.0');
+    if (isEmptyArray(updateLogs)) {
+      return;
+    }
+    const dialogInstance = DialogPlugin({
+      header: '版本更新日志',
+      top: '10vh',
+      width: '600px',
+      default: () => <div style={{maxHeight: '50vh', overflowY: 'auto'}}>
+        {updateLogs.map(log => <div>
+          <h3>{log.version}</h3>
+          <ul>
+            {log.logs.map(l => <li>{l}</li>)}
+          </ul>
+        </div>)}
+      </div>,
+      footer: false,
+      onClose() {
+        resolve();
+        dialogInstance.destroy();
+      }
+    });
+  })
 }

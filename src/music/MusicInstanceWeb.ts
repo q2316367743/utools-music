@@ -5,6 +5,7 @@ import {copyProperties} from "@/utils/lang/FieldUtil";
 import {LyricContent} from "@/types/LyricLine";
 import {transferTextToLyric} from "@/plugin/music";
 import {MusicInstance} from "@/types/MusicInstance";
+import {clone} from "radash";
 
 export class MusicInstanceWeb implements MusicInstance {
 
@@ -12,7 +13,7 @@ export class MusicInstanceWeb implements MusicInstance {
   private readonly pId: number;
 
   constructor(item: IMusicItem, pluginId: number) {
-    this.item = item;
+    this.item = clone(item);
     this.pId = pluginId;
   }
 
