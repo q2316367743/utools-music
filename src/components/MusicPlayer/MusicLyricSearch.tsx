@@ -5,12 +5,13 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {getForText} from "@/plugin/http";
 import {transferLyricToText, transferTextToLyric} from "@/plugin/music";
 import {DialogPlugin} from "tdesign-vue-next";
-import {lyricGroups, lyricIndex, lyrics, music} from "@/components/MusicPlayer/MusicPlayer";
+import {currentTime, lyricGroups, lyricIndex, lyrics, music} from "@/components/MusicPlayer/MusicPlayer";
 import {MusicInstance} from "@/types/MusicInstance";
 import {stringToBase64} from "@/utils/file/CovertUtil";
 import {MusicItem} from "@/entity/MusicItem";
 import {unlinkAsync} from "@/utils/file/FileUtil";
 import {LyricLine} from "@/types/LyricLine";
+import {basenameWeb} from "@/utils/lang/FieldUtil";
 
 export interface IMusicItemLyric {
   item: IMusicItem,
@@ -19,9 +20,13 @@ export interface IMusicItemLyric {
 
 async function downloadLrc(lrcLines: Array<LyricLine>, source: MusicInstance) {
   // 下载歌词
-  const {name, artist, self} = source;
+  const {self} = source;
   const {url, id} = (self as MusicItem);
-  const lrcName = `${artist} - ${name}.lrc`;
+  let basename = window.preload.path.basename(url);
+  basename = basenameWeb(basename)
+  let lrcName = `${basename}.lrc`;
+  lrcName = lrcName.replace(/[\/\\]/, '，');
+
   let dirname = window.preload.path.dirname(url);
   const target = window.preload.path.join(dirname, lrcName);
 
@@ -39,10 +44,11 @@ async function downloadLrc(lrcLines: Array<LyricLine>, source: MusicInstance) {
     id: id,
     lyric: target
   });
+  MessageUtil.success("歌词下载成功");
 }
 
-async function showLyricWrap(id: number, itemLyric: IMusicItemLyric,
-                             onComplete: () => void) {
+async function showLyricWrap(
+  id: number, itemLyric: IMusicItemLyric, onSet: () => void) {
   const {item, source} = itemLyric;
   const {getInstance} = usePluginStore()
   const instance = getInstance(id);
@@ -68,13 +74,15 @@ async function showLyricWrap(id: number, itemLyric: IMusicItemLyric,
     header: "歌词详情",
     top: '8vh',
     default: () => <ul style={{maxHeight: '45vh'}}>
-      {lyricLines.map((line, i) => <li key={i}>{line.text}</li>)}
+      {lyricLines.map((line, i) => <li
+        key={i}
+        style={{color: line.start <= currentTime.value && currentTime.value <= line.end ? 'var(--td-text-color-link)' : ''}}
+      >{line.text}</li>)}
     </ul>,
     confirmBtn: {
       default: '设为歌词',
     },
     onConfirm() {
-      // TODO: 设为歌词
       downloadLrc(lyricLines, source);
       // 设为歌词
       const current = music.value;
@@ -89,7 +97,7 @@ async function showLyricWrap(id: number, itemLyric: IMusicItemLyric,
       lyricIndex.value = lyricGroups.value.length - 1;
       lyrics.value = lyricLines;
       dialogInstance.destroy();
-      onComplete();
+      onSet()
     }
   });
 }
@@ -97,8 +105,10 @@ async function showLyricWrap(id: number, itemLyric: IMusicItemLyric,
 export function showLyric(
   id: number,
   item: IMusicItemLyric,
-  onComplete: () => void
+  onComplete: () => void,
+  onSet: () => void
 ) {
-  showLyricWrap(id, item, onComplete)
+  showLyricWrap(id, item, onSet)
     .catch(e => MessageUtil.error("获取歌词失败", e))
+    .finally(onComplete)
 }

@@ -102,6 +102,7 @@ watch(active, val => {
   if (isEmptyString(keyword.value)) {
     return;
   }
+  loading.value = false;
   search();
 });
 
@@ -173,8 +174,9 @@ function search() {
 function handleLyric(i: IMusicItemLyric) {
   loading.value = true;
   showLyric(active.value, i, () => {
+    loading.value = false;
+  }, () => {
     visible.value = false;
-    loading.value = false
   });
 }
 

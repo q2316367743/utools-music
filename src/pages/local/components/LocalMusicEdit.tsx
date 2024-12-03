@@ -10,7 +10,7 @@ export function openLocalMusicEditDialog(row: MusicItemView): void {
     header: '编辑音乐数据',
     top: '10vh',
     width: '600px',
-    default: () => <Form style={{maxHeight: ' 45vh', overflow: 'auto'}}>
+    default: () => <Form style={{maxHeight: ' 45vh', overflow: 'auto', padding: '8px'}}>
       <FormItem label={'歌曲名称'}>
         <Input v-model={data.value.name} clearable={true} />
       </FormItem>

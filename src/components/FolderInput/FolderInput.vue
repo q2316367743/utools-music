@@ -1,6 +1,6 @@
 <template>
   <t-input-group>
-    <t-input v-model="modelValue" :clearable="true" :disabled="true"></t-input>
+    <t-input v-model="modelValue" :clearable="true"></t-input>
     <t-button @click="handleClick">选择文件夹</t-button>
   </t-input-group>
 </template>

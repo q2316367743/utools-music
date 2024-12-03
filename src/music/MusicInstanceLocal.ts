@@ -8,6 +8,7 @@ import {base64ToString} from "@/utils/file/CovertUtil";
 import {transferTextToLyric} from "@/plugin/music";
 import {MusicInstance} from "@/types/MusicInstance";
 import {isNotEmptyArray} from "@/utils/lang/FieldUtil";
+import {clone} from "radash";
 
 function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItem) {
   if (isNotEmptyString(m.cover)) {
@@ -46,7 +47,7 @@ export class MusicInstanceLocal implements MusicInstance {
   private metadata: IAudioMetadata | null = null;
 
   constructor(item: MusicItemView) {
-    this.item = item;
+    this.item = clone(item);
   }
 
   get album(): string {

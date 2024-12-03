@@ -1,6 +1,6 @@
 <template>
   <t-input-group class="w-full">
-    <t-input v-model="modelValue" :clearable="true" :disabled="true"></t-input>
+    <t-input v-model="modelValue" :clearable="true"></t-input>
     <t-button @click="handleClick">选择文件</t-button>
   </t-input-group>
 </template>

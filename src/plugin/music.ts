@@ -10,8 +10,8 @@ export function transferTextToLyric(text: string): Array<LyricLine> {
     let match = line.match(/\[\d{2}:\d{2}\.\d+][^\[]+/g);
     if (match) {
       for (let lrc of match) {
-        const time = lrc.match(/\[\d{2}:\d{2}\.\d{2}]/g);
-        const text = lrc.replace(/\[\d{2}:\d{2}\.\d{2}]/g, '');
+        const time = lrc.match(/\[\d{2}:\d{2}\.\d+]/g);
+        const text = lrc.replace(/\[\d{2}:\d{2}\.\d+]/g, '');
         if (time) {
           time.forEach(t => {
             const minutes = parseInt(t.slice(1, 3));
