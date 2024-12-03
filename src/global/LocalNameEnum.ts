@@ -44,6 +44,8 @@ export enum LocalNameEnum {
 
   KEY_DOWNLOAD_FOLDER = '/key/download-folder',
 
+  KEY_FONT_FAMILY = '/key/font-family',
+
   KEY_VERSION = '/key/version',
 
   KEY_COLOR_MODE = '/key/color-mode',

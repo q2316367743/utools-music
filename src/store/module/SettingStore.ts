@@ -20,3 +20,20 @@ export const downloadFolder = useStorage(
     flush: "sync"
   }
 )
+
+export const pluginFontFamily = useStorage(
+  `${LocalNameEnum.KEY_FONT_FAMILY}/${utools.getNativeId()}`,
+  '',
+  utools.dbStorage,
+  {
+    deep: true,
+    flush: "sync"
+  }
+)
+
+export const fontFamily = computed(() => {
+  if (!pluginFontFamily.value) {
+    return 'PingFang SC, Microsoft YaHei, Arial Regular, serif';
+  }
+  return `${pluginFontFamily.value}, PingFang SC, Microsoft YaHei, Arial Regular, serif`;
+});

@@ -2,7 +2,8 @@
   <div class="music-display" :class="{show: displayVisible}">
     <div class="main-mask"/>
     <t-layout class="music-display__container">
-      <t-aside class="list" :width="listVisible ? '300px' : '0px'" :style="{opacity: listVisible? 1 : 0, overflowX: 'hidden'}">
+      <t-aside class="list" :width="listVisible ? '300px' : '0px'"
+               :style="{opacity: listVisible? 1 : 0, overflowX: 'hidden'}">
         <div v-for="(m, i) in musics" :key="m.id" class="item" :class="{active: music?.id === m.id}"
              @dblclick="switchIndex(i)">
           <t-row :gutter="8">
@@ -67,6 +68,7 @@ import {
 import {DeleteIcon, PlayIcon, ChevronDownIcon} from 'tdesign-icons-vue-next';
 import {LyricLine} from "@/types/LyricLine";
 import MusicLyricSearch from "@/components/MusicPlayer/MusicLyricSearch.vue";
+import {fontFamily} from "@/store";
 
 
 const name = computed(() => music.value?.name || '无歌曲');
@@ -79,6 +81,7 @@ function handleLyricClick(value: LyricLine) {
     audio.play();
   }
 }
+
 </script>
 <style scoped lang="less">
 .music-display {
@@ -184,6 +187,7 @@ function handleLyricClick(value: LyricLine) {
         position: relative;
         font-size: 2rem;
         line-height: 2.5rem;
+        font-family: v-bind(fontFamily) !important;
 
         .play {
           display: none;

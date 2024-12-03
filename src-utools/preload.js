@@ -16,6 +16,7 @@ const http = require("node:http");
 const {atob} = require('node:buffer')
 const {ipcRenderer} = require("electron");
 const axios = require('axios');
+const {getFonts} = require('font-list');
 const {createServer} = require('./src/server');
 
 /**
@@ -170,7 +171,8 @@ window.preload = {
         sendLyric
     },
     lib: {
-        axios
+        axios,
+        getFonts
     },
     customer: {
         openFile, downloadFileFromUrl, downloadFile,

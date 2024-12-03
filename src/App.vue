@@ -34,7 +34,8 @@ const route = useRoute();
 const router = useRouter();
 const selectedKeys = ref(['/home']);
 
-const exclude = ref(['MusicGroupInfo'])
+const exclude = ref(['MusicGroupInfo']);
+
 
 watch(() => selectedKeys.value, value => router.push(value[0]));
 

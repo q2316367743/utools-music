@@ -1,5 +1,5 @@
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {globalSetting} from "@/store";
+import {globalSetting, pluginFontFamily} from "@/store";
 
 export class MusicLyric {
 
@@ -33,6 +33,7 @@ export class MusicLyric {
             fontSize: lyricFontSize,
             color: lyricColor,
             borderColor: lyricBorderColor,
+            fontFamily: pluginFontFamily.value
           }
         })
         callback()

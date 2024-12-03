@@ -94,7 +94,9 @@ interface Window {
       sendLyric(ids: Array<number>, content: any): void
     },
     lib: {
-      axios: any
+      axios: any;
+      // 获取全部字体
+      getFonts(): Promise<Array<string>>;
     }
   }
 }
