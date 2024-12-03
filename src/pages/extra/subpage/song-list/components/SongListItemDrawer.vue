@@ -137,11 +137,11 @@ watch(visible, val => {
 
 
 async function handleRowDblclickWrap(context: RowEventContext<TableRowData>) {
-  let musicItem = context.row as IMusicItem;
+  const {index} = context;
   // 此处获取音频详情
   useMusicPlay.emit({
-    index: 0,
-    views: [new MusicInstanceWeb(musicItem, props.pluginId!)]
+    index: index,
+    views: data.value.map(e => new MusicInstanceWeb(e, props.pluginId!))
   })
 }
 
@@ -217,6 +217,7 @@ function collectionAll() {
       justify-content: space-between;
     }
   }
+
   main {
     margin-top: 8px;
   }

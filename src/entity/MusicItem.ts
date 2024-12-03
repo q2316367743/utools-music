@@ -75,6 +75,21 @@ export interface MusicItemView extends MusicItem {
   repositoryName: string;
 }
 
+export function transferMusicItem(view: MusicItemView): MusicItem{
+  return  {
+    id: view.id,
+    name: view.name,
+    artist: view.artist,
+    album: view.album,
+    duration: view.duration,
+    cover: view.cover,
+    lyric: view.lyric,
+    url: view.url,
+    nativeId: view.nativeId,
+    source: view.source,
+  }
+}
+
 export function buildFromIMusicItem(item: IMusicItem, url: string): MusicItemView {
   let lyric = '';
   if (item.lrc) {

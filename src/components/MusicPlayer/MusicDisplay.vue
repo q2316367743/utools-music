@@ -44,7 +44,7 @@
           <t-tooltip placement="bottom" content="搜索歌词" v-if="lyrics.length > 0">
             <music-lyric-search :icon="true"/>
           </t-tooltip>
-          <t-button theme="primary" variant="text" size="large" shape="circle" @click="displayVisible=false">
+          <t-button theme="primary" variant="text" size="large" shape="circle" @click="switchDisplay">
             <template #icon>
               <chevron-down-icon/>
             </template>
@@ -61,7 +61,7 @@ import {
   lyrics,
   music,
   musics, played,
-  removeIndex, switchCurrentTime,
+  removeIndex, switchCurrentTime, switchDisplay,
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
 import {DeleteIcon, PlayIcon, ChevronDownIcon} from 'tdesign-icons-vue-next';
@@ -102,7 +102,6 @@ function handleLyricClick(value: LyricLine) {
 
   :deep(.t-layout) {
     background-color: transparent;
-
   }
 
   &.show {

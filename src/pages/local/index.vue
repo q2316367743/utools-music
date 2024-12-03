@@ -51,6 +51,7 @@ import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {MusicGroupType} from "@/entity/MusicGroup";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
+import {openLocalMusicEditDialog} from "@/pages/local/components/LocalMusicEdit";
 
 const size = useWindowSize();
 
@@ -74,6 +75,7 @@ const menuConfig = reactive<VxeTablePropTypes.MenuConfig<MusicItemView>>({
   body: {
     options: [
       [
+        {code: 'edit', name: '编辑'},
         {code: 'next', name: '下一首播放'},
         {code: 'music-group', name: '添加到歌单'},
         {code: 'folder', name: '打开歌曲所在文件夹'}
@@ -101,6 +103,9 @@ function handleRowDblclick(context: { row: MusicItemView }) {
 
 const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) => {
   switch (menu.code) {
+    case 'edit':
+      openLocalMusicEditDialog(row);
+      break;
     case 'next':
       useMusicAppend.emit(new MusicInstanceLocal(row));
       break
