@@ -66,7 +66,7 @@ export function handleMenuClickEvent(params: VxeTableDefines.MenuClickEventParam
       musicGroupChoose([MusicGroupType.LOCAL])
         .then(id => {
           if (id > 0) {
-            useMusicGroupStore().appendMusicGroup([id], row)
+            useMusicGroupStore().appendMusicGroup(id, row)
               .then(() => MessageUtil.success("添加成功"))
               .catch(e => MessageUtil.error("添加失败", e));
           }

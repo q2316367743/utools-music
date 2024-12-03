@@ -9,9 +9,12 @@ export function isNotNull(value?: any): boolean {
   return !isNull(value);
 }
 
-export function copyProperties<S extends Record<string, any>, T extends Record<string, any>>(source: S, target: T) {
+export function copyProperties<S extends Record<string, any>, T extends Record<string, any>>(source: S, target: T, focus = false) {
   listify(source, (k, v) => {
-    if (isNotNull(v) && v) {
+    if (focus) {
+      // @ts-ignore
+      target[k] = v;
+    } else if (isNotNull(v) && v) {
       // @ts-ignore
       target[k] = v;
     }

@@ -100,7 +100,7 @@ export const useMusicStore = defineStore('music', () => {
           if (index >= 0) {
             old.list[index] = Object.assign(old.list[index], res);
             await saveListByAsync(`${LocalNameEnum.LIST_MUSIC}/${music.repositoryId}`, old.list, old.rev);
-            copyProperties(res, music);
+            copyProperties(res, music, true);
             return;
           }
         }

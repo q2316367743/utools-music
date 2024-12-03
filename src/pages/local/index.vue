@@ -7,15 +7,20 @@
             <search-icon/>
           </template>
         </t-input>
-        <music-scanner/>
+        <t-space>
+          <t-button size="small" v-if="checks.length > 0" @click="addMusicGroup">添加到歌单</t-button>
+          <music-scanner/>
+        </t-space>
       </div>
       <vxe-table :data="data" row-key :border="false" :height="maxHeight" empty-text="空空如也"
-                 :scroll-y="{enabled: true, gt: 0}"
-                 :menu-config="menuConfig" @menu-click="menuClickEvent" :row-config="{isCurrent: false, isHover: true}"
-                 @cell-dblclick="handleRowDblclick">
-        <vxe-column field="name" title="歌曲名" show-overflow="tooltip"/>
-        <vxe-column field="artist" title="演唱者" show-overflow="tooltip"/>
-        <vxe-column field="album" title="专辑" show-overflow="tooltip">
+                 :scroll-y="{enabled: true, gt: 0}" :menu-config="menuConfig" :sort-config="sortConfig"
+                 :row-config="{isCurrent: false, isHover: true, keyField: 'id'}" ref="table"
+                 @cell-dblclick="handleRowDblclick" @menu-click="menuClickEvent" @checkbox-change="onCheckboxChange"
+                 @checkbox-all="onCheckboxAll">
+        <vxe-column type="checkbox" width="40"></vxe-column>
+        <vxe-column sortable field="name" title="歌曲名" show-overflow="tooltip"/>
+        <vxe-column sortable field="artist" title="演唱者" show-overflow="tooltip"/>
+        <vxe-column sortable field="album" title="专辑" show-overflow="tooltip">
           <template #default="{ row }">
             {{ row.album || '-' }}
           </template>
@@ -46,17 +51,20 @@ import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
 import {SearchIcon} from 'tdesign-icons-vue-next';
 import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
-import {VxeTableEvents, VxeTablePropTypes} from "vxe-table";
+import {VxeTableEvents, VxeTableInstance, VxeTablePropTypes} from "vxe-table";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {MusicGroupType} from "@/entity/MusicGroup";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 import {openLocalMusicEditDialog} from "@/pages/local/components/LocalMusicEdit";
+import {VxeTableDefines} from "vxe-table/types/table";
 
 const size = useWindowSize();
 
 const keyword = ref('');
 const activeRowKeys = ref<Array<number>>([])
+
+const checks = ref<Array<MusicItemView>>([]);
 
 const musics = computed(() => useMusicStore().musics);
 const maxHeight = computed(() => size.height.value - 106);
@@ -70,6 +78,10 @@ const {results} = useFuse<MusicItemView>(keyword, musics, {
 const data = computed(() => results.value.map(e => e.item));
 
 
+const tableInstance = useTemplateRef<VxeTableInstance<MusicItemView>>('table')
+const sortConfig = ref<VxeTablePropTypes.SortConfig<MusicItemView>>({
+  multiple: true
+});
 const menuConfig = reactive<VxeTablePropTypes.MenuConfig<MusicItemView>>({
   className: 'local-music-menu',
   body: {
@@ -113,7 +125,7 @@ const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) =>
       musicGroupChoose([MusicGroupType.LOCAL])
         .then(id => {
           if (id > 0) {
-            useMusicGroupStore().appendMusicGroup([id], row)
+            useMusicGroupStore().appendMusicGroup(id, row)
               .then(() => MessageUtil.success("添加成功"))
               .catch(e => MessageUtil.error("添加失败", e));
           }
@@ -123,6 +135,29 @@ const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) =>
       utools.shellShowItemInFolder(row.url)
       break
   }
+}
+
+function onCheckboxChange(e: VxeTableDefines.CheckboxChangeEventParams<MusicItemView>) {
+  checks.value = e.$table.getCheckboxRecords();
+}
+
+function onCheckboxAll(e: VxeTableDefines.CheckboxAllEventParams<MusicItemView>) {
+  checks.value = e.$table.getCheckboxRecords(true);
+}
+
+function addMusicGroup() {
+  musicGroupChoose([MusicGroupType.LOCAL])
+    .then(id => {
+      if (id > 0) {
+        useMusicGroupStore().appendMusicGroup(id, ...checks.value)
+          .then(() => MessageUtil.success("添加成功"))
+          .catch(e => MessageUtil.error("添加失败", e))
+          .finally(() => {
+            tableInstance.value?.clearCheckboxRow();
+            checks.value = [];
+          });
+      }
+    })
 }
 </script>
 <style scoped lang="less">

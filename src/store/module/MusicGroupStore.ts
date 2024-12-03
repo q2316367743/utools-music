@@ -99,25 +99,25 @@ export const useMusicGroupStore = defineStore('music-group', () => {
     }
   }
 
-  async function appendMusicGroup(ids: Array<number>, musicItem: MusicItem): Promise<void> {
-    for (let id of ids) {
-      const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`);
-      const {record, rev} = res;
-      if (record) {
+  async function appendMusicGroup(id: number, ...musicItems: Array<MusicItem>): Promise<void> {
+    const res = await getFromOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`);
+    const {record, rev} = res;
+    if (record) {
+      for (const musicItem of musicItems) {
         // 更新
         const index = record.items.findIndex((e) => e.id === id);
         if (index === -1) {
           // 不存在，新增
           record.items.push(musicItem);
-          await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, record, rev);
         }
-      } else {
-        // 新增
-        await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, {
-          id,
-          items: [musicItem],
-        });
       }
+      await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, record, rev);
+    } else {
+      // 新增
+      await saveOneByAsync<MusicGroupContent>(`${LocalNameEnum.ITEM_MUSIC_GROUP}/${id}`, {
+        id,
+        items: musicItems,
+      });
     }
   }
 
@@ -137,7 +137,7 @@ export const useMusicGroupStore = defineStore('music-group', () => {
       ...e,
       pluginId,
       // 确保一定有ID
-      id: e.id || (now ++)
+      id: e.id || (now++)
     }));
 
     if (record) {
@@ -172,7 +172,7 @@ export const useMusicGroupStore = defineStore('music-group', () => {
   return {
     musicGroups, musicGroupItems,
     loadMusicItems, postMusicGroup, postMusicGroupIndex, deleteMusicGroup,
-    appendMusicGroup, appendMixGroup,removeContentItem
+    appendMusicGroup, appendMixGroup, removeContentItem
   }
 
 })

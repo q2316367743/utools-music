@@ -6,7 +6,7 @@ export const Constants = {
   // 项目中文名称
   name: '音乐播放器',
   // 版本
-  version: '1.0.2',
+  version: '1.0.3',
   // 作者
   author: '落雨不悔',
   website: 'https://blog.esion.xyz',
@@ -18,9 +18,22 @@ export const Constants = {
   }
 }
 
-export const MUSIC_REGEX = /.*\.mp3|flac|wav$/;
-export const MUSIC_EXTNAME =  ['.mp3', '.flac', '.wav'];
+// ".mp3",
+//   ".mp4",
+//   ".m4s",
+//   ".flac",
+//   ".wma",
+//   ".wav",
+//   ".m4a",
+//   ".ogg",
+//   ".acc",
+//   ".aac",
+//   // ".ape",
+//   ".opus",
+export const MUSIC_REGEX = /.*\.mp3|flac|wav|mp4|m4s|wma|m4a|ogg|acc|aac|opus$/;
+export const MUSIC_EXTNAME = ['.mp3', '.flac', '.wav', '.mp4', '.m4s', '.wma', '.m4a', '.ogg',
+  '.acc', '.aac', 'opus'];
 export const IMAGE_REGEX = /.*\.jpg|jpeg|png|webp$/;
-export const IMAGE_EXTNAME =  ['.jpg', '.jpeg', '.png', '.webp'];
+export const IMAGE_EXTNAME = ['.jpg', '.jpeg', '.png', '.webp'];
 export const LYRIC_REGEX = /.*\.lrc$/;
-export const LYRIC_EXTNAME =  ['.lrc'];
+export const LYRIC_EXTNAME = ['.lrc'];

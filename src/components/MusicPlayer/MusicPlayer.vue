@@ -212,7 +212,7 @@ function onAddMusicGroup() {
             .catch(e => MessageUtil.error("新增失败", e));
         } else {
           current.getInfo().then(item => {
-            appendMusicGroup([id], item)
+            appendMusicGroup(id, item)
               .then(() => MessageUtil.success("新增成功"))
               .catch(e => MessageUtil.error("新增失败", e));
           })

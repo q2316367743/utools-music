@@ -53,7 +53,6 @@ const isBottom = ref(false);
 const loading = ref(false);
 
 const playLoading = ref(false);
-const operatorLoading = ref(false);
 
 
 const plugins = computed<Array<PluginInstanceView>>(() => {
@@ -94,7 +93,6 @@ const columns: Array<BaseTableCol> = [{
       h(Button, {
         theme: 'success',
         variant: 'text',
-        disabled: operatorLoading.value,
         onClick() {
           handleNextPlay(context);
         }
@@ -102,7 +100,6 @@ const columns: Array<BaseTableCol> = [{
       h(Button, {
           theme: 'primary',
           variant: 'text',
-          disabled: operatorLoading.value,
           onClick() {
             handleDownloadWrap(context)
           }
@@ -164,8 +161,8 @@ async function handleRowDblclickWrap(context: RowEventContext<TableRowData>) {
   let musicItem = context.row as IMusicItemWrap;
   // 此处获取音频详情
   useMusicPlay.emit({
-    index: 0,
-    views: [new MusicInstanceWeb(musicItem, musicItem.pluginId)]
+    index: Math.max(data.value.findIndex(e => e.id === musicItem.id), 0),
+    views: data.value.map(e => new MusicInstanceWeb(e, e.pluginId))
   })
 }
 
@@ -183,10 +180,8 @@ async function handleNextPlayWrap(context: BaseTableCellParams<TableRowData>) {
 }
 
 function handleNextPlay(context: BaseTableCellParams<TableRowData>) {
-  operatorLoading.value = true
   handleNextPlayWrap(context)
     .catch(e => MessageUtil.error("播放失败", e))
-    .finally(() => operatorLoading.value = false);
 }
 
 async function handleDownload(context: BaseTableCellParams<TableRowData>) {
@@ -196,10 +191,8 @@ async function handleDownload(context: BaseTableCellParams<TableRowData>) {
 }
 
 function handleDownloadWrap(context: BaseTableCellParams<TableRowData>) {
-  operatorLoading.value = true
   handleDownload(context)
     .catch(e => MessageUtil.error("下载失败", e))
-    .finally(() => operatorLoading.value = false);
 }
 
 watch(plugins, value => {
