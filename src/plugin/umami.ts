@@ -6,7 +6,7 @@ function buildBasePayload() {
     return {
         hostname: "u.tools",
         language: navigator.language,
-        referrer: "https://u.tools'",
+        referrer: "https://u.tools",
         screen: `${window.screen.width}x${window.screen.height}`,
         website: Constants.umami.id,
     }
