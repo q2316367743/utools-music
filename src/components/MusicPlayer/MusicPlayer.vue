@@ -27,6 +27,11 @@
         </t-space>
       </div>
       <div class="operator">
+        <t-tooltip placement="top" content="控制器">
+          <t-button shape="circle" theme="primary" variant="text" @click="switchControls" :disabled="!music">
+            控
+          </t-button>
+        </t-tooltip>
         <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="!music">
           加
         </t-button>
@@ -114,7 +119,7 @@ import {
   NextIcon,
   PauseIcon,
   PlayIcon,
-  PreviousIcon
+  PreviousIcon, TerminalWindowIcon
 } from 'tdesign-icons-vue-next';
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
@@ -133,7 +138,7 @@ import {
   played,
   playLoading,
   pre,
-  removeIndex,
+  removeIndex, switchControls,
   switchCurrentTime,
   switchDisplay,
   switchIndex,

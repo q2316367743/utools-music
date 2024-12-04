@@ -92,13 +92,19 @@ interface Window {
     },
     ipcRenderer: {
       sendLyric(ids: Array<number>, content: any): void
+      sendControls(id: number, content: any): void
+      receiveControls(callback: (msg: string) => void): void
     },
     lib: {
       axios: any;
       // 获取全部字体
       getFonts(): Promise<Array<string>>;
     }
-  }
+
+    // 第三方相关
+    receiveMsg(callback: (data: { type: string, value: any }) => void): void;
+    sendMsg(msg: string): void;
+  },
 }
 
 declare module 'qs';

@@ -4,7 +4,7 @@ import {getEffectiveNumber} from "@/utils/lang/FieldUtil";
 import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {musicLyric} from "@/global/BeanFactory";
+import {musicControls, musicLyric} from "@/global/BeanFactory";
 import {headForExist} from "@/plugin/http";
 import {globalSetting, useDownloadStore} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
@@ -54,14 +54,17 @@ audio.addEventListener('canplay', () => {
 });
 audio.addEventListener('timeupdate', () => {
   currentTime.value = audio.currentTime;
+  musicControls.sendProgress(audio.currentTime, audio.duration)
   // 歌词处理
   sendLyricWrap()
 });
 audio.addEventListener('playing', () => {
   played.value = true;
+  musicControls.sendControl('play');
 });
 audio.addEventListener('pause', () => {
   played.value = false;
+  musicControls.sendControl('pause');
 });
 audio.addEventListener('ended', () => {
   played.value = false;
@@ -176,7 +179,7 @@ async function playWrapper() {
     if (lyricGroups.value.length > 0) {
       lyrics.value = lyricGroups.value[0].lines;
     }
-  }catch (e) {
+  } catch (e) {
     MessageUtil.warning("获取歌词失败", e);
   }
   // 播放成功，清空
@@ -300,6 +303,9 @@ export function switchLyric() {
   musicLyric.switchWindow(sendLyricWrap);
 }
 
+export function switchControls() {
+  musicControls.switchWindow();
+}
 export function switchCurrentTime(currentTime: number) {
   audio.currentTime = currentTime;
 }

@@ -18,7 +18,7 @@ export class MusicLyric {
       hasShadow: false,
       backgroundColor: '#00000000',
       webPreferences: {
-        preload: 'lyric/preload.js',
+        preload: 'preload/lyric.js',
         zoomFactor: 0,
         devTools: utools.isDev()
       }

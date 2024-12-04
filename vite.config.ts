@@ -43,7 +43,13 @@ export default defineConfig({
   ],
   base: "./",
   build: {
-    outDir: "src-utools/dist"
+    outDir: "src-utools/dist",
+    rollupOptions: {
+      input: {
+        main: _resolve('index.html'),
+        controls: _resolve('controls.html'),
+      },
+    },
   },
 
 });

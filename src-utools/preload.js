@@ -5,7 +5,8 @@ const {
     existsSync,
     createWriteStream
 } = require('node:fs');
-const {join,
+const {
+    join,
     basename,
     extname,
     dirname
@@ -155,6 +156,16 @@ function sendLyric(ids, content) {
     }
 }
 
+function sendControls(id, content) {
+    ipcRenderer.sendTo(id, 'controls', content);
+}
+
+function receiveControls(callback) {
+    ipcRenderer.on('controls', (e, res) => {
+        callback(res);
+    });
+}
+
 
 window.preload = {
     fs: {
@@ -168,7 +179,9 @@ window.preload = {
         join, basename, extname, dirname
     },
     ipcRenderer: {
-        sendLyric
+        sendLyric,
+        sendControls,
+        receiveControls,
     },
     lib: {
         axios,
