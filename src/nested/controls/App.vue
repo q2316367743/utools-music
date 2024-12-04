@@ -26,6 +26,14 @@
 <script lang="ts" setup>
 import {PauseIcon, PlayIcon} from "tdesign-icons-vue-next";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
+import {useColorMode} from "@/hooks/ColorMode";
+import {LocalNameEnum} from "@/global/LocalNameEnum";
+
+useColorMode({
+  key: LocalNameEnum.KEY_COLOR_MODE,
+  attribute: 'theme-mode',
+  selector: 'html'
+});
 
 const cover = ref('');
 const name = ref('');
@@ -73,7 +81,7 @@ function play() {
     left: 5px;
     right: 5px;
     bottom: 5px;
-    background-color: #1E1F23;
+    background-color: var(--td-bg-color-container);
     user-select: none;
     -webkit-app-region: drag;
     box-shadow: var(--td-shadow-3);
@@ -93,11 +101,11 @@ function play() {
       align-items: center;
 
       .name {
-        color: #fff;
+        color: var(--td-text-color-primary);
       }
 
       .artist {
-        color: #b6b6b6;
+        color: var(--td-text-color-secondary);
         margin-top: 8px;
         font-size: var(--td-font-size-body-small);
       }
@@ -138,7 +146,7 @@ function play() {
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: var(--music-bg-color-3);
       opacity: 0;
       transition: opacity 0.3s;
       cursor: pointer;
