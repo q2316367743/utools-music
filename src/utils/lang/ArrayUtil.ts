@@ -1,15 +1,15 @@
 export function contains<T>(arr: T[], keyword: T): boolean {
-    try {
-        for (let item of arr) {
-            if (item === keyword) {
-                return true;
-            }
-        }
-        return false;
-    } catch (e) {
-        console.error(e);
-        return false;
+  try {
+    for (let item of arr) {
+      if (item === keyword) {
+        return true;
+      }
     }
+    return false;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 }
 
 /**
@@ -18,19 +18,25 @@ export function contains<T>(arr: T[], keyword: T): boolean {
  * @param keywords 关键字数组
  */
 export function containsArray<T>(arr: T[], keywords: T[]): boolean {
-    try {
-        for (let item of arr) {
-            for (let keyword of keywords) {
-                if (item === keyword) {
-                    return true;
-                }
-            }
+  try {
+    for (let item of arr) {
+      for (let keyword of keywords) {
+        if (item === keyword) {
+          return true;
         }
-        return false;
-    } catch (e) {
-        console.error(e);
-        return false;
+      }
     }
+    return false;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
+class MapWrapper<K, V> extends Map<K, V> {
+  getOrDefault(key: K, defaultValue: V): V {
+    return this.get(key) || defaultValue;
+  }
 }
 
 /**
@@ -41,35 +47,42 @@ export function containsArray<T>(arr: T[], keywords: T[]): boolean {
  * @param merge key冲突合并解决办法
  * @returns map结果
  */
-export function map<T extends Record<string, any>, K extends T[A], A extends keyof T>(arr: T[], attrName: A, merge?: (item1: T, item2: T) => T): Map<K, T> {
-    let result = new Map<K, T>();
-    for (let item of arr) {
-        const key = item[attrName];
-        const old = result.get(key);
-        if (old) {
-            if (merge) {
-                result.set(key, merge(old, item));
-            } else {
-                throw new Error('未设置合并方法，无法合并相同key');
-            }
-        } else {
-            result.set(key, item);
-        }
+export function map<T extends Record<string, any>, K extends T[A], A extends keyof T>(arr: T[], attrName: A, merge?: (item1: T, item2: T) => T): MapWrapper<K, T> {
+  let result = new MapWrapper<K, T>();
+  for (let item of arr) {
+    const key = item[attrName];
+    const old = result.get(key);
+    if (old) {
+      if (merge) {
+        result.set(key, merge(old, item));
+      } else {
+        throw new Error('未设置合并方法，无法合并相同key');
+      }
+    } else {
+      result.set(key, item);
     }
-    return result;
+  }
+  return result;
 }
 
 /**
  * 讲一个数组变为set
  * @param arr 数组
  * @param attrName 属性名
+ * @param empty 是否允许空值
  */
-export function set<T extends S[A], S extends Record<string, any>, A extends keyof S>(arr: S[], attrName: A): Set<T> {
-    let result = new Set<T>();
-    for (let item of arr) {
+export function set<T extends S[A], S extends Record<string, any>, A extends keyof S>(arr: S[], attrName: A, empty = true): Set<T> {
+  let result = new Set<T>();
+  for (let item of arr) {
+    if (item[attrName]) {
+      result.add(item[attrName]);
+    } else {
+      if (empty) {
         result.add(item[attrName]);
+      }
     }
-    return result;
+  }
+  return result;
 }
 
 /**
@@ -79,15 +92,15 @@ export function set<T extends S[A], S extends Record<string, any>, A extends key
  * @param attrName 属性名
  * @returns 分组后的结果
  */
-export function group<T extends Record<any, any>, K extends T[A], A extends keyof T>(arr: T[], attrName: A): Map<K, T[]> {
-    let result = new Map<K, T[]>();
-    for (let item of arr) {
-        const key = item[attrName];
-        const v = result.get(key) || [];
-        v.push(item);
-        result.set(key, v);
-    }
-    return result;
+export function group<T extends Record<any, any>, K extends T[A], A extends keyof T>(arr: T[], attrName: A): MapWrapper<K, T[]> {
+  let result = new MapWrapper<K, T[]>();
+  for (let item of arr) {
+    const key = item[attrName];
+    const v = result.get(key) || [];
+    v.push(item);
+    result.set(key, v);
+  }
+  return result;
 }
 
 /**
@@ -98,30 +111,30 @@ export function group<T extends Record<any, any>, K extends T[A], A extends keyo
  * @return 属性 -> 数量
  */
 export function count<T, K extends keyof T>(arr: T[], attrName: K): Map<any, number> {
-    let result = new Map<any, number>();
-    for (let item of arr) {
-        if (result.has(item[attrName])) {
-            result.set(item[attrName], result.get(item[attrName])! + 1);
-        } else {
-            result.set(item[attrName], 1);
-        }
+  let result = new Map<any, number>();
+  for (let item of arr) {
+    if (result.has(item[attrName])) {
+      result.set(item[attrName], result.get(item[attrName])! + 1);
+    } else {
+      result.set(item[attrName], 1);
     }
-    return result;
+  }
+  return result;
 }
 
 export function size<T, K extends keyof T>(arr: Array<T>, attrName: K, value: any): number {
-    try {
-        let count = 0;
-        for (let t of arr) {
-            if (t[attrName] === value) {
-                count += 1;
-            }
-        }
-        return count;
-    } catch (e) {
-        console.error(e);
-        return 0;
+  try {
+    let count = 0;
+    for (let t of arr) {
+      if (t[attrName] === value) {
+        count += 1;
+      }
     }
+    return count;
+  } catch (e) {
+    console.error(e);
+    return 0;
+  }
 }
 
 /**
@@ -129,11 +142,11 @@ export function size<T, K extends keyof T>(arr: Array<T>, attrName: K, value: an
  * @param arr
  */
 export function reverse<T>(arr: Array<T>): Array<T> {
-    let records = new Array<T>();
-    for (let i = arr.length - 1; i >= 0; i--) {
-        records.push(arr[i]);
-    }
-    return records;
+  let records = new Array<T>();
+  for (let i = arr.length - 1; i >= 0; i--) {
+    records.push(arr[i]);
+  }
+  return records;
 }
 
 /**
@@ -143,18 +156,18 @@ export function reverse<T>(arr: Array<T>): Array<T> {
  * @param ignoreCase 是否忽略大小写，默认不忽略
  */
 export function startWith(arr: Array<string>, keyword: string, ignoreCase: boolean = false): boolean {
-    for (let item of arr) {
-        if (ignoreCase) {
-            if (item.toUpperCase().startsWith(keyword.toUpperCase())) {
-                return true;
-            }
-        } else {
-            if (item.startsWith(keyword)) {
-                return true;
-            }
-        }
+  for (let item of arr) {
+    if (ignoreCase) {
+      if (item.toUpperCase().startsWith(keyword.toUpperCase())) {
+        return true;
+      }
+    } else {
+      if (item.startsWith(keyword)) {
+        return true;
+      }
     }
-    return false;
+  }
+  return false;
 }
 
 /**
@@ -163,13 +176,13 @@ export function startWith(arr: Array<string>, keyword: string, ignoreCase: boole
  * @param key 根据的key
  */
 export function distinct<T extends Record<string, any>, K extends keyof T>(items: Array<T>, key: K): Array<T> {
-    const keys = new Set<T[K]>();
-    const results = new Array<T>();
-    for (let item of items) {
-        if (!keys.has(item[key])) {
-            results.push(item);
-            keys.add(item[key]);
-        }
+  const keys = new Set<T[K]>();
+  const results = new Array<T>();
+  for (let item of items) {
+    if (!keys.has(item[key])) {
+      results.push(item);
+      keys.add(item[key]);
     }
-    return results;
+  }
+  return results;
 }

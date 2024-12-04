@@ -2,19 +2,25 @@
   <div class="local-music">
     <div class="container">
       <div class="local-music__header">
-        <t-input style="width: 200px" placeholder="搜索本地音乐" v-model="keyword" :clearable="true">
+        <t-auto-complete :options style="width: 200px" placeholder="搜索本地音乐" v-model="keyword" :clearable="true"
+                         :highlight-keyword="true" :filterable="true">
           <template #suffix-icon>
             <search-icon/>
           </template>
-        </t-input>
+        </t-auto-complete>
         <t-space>
           <t-button size="small" v-if="checks.length > 0" @click="addMusicGroup">添加到歌单</t-button>
+          <t-button size="small" shape="square" v-if="music" @click="setLocation(music)">
+            <template #icon>
+              <location-icon />
+            </template>
+          </t-button>
           <music-scanner/>
         </t-space>
       </div>
       <vxe-table :data="data" row-key :border="false" :height="maxHeight" empty-text="空空如也"
                  :scroll-y="{enabled: true, gt: 0}" :menu-config="menuConfig" :sort-config="sortConfig"
-                 :row-config="{isCurrent: false, isHover: true, keyField: 'id'}" ref="table"
+                 :row-config="{isCurrent: true, isHover: true, keyField: 'id'}" ref="table"
                  @cell-dblclick="handleRowDblclick" @menu-click="menuClickEvent" @checkbox-change="onCheckboxChange"
                  @checkbox-all="onCheckboxAll">
         <vxe-column type="checkbox" width="40"></vxe-column>
@@ -42,32 +48,42 @@
   </div>
 </template>
 <script lang="tsx" setup>
-import MusicScanner from "@/pages/local/components/MusicScanner/MusicScanner.vue";
-import {useMusicGroupStore, useMusicStore} from "@/store";
-import {prettyDateTime} from "@/utils/lang/FormatUtil";
-import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {VxeTableEvents, VxeTableInstance, VxeTablePropTypes, VxeTableDefines} from "vxe-table";
+import {LocationIcon, SearchIcon} from 'tdesign-icons-vue-next';
 import {useFuse} from "@vueuse/integrations/useFuse";
-import {useMusicAppend, useMusicPlay} from "@/global/Event";
-import {music} from "@/components/MusicPlayer/MusicPlayer";
-import {SearchIcon} from 'tdesign-icons-vue-next';
-import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
-import {VxeTableEvents, VxeTableInstance, VxeTablePropTypes} from "vxe-table";
-import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
-import {MusicGroupType} from "@/entity/MusicGroup";
-import MessageUtil from "@/utils/modal/MessageUtil";
-import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
+import {useMusicGroupStore, useMusicStore} from "@/store";
 import {openLocalMusicEditDialog} from "@/pages/local/components/LocalMusicEdit";
-import {VxeTableDefines} from "vxe-table/types/table";
+import MusicScanner from "@/pages/local/components/MusicScanner/MusicScanner.vue";
+import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
+import {music} from "@/components/MusicPlayer/MusicPlayer";
+import {prettyDateTime} from "@/utils/lang/FormatUtil";
+import MessageUtil from "@/utils/modal/MessageUtil";
+import {useMusicAppend, useMusicPlay} from "@/global/Event";
+import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {MusicGroupType} from "@/entity/MusicGroup";
+import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
+import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
+import {MusicInstance} from "@/types/MusicInstance";
 
 const size = useWindowSize();
 
 const keyword = ref('');
-const activeRowKeys = ref<Array<number>>([])
 
+const activeRowKeys = ref<Array<number>>([])
 const checks = ref<Array<MusicItemView>>([]);
+
 
 const musics = computed(() => useMusicStore().musics);
 const maxHeight = computed(() => size.height.value - 106);
+const options = computed(() => {
+  const items = new Set<string>();
+  musics.value.forEach(value => {
+    items.add(value.name);
+    items.add(value.artist);
+    items.add(value.album);
+  });
+  return Array.from(items);
+});
 
 const {results} = useFuse<MusicItemView>(keyword, musics, {
   matchAllWhenSearchEmpty: true,
@@ -96,7 +112,6 @@ const menuConfig = reactive<VxeTablePropTypes.MenuConfig<MusicItemView>>({
   },
 })
 
-
 watch(music, val => {
   if (val) {
     activeRowKeys.value = [Number(val.id)];
@@ -111,6 +126,7 @@ function handleRowDblclick(context: { row: MusicItemView }) {
     views: list.map(e => e.source === MusicItemSource.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e)),
     index: Math.max(index, 0)
   });
+  tableInstance.value?.clearCurrentColumn();
 }
 
 const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) => {
@@ -159,12 +175,18 @@ function addMusicGroup() {
       }
     })
 }
+
+function setLocation(item: MusicInstance) {
+  tableInstance.value?.scrollToRow(item.self);
+  tableInstance.value?.setCurrentRow(item.self);
+}
 </script>
 <style scoped lang="less">
 .local-music {
   position: relative;
   height: 100%;
   width: 100%;
+  contain: strict;
 
   .container {
     position: absolute;

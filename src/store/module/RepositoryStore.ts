@@ -156,6 +156,5 @@ export async function scanRepository(): Promise<Array<KeyValue<Array<MusicItem> 
       });
     }
   }
-  console.log(items);
   return items
 }
