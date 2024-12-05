@@ -16,6 +16,13 @@ export const getUpdateLogs = (newVersion: string, oldVersion: string): Array<Upd
 }
 
 const UPDATE_LOG: Array<UpdateLogGroup> = [{
+  version: '1.0.4',
+  logs: [
+    'feat: 本地音乐播放时，可以在本地音乐列表快速定位正在播放的歌曲',
+    'feat: 新增音乐控制器，新增了3中不同的样式，可以在设置中修改',
+    'fixed: 歌曲名字中如果带特殊字符会保存失败的问题'
+  ]
+}, {
   version: '1.0.3',
   logs: [
     'feat: 新增歌词搜索，可以一键替换歌词并直接下载到本地',
