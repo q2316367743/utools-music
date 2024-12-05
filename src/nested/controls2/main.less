@@ -8,13 +8,14 @@
 
 .audio-content {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
   overflow: hidden;
   -webkit-app-region: drag;
   border-radius: var(--td-radius-large);
+  box-shadow: rgba(0, 0, 0, 0.19) 0 5px 10px, rgba(0, 0, 0, 0.23) 0 6px 6px;
 
   .audio-bg {
     position: absolute;
@@ -35,8 +36,10 @@
 
     .mask {
       position: absolute;
-      width: 240px;
-      height: 60px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       backdrop-filter: blur(10px);
     }
 

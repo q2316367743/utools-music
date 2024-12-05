@@ -26,8 +26,8 @@ export class MusicControls {
     },
     '2': {
       file: 'controls2',
-      width: 240,
-      height: 60
+      width: 260,
+      height: 80
     }
   };
 
