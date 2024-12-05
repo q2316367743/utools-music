@@ -7,6 +7,15 @@ import {listByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {downloadFolder} from "@/store";
 
+// 首先添加一个处理文件名的辅助函数
+function sanitizeFileName(fileName: string): string {
+  // 移除或替换不安全的文件名字符
+  return fileName
+    .replace(/[<>:"/\\|?*]/g, '_') // 替换 Windows 不允许的字符
+    .replace(/[^\x20-\x7E]/g, '')  // 移除非 ASCII 字符
+    .trim();
+}
+
 export const useDownloadStore = defineStore('download', () => {
   const items = ref(new Array<DownloadItem>());
   let rev: string | undefined = undefined;
@@ -71,7 +80,8 @@ export const useDownloadStore = defineStore('download', () => {
     }
 
     try {
-      const mainPath = await window.preload.customer.downloadFile(url, `${basename}${extname ? extname[0] : '.mp3'}`, downloadFolder.value);
+      const fileName = `${basename}${extname ? extname[0] : '.mp3'}`;
+      const mainPath = await window.preload.customer.downloadFile(url, sanitizeFileName(fileName), downloadFolder.value);
       for (let i = 0; i < items.value.length; i++) {
         const r = items.value[i];
         if (r.id === item.id) {

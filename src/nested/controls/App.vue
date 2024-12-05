@@ -7,14 +7,7 @@
       </div>
     </div>
     <div class="cover">
-      <t-progress :size="84" :percentage="percentage" theme="circle">
-        <template #label>
-          <div style="color: #fff;font-size: 0.7rem">
-            <div>{{ duration1 }}</div>
-            <div style="margin-top: 8px;padding-top: 8px;border-top: 1px solid #f2f2f2">{{ duration2 }}</div>
-          </div>
-        </template>
-      </t-progress>
+      <t-progress :size="84" :percentage="percentage" theme="circle" :label="false" />
       <img :src="DefaultCover" :alt="name" draggable="false" />
       <img v-if="cover" :src="cover" :alt="name" draggable="false"/>
       <div class="icon" @click="play">
