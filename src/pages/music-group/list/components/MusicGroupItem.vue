@@ -3,20 +3,18 @@
     <div class="mg-item__cover">
       <img :src="item.cover || MusicGroupImage" :alt="item.name"/>
     </div>
-    <div class="mg-item__title ellipsis-2">
-      {{ item.name }}
+    <div class="mg-item__content">
+      <div class="mg-item__title ellipsis-2">
+        {{ item.name }}
+      </div>
+      <div class="mg-item__artist ellipsis">
+        {{ item.author }}
+      </div>
     </div>
-    <div class="mg-item__artist ellipsis">
-      {{ item.author }}
-    </div>
-    <div class="mg-item__web" v-if="item.type === MusicGroupType.WEB">
-      <t-tag theme="primary">Web</t-tag>
-    </div>
-    <div class="mg-item__web" v-else-if="item.type === MusicGroupType.MIX">
-      <t-tag theme="success">混合</t-tag>
-    </div>
-    <div class="mg-item__web" v-else>
-      <t-tag theme="warning">本地</t-tag>
+    <div class="mg-item__tag">
+      <t-tag v-if="item.type === MusicGroupType.WEB" theme="primary" variant="light-outline">Web</t-tag>
+      <t-tag v-else-if="item.type === MusicGroupType.MIX" theme="success" variant="light-outline">混合</t-tag>
+      <t-tag v-else theme="warning" variant="light-outline">本地</t-tag>
     </div>
   </div>
 </template>
@@ -32,71 +30,65 @@ defineProps({
 <style scoped lang="less">
 .mg-item {
   width: 120px;
-  height: 180px;
+  height: 120px;
   margin: 8px;
   user-select: none;
   cursor: pointer;
   position: relative;
+  background: transparent;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
 
   &__cover {
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
+    margin: 4px auto;
     overflow: hidden;
-    border-radius: var(--td-radius-default);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    border-radius: 8px;
 
     img {
-      width: 120px;
-      height: 120px;
-      object-fit: contain;
-      transition: 0.5s;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
-        transform: scale(1.3);
+        transform: scale(1.05);
       }
     }
   }
 
+  &__content {
+    padding: 4px 8px;
+  }
+
   &__title {
-    font-size: var(--td-font-size-body-medium);
+    font-size: 13px;
+    font-weight: 500;
     color: var(--td-text-color-primary);
-    height: 42px;
-    width: 100%;
+    margin-bottom: 2px;
     text-align: center;
   }
 
   &__artist {
-    font-size: var(--td-font-size-body-small);
+    font-size: 12px;
     color: var(--td-text-color-secondary);
     text-align: center;
   }
 
-  &__web {
+  &__tag {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 4px;
+    right: 4px;
+    
+    :deep(.t-tag) {
+      font-size: 11px;
+      padding: 0 4px;
+      height: 18px;
+      line-height: 18px;
+    }
   }
 }
-
-@keyframes ranking-item-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(90deg);
-  }
-}
-
-.ranking-item__icon {
-  transform: rotate(0deg);
-  transition: 0.5s;
-
-  &.active {
-    transform: rotate(90deg);
-  }
-}
-
 </style>

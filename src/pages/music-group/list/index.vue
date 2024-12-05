@@ -1,12 +1,16 @@
 <template>
   <div class="music-group">
-    <t-dropdown v-for="group in musicGroups" :key="group.id" :options trigger="context-menu"
-                @click="onContextMenu(group, $event)">
-      <music-group-item :item="group" @click="onClick(group)"/>
-    </t-dropdown>
-    <div class="music-group-item plus" @click="addMusicGroup">
-      <div class="music-group-item__image">
-        <plus-icon size="80px"></plus-icon>
+    <div class="music-group__content">
+      <t-dropdown v-for="group in musicGroups" :key="group.id" :options trigger="context-menu"
+                  @click="onContextMenu(group, $event)">
+        <music-group-item :item="group" @click="onClick(group)"/>
+      </t-dropdown>
+      
+      <div class="music-group__add" @click="addMusicGroup">
+        <div class="music-group__add-content">
+          <plus-icon size="32px"/>
+          <span>新建歌单</span>
+        </div>
       </div>
     </div>
   </div>
@@ -51,59 +55,52 @@ function onContextMenu(group: MusicGroupIndex, value: DropdownOption) {
 </script>
 <style scoped lang="less">
 .music-group {
-  position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: flex-start;
+  padding: 16px;
+  background: transparent;
   overflow: auto;
-  contain: strict;
-  align-content: flex-start;
 
-  .music-group-item {
-    padding: 8px;
-    width: 80px;
-    height: 100px;
+  &__content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    justify-items: center;
+  }
+
+  &__add {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    border: 1px dashed var(--td-component-stroke);
     cursor: pointer;
-    transition: 0.3s;
-    border: 3px dashed var(--td-border-level-1-color);
-    margin: 8px;
-    position: relative;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
 
     &:hover {
-      background-color: var(--td-bg-color-component-hover);
+      background: rgba(var(--td-brand-color-rgb), 0.1);
+      border-color: var(--td-brand-color);
+      transform: scale(0.98);
     }
 
-    &__cover {
-      width: 80px;
-      height: 80px;
-    }
-
-    &__title {
-      width: 80px;
-      height: 20px;
-      text-align: center;
-    }
-
-    &__image {
-      width: 80px;
-      height: 100px;
+    &-content {
       display: flex;
-      justify-content: center;
       flex-direction: column;
       align-items: center;
-    }
+      gap: 4px;
+      color: var(--td-text-color-secondary);
 
-    &__web {
-      position: absolute;
-      top: -3px;
-      right: -3px;
-      z-index: 9;
-    }
+      :deep(.t-icon) {
+        font-size: 24px;
+      }
 
+      span {
+        font-size: 13px;
+      }
+    }
   }
 }
 </style>

@@ -1,87 +1,64 @@
 <!doctype html>
 <html lang="zh">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>音乐播放器-歌词</title>
-  <style>
-      .container {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          border: 1px solid rgba(110, 110, 110, 0.8);
-      }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>音乐播放器-歌词</title>
+    <style>
+        body {
+            margin: 0;
+        }
 
-      .lyric {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          width: 100%;
-          height: 100%;
-          color: #006784;
-          font-size: 36px;
-          font-weight: bold;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          user-select: none;
-      }
+        .container {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.01);
+            transition: all 0.3s ease;
+            -webkit-app-region: no-drag;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-      .drag {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 32px;
-          height: 32px;
-          background-color: rgba(110, 110, 110, 0.8);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          cursor: grab;
-          -webkit-app-region: drag;
-          -webkit-user-select: none;
-      }
+        .container:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+            -webkit-app-region: drag;
+        }
 
-  </style>
+        .lyric {
+            color: #006784;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            user-select: none;
+            pointer-events: none;
+        }
+    </style>
 </head>
+
 <body>
-<div class="container">
-  <div class="lyric"></div>
-  <div class="drag">
-    <svg t="1731461554684" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-         p-id="4539" id="mx_n_1731461554685" width="16" height="16">
-      <path d="M704 896m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4540" fill="#0052D9"></path>
-      <path d="M320 896m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4541" fill="#0052D9"></path>
-      <path d="M704 640m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4542" fill="#0052D9"></path>
-      <path d="M320 640m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4543" fill="#0052D9"></path>
-      <path d="M704 384m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4544" fill="#0052D9"></path>
-      <path d="M320 384m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4545" fill="#0052D9"></path>
-      <path d="M704 128m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4546" fill="#0052D9"></path>
-      <path d="M320 128m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0Z" p-id="4547" fill="#0052D9"></path>
-    </svg>
-  </div>
-</div>
+    <div class="container">
+        <div class="lyric"></div>
+    </div>
 </body>
 <script>
     window.preload.receiveMsg(msg => {
         console.log('接收插件发送的消息：', msg);
-        const {type, value} = msg;
+        const { type, value } = msg;
         if (type === 'lyric') {
             document.querySelectorAll('.lyric')
                 .forEach(e => {
                     e.innerHTML = `${value}`
                 })
         } else if (type === 'config') {
-            const {fontSize, color, borderColor, fontFamily} = value;
-            document.querySelectorAll('.container').forEach(e => {
-                e.style.border = `1px solid ${borderColor}`;
-            });
+            const { fontSize, color, borderColor, fontFamily } = value;
+            // document.querySelectorAll('.container').forEach(e => {
+            //     e.style.border = `1px solid ${borderColor}`;
+            // });
             document.querySelectorAll('.lyric')
                 .forEach(e => {
                     e.style.fontSize = `${fontSize}px`;
@@ -91,4 +68,5 @@
         }
     });
 </script>
+
 </html>
