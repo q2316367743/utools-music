@@ -10,7 +10,7 @@
     <div class="player__bar">
       <div class="player__album">
         <div class="player__albumImg active-song">
-          <div class="cover">
+          <div class="cover" :style="{transform: `rotate(${rotation}deg)`}">
             <img :src="DefaultCover" :alt="name"/>
             <img :src="cover" :alt="name"/>
           </div>
@@ -62,6 +62,8 @@ useColorMode({
   selector: 'html'
 });
 
+const rotation = ref(0);
+
 const cover = ref('');
 const name = ref('');
 const artist = ref('');
@@ -71,6 +73,23 @@ const percentage = ref('0px');
 const controls = ref('pause');
 const duration1 = ref('');
 const duration2 = ref('');
+
+let raf = 0;
+const func = () => {
+  if (rotation.value >= 360) {
+    rotation.value = 0;
+  }
+  rotation.value += 1;
+  raf = requestAnimationFrame(func)
+};
+
+watch(controls, val => {
+  if (val === 'play') {
+    raf = requestAnimationFrame(func);
+  }else {
+    cancelAnimationFrame(raf)
+  }
+})
 
 window.preload.receiveMsg(({type, value}) => {
   if (type === 'info') {
