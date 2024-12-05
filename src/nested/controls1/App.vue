@@ -103,7 +103,7 @@ window.preload.receiveMsg(({type, value}) => {
   } else if (type === 'control') {
     controls.value = value;
   } else if (type === 'progress') {
-    percentage.value = (value.progress / value.total * 209).toFixed(0) + 'px';
+    percentage.value = (value.progress / value.total * 161).toFixed(0) + 'px';
     duration1.value = prettyDateTime(value.progress)
     duration2.value = prettyDateTime(value.total)
   }
