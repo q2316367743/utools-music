@@ -47,12 +47,12 @@
         </t-form-item>
         <t-form-item v-if="nativeSetting.bgType === 'color'" label="背景颜色">
           <t-color-picker-panel :clearable="true" v-model="nativeSetting.bgColor"
-                                :color-modes="['monochrome']" :swatch-colors="null" :recent-colors="null"
+                                :color-modes="['monochrome']" :swatch-colors="[]" :recent-colors="false"
                                 :enable-alpha="true"></t-color-picker-panel>
         </t-form-item>
         <t-form-item v-else-if="nativeSetting.bgType === 'linearGradient'" label="渐变颜色">
           <t-color-picker-panel :clearable="true" v-model="nativeSetting.bgGradient"
-                                :color-modes="['linear-gradient']" :swatch-colors="null" :recent-colors="null"
+                                :color-modes="['linear-gradient']" :swatch-colors="[]" :recent-colors="false"
                                 :enable-alpha="true"></t-color-picker-panel>
         </t-form-item>
         <t-form-item v-else-if="nativeSetting.bgType === 'image'" label="背景图片">
