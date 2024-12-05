@@ -23,6 +23,11 @@ export class MusicControls {
       file: 'controls1',
       width: 330,
       height: 200
+    },
+    '2': {
+      file: 'controls2',
+      width: 240,
+      height: 60
     }
   };
 

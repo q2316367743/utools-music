@@ -1,0 +1,97 @@
+#app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.audio-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  -webkit-app-region: drag;
+  border-radius: var(--td-radius-large);
+
+  .audio-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #ad3737 0%, rgba(29, 65, 182, 0.5) 100%);
+
+    img {
+      position: absolute;
+      top: -90px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+
+    .mask {
+      position: absolute;
+      width: 240px;
+      height: 60px;
+      backdrop-filter: blur(10px);
+    }
+
+  }
+
+  .audio-detail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    background-color: var(--music-bg-color-3);
+
+    .left-config {
+      padding-left: 12px;
+      width: 90px;
+      height: 60px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+
+      .play, .next {
+        -webkit-app-region: no-drag;
+      }
+
+      .next {
+        margin-left: 8px;
+      }
+    }
+
+    .right-info {
+      width: 120px;
+      height: 60px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+
+      .m-title {
+        margin-top: 8px;
+      }
+
+      .m-singer {
+        font-size: 0.8rem;
+        margin-top: 6px;
+      }
+    }
+  }
+
+  .audio-progress {
+    position: absolute;
+    left: 6px;
+    bottom: 0;
+    height: 3px;
+    background-color: #b4b3b3;
+  }
+}

@@ -7,7 +7,7 @@ export enum GlobalSettingPlayErrorType {
 export interface GlobalSetting {
 
   // 控制器样式
-  globalControl: '0' | '1',
+  globalControl: '0' | '1' | '2',
 
   // 播放异常
   playError: GlobalSettingPlayErrorType;
