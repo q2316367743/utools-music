@@ -6,7 +6,7 @@ export const Constants = {
   // 项目中文名称
   name: '音乐播放器',
   // 版本
-  version: '1.0.3',
+  version: '1.1.0',
   // 作者
   author: '落雨不悔',
   website: 'https://blog.esion.xyz',
