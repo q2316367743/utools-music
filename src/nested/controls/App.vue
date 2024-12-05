@@ -15,6 +15,7 @@
           </div>
         </template>
       </t-progress>
+      <img :src="DefaultCover" :alt="name" draggable="false" />
       <img v-if="cover" :src="cover" :alt="name" draggable="false"/>
       <div class="icon" @click="play">
         <play-icon size="56px" color="white" v-if="controls === 'pause'"/>
@@ -28,6 +29,7 @@ import {PauseIcon, PlayIcon} from "tdesign-icons-vue-next";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {useColorMode} from "@/hooks/ColorMode";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
+import DefaultCover from '@/assets/image/default-cover.png'
 
 useColorMode({
   key: LocalNameEnum.KEY_COLOR_MODE,
@@ -68,7 +70,14 @@ function play() {
   }
 }
 </script>
-<style scoped lang="less">
+<style lang="less">
+#app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 .controls {
   position: relative;
   width: 100%;

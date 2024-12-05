@@ -1,6 +1,6 @@
 <template>
   <div class="music-display" :class="{show: displayVisible}">
-    <div class="main-mask"/>
+    <customer-bg />
     <t-layout class="music-display__container">
       <t-aside class="list" :width="listVisible ? '300px' : '0px'"
                :style="{opacity: listVisible? 1 : 0, overflowX: 'hidden'}">

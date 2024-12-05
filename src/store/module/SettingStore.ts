@@ -1,9 +1,18 @@
-import {buildGlobalSetting} from "@/entity/GlobalSetting";
+import {buildGlobalSetting, buildNativeSetting} from "@/entity/GlobalSetting";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 
 export const globalSetting = useStorage(
   LocalNameEnum.KEY_GLOBAL_SETTING,
   buildGlobalSetting(),
+  utools.dbStorage,
+  {
+    deep: true,
+    flush: "sync"
+  }
+);
+export const nativeSetting = useStorage(
+  `${LocalNameEnum.KEY_NATIVE_SETTING}/${utools.getNativeId()}`,
+  buildNativeSetting(),
   utools.dbStorage,
   {
     deep: true,
@@ -21,19 +30,10 @@ export const downloadFolder = useStorage(
   }
 )
 
-export const pluginFontFamily = useStorage(
-  `${LocalNameEnum.KEY_FONT_FAMILY}/${utools.getNativeId()}`,
-  '',
-  utools.dbStorage,
-  {
-    deep: true,
-    flush: "sync"
-  }
-)
 
 export const fontFamily = computed(() => {
-  if (!pluginFontFamily.value) {
+  if (!nativeSetting.value.lyricFontFamily) {
     return 'PingFang SC, Microsoft YaHei, Arial Regular, serif';
   }
-  return `${pluginFontFamily.value}, PingFang SC, Microsoft YaHei, Arial Regular, serif`;
+  return `${nativeSetting.value.lyricFontFamily}, PingFang SC, Microsoft YaHei, Arial Regular, serif`;
 });

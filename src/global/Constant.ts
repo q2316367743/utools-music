@@ -34,6 +34,6 @@ export const MUSIC_REGEX = /.*\.mp3|flac|wav|mp4|m4s|wma|m4a|ogg|acc|aac|opus$/;
 export const MUSIC_EXTNAME = ['.mp3', '.flac', '.wav', '.mp4', '.m4s', '.wma', '.m4a', '.ogg',
   '.acc', '.aac', 'opus'];
 export const IMAGE_REGEX = /.*\.jpg|jpeg|png|webp$/;
-export const IMAGE_EXTNAME = ['.jpg', '.jpeg', '.png', '.webp'];
+export const IMAGE_EXTNAME = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
 export const LYRIC_REGEX = /.*\.lrc$/;
 export const LYRIC_EXTNAME = ['.lrc'];

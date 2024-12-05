@@ -42,9 +42,13 @@ export enum LocalNameEnum {
 
   KEY_GLOBAL_SETTING = '/key/global-setting',
 
+  KEY_NATIVE_SETTING = '/key/native-setting',
+
   KEY_DOWNLOAD_FOLDER = '/key/download-folder',
 
   KEY_FONT_FAMILY = '/key/font-family',
+
+  KEY_BG_IMAGE = '/key/bg-image',
 
   KEY_VERSION = '/key/version',
 

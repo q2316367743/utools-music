@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <div class="main-mask"/>
+    <customer-bg />
     <t-layout class="main-container">
       <menu-side class="main-side"></menu-side>
       <t-content class="main-content-wrapper">
@@ -29,6 +29,7 @@ import MusicPlayer from "@/components/MusicPlayer/MusicPlayer.vue";
 import MenuSide from "@/components/MenuSide/MenuSide.vue";
 import {versionCheck} from "@/components/UpdateLog";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import CustomerBg from "@/components/CustomerBg/CustomerBg.vue";
 
 const route = useRoute();
 const router = useRouter();

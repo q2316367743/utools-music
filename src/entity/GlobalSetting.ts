@@ -3,7 +3,11 @@ export enum GlobalSettingPlayErrorType {
   PAUSE = 2
 }
 
+// 全局设置
 export interface GlobalSetting {
+
+  // 控制器样式
+  globalControl: '0' | '1',
 
   // 播放异常
   playError: GlobalSettingPlayErrorType;
@@ -41,6 +45,7 @@ export interface GlobalSetting {
 
 export function buildGlobalSetting(): GlobalSetting {
   return {
+    globalControl: '0',
     playError: GlobalSettingPlayErrorType.NEXT,
     playDownload: false,
     playQuality: "super",
@@ -55,5 +60,34 @@ export function buildGlobalSetting(): GlobalSetting {
     proxyPort: 7890,
     proxyUser: '',
     proxyPassword: ''
+  }
+}
+
+/**
+ * 本地设置
+ */
+export interface NativeSetting {
+
+  // 插件背景
+  bgType: 'none' | 'color' | 'linearGradient' | 'image';
+  // 背景颜色
+  bgColor: string;
+  // 背景渐变
+  bgGradient: string;
+  // 背景图片
+  bgImage: string;
+
+  // 歌词字体
+  lyricFontFamily: string;
+
+}
+
+export function buildNativeSetting(): NativeSetting {
+  return {
+    bgType: 'none',
+    bgColor: '',
+    bgGradient: '',
+    bgImage: '',
+    lyricFontFamily: ''
   }
 }

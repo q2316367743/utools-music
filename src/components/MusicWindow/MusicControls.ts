@@ -1,15 +1,39 @@
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {audio, music, pre, next, played} from "@/components/MusicPlayer/MusicPlayer";
+import {globalSetting} from "@/store";
 
 type MusicControl = 'play' | 'pause';
+
+interface MusicControlData {
+  file: string;
+  width: number;
+  height: number;
+}
 
 export class MusicControls {
 
   private ubWindow: BrowserWindow.WindowInstance | null = null;
+  private readonly controlMap: Record<string, MusicControlData> = {
+    '0': {
+      file: 'controls',
+      width: 335,
+      height: 110
+    },
+    '1': {
+      file: 'controls1',
+      width: 430,
+      height: 200
+    }
+  };
 
   constructor() {
     this.enableInterval();
     this.enableControls();
+  }
+
+  private getControls(): MusicControlData {
+    const {globalControl} = toRaw(globalSetting.value);
+    return this.controlMap[globalControl] || this.controlMap['0'];
   }
 
   private enableInterval() {
@@ -52,15 +76,17 @@ export class MusicControls {
   }
 
   private createWindow(callback?: () => void) {
+    const data = this.getControls();
+
     let ubWindow = utools.createBrowserWindow(
-      utools.isDev() ? 'lyric/index.html' : 'dist/controls.html',
+      utools.isDev() ? 'lyric/index.html' : `dist/${data.file}.html`,
       {
         // @ts-ignore
         useContentSize: false,
         resizable: false,
         skipTaskbar: true,
-        width: 335,
-        height: 110,
+        width: data.width,
+        height: data.height,
         alwaysOnTop: true,
         frame: false,
         transparent: true,
@@ -76,7 +102,7 @@ export class MusicControls {
         try {
           ubWindow.show();
           if (utools.isDev()) {
-            ubWindow.webContents.executeJavaScript(`location.href = 'http://localhost:5173/controls.html'`)
+            ubWindow.webContents.executeJavaScript(`location.href = 'http://localhost:5173/${data.file}.html'`)
               .then(() => console.log("代码执行成功"))
               .catch(e => console.error("代码执行失败", e));
             ubWindow.webContents.openDevTools();
@@ -87,6 +113,8 @@ export class MusicControls {
             type: 'control',
             value: played.value ? 'play' : 'pause'
           });
+          utools.hideMainWindow();
+          utools.outPlugin(false);
         } catch (e) {
           MessageUtil.error("打开控制器失败", e);
         }

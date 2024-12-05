@@ -19,6 +19,46 @@
             </t-button>
           </t-input-group>
         </t-form-item>
+        <t-form-item label="播放器样式">
+          <t-radio-group v-model="globalSetting.globalControl">
+            <t-popup placement="top-left">
+              <template #content>
+                <t-image :src="ControlImage" style="width: 200px"/>
+              </template>
+              <t-radio value="0">默认</t-radio>
+            </t-popup>
+            <t-popup placement="top-left">
+              <template #content>
+                <t-image :src="Control11Image" style="width: 200px"/>
+              </template>
+              <t-radio value="1">样式一</t-radio>
+            </t-popup>
+          </t-radio-group>
+        </t-form-item>
+      </t-tab-panel>
+      <t-tab-panel label="背景" value="bg" style="padding: 8px">
+        <t-form-item label="背景类型">
+          <t-radio-group v-model="nativeSetting.bgType">
+            <t-radio value="none">默认</t-radio>
+            <t-radio value="color">纯色</t-radio>
+            <t-radio value="linearGradient">渐变</t-radio>
+            <t-radio value="image">图片</t-radio>
+          </t-radio-group>
+        </t-form-item>
+        <t-form-item v-if="nativeSetting.bgType === 'color'" label="背景颜色">
+          <t-color-picker-panel :clearable="true" v-model="nativeSetting.bgColor"
+                                :color-modes="['monochrome']" :swatch-colors="null" :recent-colors="null"
+                                :enable-alpha="true"></t-color-picker-panel>
+        </t-form-item>
+        <t-form-item v-else-if="nativeSetting.bgType === 'linearGradient'" label="渐变颜色">
+          <t-color-picker-panel :clearable="true" v-model="nativeSetting.bgGradient"
+                                :color-modes="['linear-gradient']" :swatch-colors="null" :recent-colors="null"
+                                :enable-alpha="true"></t-color-picker-panel>
+        </t-form-item>
+        <t-form-item v-else-if="nativeSetting.bgType === 'image'" label="背景图片">
+          <file-input v-model="nativeSetting.bgImage" title="请选择背景图片" type="image"
+                      placeholder="支持网络url和本地文件"/>
+        </t-form-item>
       </t-tab-panel>
       <t-tab-panel label="播放" value="play" style="padding: 8px;overflow: auto">
         <t-paragraph>
@@ -47,7 +87,7 @@
           <t-input-number :clearable="true" v-model="globalSetting.lyricFontSize"></t-input-number>
         </t-form-item>
         <t-form-item label=字体>
-          <t-select v-model="pluginFontFamily" :options :loading="ffLoading" loading-text="字体获取中"
+          <t-select v-model="nativeSetting.lyricFontFamily" :options :loading="ffLoading" loading-text="字体获取中"
                     style="width: 300px"/>
         </t-form-item>
         <t-form-item label="字体颜色">
@@ -110,12 +150,14 @@
   </t-form>
 </template>
 <script lang="ts" setup>
-import {downloadFolder, globalSetting, pluginFontFamily} from "@/store";
+import {downloadFolder, globalSetting, nativeSetting} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 import {FileIcon} from 'tdesign-icons-vue-next';
 import {colorMode} from "@/store/AppStore";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {SelectOption} from "tdesign-vue-next/es/select/type";
+import ControlImage from '@/assets/image/preview/control.png';
+import Control11Image from '@/assets/image/preview/control1.png';
 
 const active = ref('guide');
 
