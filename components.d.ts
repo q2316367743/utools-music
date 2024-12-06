@@ -10,10 +10,15 @@ declare module 'vue' {
     CustomerBg: typeof import('./src/components/CustomerBg/CustomerBg.vue')['default']
     FileInput: typeof import('./src/components/FileInput/FileInput.vue')['default']
     FolderInput: typeof import('./src/components/FolderInput/FolderInput.vue')['default']
+    LyricIcon: typeof import('./src/components/icon/LyricIcon.vue')['default']
     MenuSide: typeof import('./src/components/MenuSide/MenuSide.vue')['default']
+    MinIcon: typeof import('./src/components/icon/MinIcon.vue')['default']
     MusicDisplay: typeof import('./src/components/MusicPlayer/MusicDisplay.vue')['default']
     MusicLyricSearch: typeof import('./src/components/MusicPlayer/MusicLyricSearch.vue')['default']
     MusicPlayer: typeof import('./src/components/MusicPlayer/MusicPlayer.vue')['default']
+    OnePlayIcon: typeof import('./src/components/icon/OnePlayIcon.vue')['default']
+    OrderPlayIcon: typeof import('./src/components/icon/OrderPlayIcon.vue')['default']
+    RandomPlayIcon: typeof import('./src/components/icon/RandomPlayIcon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TAlert: typeof import('tdesign-vue-next')['Alert']
@@ -66,5 +71,6 @@ declare module 'vue' {
     TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTag: typeof import('tdesign-vue-next')['Tag']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+    VoiceIcon: typeof import('./src/components/icon/VoiceIcon.vue')['default']
   }
 }

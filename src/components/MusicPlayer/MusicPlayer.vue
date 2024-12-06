@@ -29,15 +29,19 @@
       <div class="operator">
         <t-tooltip placement="top" content="控制器">
           <t-button shape="circle" theme="primary" variant="text" @click="switchControls" :disabled="!music">
-            控
+            <min-icon/>
           </t-button>
         </t-tooltip>
-        <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="!music">
-          加
-        </t-button>
+        <t-tooltip placement="top" content="添加到歌单">
+          <t-button shape="circle" theme="primary" variant="text" @click="onAddMusicGroup" :disabled="!music">
+            <template #icon>
+              <folder-add1-icon/>
+            </template>
+          </t-button>
+        </t-tooltip>
         <t-popup trigger="click">
           <t-button shape="circle" theme="primary" variant="text">
-            音
+            <voice-icon/>
           </t-button>
           <template #content>
             <div class="music-player-volume">
@@ -47,19 +51,23 @@
         </t-popup>
         <t-tooltip content="歌词">
           <t-button shape="circle" theme="primary" variant="text" @click="switchLyric">
-            词
+            <template #icon>
+              <lyric-icon />
+            </template>
           </t-button>
         </t-tooltip>
         <t-tooltip :content="loopText">
           <t-button shape="circle" theme="primary" variant="text" @click="loopControl">
-            <span v-if="loop === 1">单</span>
-            <span v-else-if="loop === 2">顺</span>
-            <span v-else-if="loop === 3">随</span>
+            <template #icon>
+              <one-play-icon v-if="loop === 1" />
+              <order-play-icon v-else-if="loop === 2"/>
+              <random-play-icon v-else-if="loop === 3" />
+            </template>
           </t-button>
         </t-tooltip>
         <t-tooltip content="播放列表" placement="top-left">
           <t-button shape="circle" theme="primary" variant="text" @click="switchList">
-            列
+            <view-list-icon />
           </t-button>
         </t-tooltip>
       </div>
@@ -115,11 +123,11 @@ import {
   ChevronDownDoubleIcon,
   ChevronUpDoubleIcon,
   DeleteIcon,
-  DownloadIcon,
+  DownloadIcon, FolderAdd1Icon,
   NextIcon,
   PauseIcon,
   PlayIcon,
-  PreviousIcon, TerminalWindowIcon
+  PreviousIcon, TerminalWindowIcon, ViewListIcon
 } from 'tdesign-icons-vue-next';
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
@@ -154,6 +162,9 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {useDownloadStore, useMusicGroupStore} from "@/store";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {MusicGroupType} from "@/entity/MusicGroup";
+import MinIcon from "@/components/icon/MinIcon.vue";
+import LyricIcon from "@/components/icon/LyricIcon.vue";
+import RandomPlayIcon from "@/components/icon/RandomPlayIcon.vue";
 
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');
