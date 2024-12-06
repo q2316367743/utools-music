@@ -9,11 +9,16 @@
             <search-icon/>
           </template>
         </t-auto-complete>
-        <t-space>
+        <t-space size="small">
           <t-button size="small" v-if="checks.length > 0" @click="addMusicGroup">添加到歌单</t-button>
           <t-button size="small" shape="square" v-if="music" @click="setLocation(music)">
             <template #icon>
               <location-icon/>
+            </template>
+          </t-button>
+          <t-button size="small" @click="toFolder" >
+            <template #icon>
+              <folder-icon/>
             </template>
           </t-button>
           <music-scanner/>
@@ -66,7 +71,7 @@
   </div>
 </template>
 <script lang="tsx" setup>
-import {LocationIcon, SearchIcon} from 'tdesign-icons-vue-next';
+import {FolderIcon, LocationIcon, SearchIcon} from 'tdesign-icons-vue-next';
 import {useFuse} from "@vueuse/integrations/useFuse";
 import {useMusicGroupStore, useMusicStore} from "@/store";
 import {openLocalMusicEditDialog} from "@/pages/local/components/LocalMusicEdit";
@@ -83,6 +88,7 @@ import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 import {MusicInstance} from "@/types/MusicInstance";
 import ContextMenu from '@imengyu/vue3-context-menu'
 
+const router = useRouter();
 const tableContainer = useTemplateRef<HTMLDivElement>('table-container');
 
 const keyword = ref('');
@@ -233,6 +239,7 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
   })
 }
 
+const toFolder = () => router.push('/local/folder')
 </script>
 <style scoped lang="less">
 .local-music {

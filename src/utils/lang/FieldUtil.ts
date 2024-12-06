@@ -112,3 +112,7 @@ export function basenameWeb(str: string): string {
   }
   return items.join('.');
 }
+
+export function getFolder(dir: string): string {
+  return dir.split(window.preload.path.sep).pop() || dir;
+}

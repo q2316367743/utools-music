@@ -13,6 +13,10 @@ const router = createRouter({
     path: '/local',
     component: () => import('@/pages/local/index.vue')
   }, {
+    name: "文件夹分组",
+    path: '/local/folder',
+    component: () => import('@/pages/folder/index.vue')
+  }, {
     name: "我的歌单",
     path: '/music-group/list',
     component: () => import('@/pages/music-group/list/index.vue')

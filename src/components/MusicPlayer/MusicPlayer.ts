@@ -10,6 +10,8 @@ import {globalSetting, useDownloadStore} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 import {MusicInstance} from "@/types/MusicInstance";
 import {matchMusicAttachment} from "@/components/MusicPlayer/MusicAttachment";
+import {useUtoolsDbStorage} from "@/hooks/UtoolsDbStorage";
+import {LocalNameEnum} from "@/global/LocalNameEnum";
 
 export const musics = ref(new Array<MusicInstance>());
 export const index = ref(0);
@@ -22,7 +24,10 @@ export const audio = new Audio();
 export const duration = ref(0);
 export const currentTime = ref(0);
 export const played = ref(false);
-export const volume = ref(audio.volume * 100);
+export const volume = useUtoolsDbStorage<number>(
+  LocalNameEnum.KEY_VOLUME,
+  50
+);
 export const listVisible = ref(false);
 export const displayVisible = ref(false);
 
@@ -35,7 +40,7 @@ const errorCount = ref(0);
 
 watch(volume, val => {
   audio.volume = val / 100
-});
+}, {immediate: true});
 watch(lyricIndex, val => {
   if (lyrics.value.length > 0) {
     const cur = lyrics.value[val];
@@ -306,6 +311,7 @@ export function switchLyric() {
 export function switchControls() {
   musicControls.switchWindow();
 }
+
 export function switchCurrentTime(currentTime: number) {
   audio.currentTime = currentTime;
 }

@@ -6,7 +6,7 @@ import {FileItem, parseFileToMusic, readFileList} from "@/utils/file/FileUtil";
 import {group} from "@/utils/lang/ArrayUtil";
 import {IMAGE_EXTNAME, LYRIC_EXTNAME, MUSIC_EXTNAME} from "@/global/Constant";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
-import {basenameWeb, copyProperties, extnameWeb, parseMusicName} from "@/utils/lang/FieldUtil";
+import {basenameWeb, copyProperties, extnameWeb, getFolder, parseMusicName} from "@/utils/lang/FieldUtil";
 import {KeyValue} from "@/types/KeyValue";
 import {AuthType, createClient} from "webdav";
 import {FileStat} from "webdav/dist/node/types";
@@ -71,6 +71,12 @@ async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicI
         } catch (e) {
           console.error("元数据解析失败", e)
         }
+      }
+      if (source === MusicItemSource.LOCAL) {
+        // 本地音乐
+        musicItem.dir = window.preload.path.dirname(musicItem.url);
+        // 从目录中获取文件夹名
+        musicItem.folder = getFolder(musicItem.dir);
       }
       musicItems.push(musicItem);
     }

@@ -29,7 +29,6 @@ export interface MusicItemMeta {
 
 export interface MusicItemBase extends MusicItemMeta {
   id: number;
-
 }
 
 export interface MusicItemLink {
@@ -46,6 +45,15 @@ export interface MusicItemLink {
    * 封面
    */
   cover: string;
+
+  /**
+   * 文件夹
+   */
+  folder?: string;
+  /**
+   * 目录
+   */
+  dir?: string;
 
 }
 

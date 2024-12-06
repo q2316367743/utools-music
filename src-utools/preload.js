@@ -9,7 +9,8 @@ const {
     join,
     basename,
     extname,
-    dirname
+    dirname,
+    sep,
 } = require('node:path');
 const {URL} = require("node:url");
 const https = require("node:https");
@@ -176,7 +177,7 @@ window.preload = {
         unlink
     },
     path: {
-        join, basename, extname, dirname
+        join, basename, extname, dirname, sep
     },
     ipcRenderer: {
         sendLyric,

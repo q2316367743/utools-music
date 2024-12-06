@@ -89,6 +89,7 @@ interface Window {
       basename(path: string): string;
       extname(path: string): string;
       dirname(path: string): string;
+      sep: '/' | '\\';
     },
     ipcRenderer: {
       sendLyric(ids: Array<number>, content: any): void

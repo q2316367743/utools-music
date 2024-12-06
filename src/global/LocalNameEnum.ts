@@ -52,6 +52,9 @@ export enum LocalNameEnum {
 
   KEY_COLLAPSED = '/key/collapsed',
 
+  // 音量
+  KEY_VOLUME = '/key/volume',
+
   DATA_PLUGIN =  '/data/plugin',
 
   // 控制器窗口位置
