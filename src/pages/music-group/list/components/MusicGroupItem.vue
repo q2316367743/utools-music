@@ -31,14 +31,20 @@ defineProps({
 .mg-item {
   width: 120px;
   height: 120px;
-  margin: 8px;
   user-select: none;
   cursor: pointer;
   position: relative;
   background: transparent;
-  border-radius: 12px;
+  border-radius: var(--td-radius-default);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
+  border: 1px dashed var(--td-component-stroke);
+
+  &:hover {
+    background: rgba(var(--td-brand-color-rgb), 0.1);
+    border-color: var(--td-brand-color);
+    transform: scale(0.98);
+  }
 
 
   &__cover {
@@ -54,9 +60,6 @@ defineProps({
       object-fit: cover;
       transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-      &:hover {
-        transform: scale(1.05);
-      }
     }
   }
 
@@ -82,7 +85,7 @@ defineProps({
     position: absolute;
     top: 4px;
     right: 4px;
-    
+
     :deep(.t-tag) {
       font-size: 11px;
       padding: 0 4px;

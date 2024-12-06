@@ -1,11 +1,8 @@
 <template>
   <div class="music-group">
     <div class="music-group__content">
-      <t-dropdown v-for="group in musicGroups" :key="group.id" :options trigger="context-menu"
-                  @click="onContextMenu(group, $event)">
-        <music-group-item :item="group" @click="onClick(group)"/>
-      </t-dropdown>
-      
+      <music-group-item v-for="group in musicGroups" :key="group.id" :item="group" @click="onClick(group)"
+                        @contextmenu.prevent="handleContextMenu($event, group)"/>
       <div class="music-group__add" @click="addMusicGroup">
         <div class="music-group__add-content">
           <plus-icon size="32px"/>
@@ -19,18 +16,13 @@
 import {useMusicGroupStore} from "@/store/module/MusicGroupStore";
 import {addMusicGroup, editMusicGroup} from "@/pages/music-group/list/components/MusicGroupFunc";
 import {MusicGroupIndex} from "@/entity/MusicGroup";
-import {DropdownOption} from "tdesign-vue-next";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {PlusIcon} from 'tdesign-icons-vue-next'
 import MusicGroupItem from "@/pages/music-group/list/components/MusicGroupItem.vue";
+import ContextMenu from "@imengyu/vue3-context-menu";
 
 const router = useRouter();
-
-const options: Array<DropdownOption> = [
-  {content: '重命名', value: 1},
-  {content: '删除', value: 2, theme: 'error'},
-];
 
 const musicGroups = computed(() => useMusicGroupStore().musicGroupItems);
 
@@ -38,19 +30,29 @@ function onClick(res: MusicGroupIndex) {
   router.push(`/music-group/info/${res.id}`);
 }
 
-function onContextMenu(group: MusicGroupIndex, value: DropdownOption) {
-  if (value.value === 1) {
-    editMusicGroup(group)
-  } else if (value.value === 2) {
-    // 删除
-    MessageBoxUtil.alert(`是否删除歌单【${group.name}】？`, "删除跟单")
-      .then(() => {
-        useMusicGroupStore().deleteMusicGroup(group.id)
-          .then(() => MessageUtil.success("删除成功"))
-          .catch(e => MessageUtil.error("删除失败", e));
-      })
-  }
+function handleContextMenu(e: MouseEvent, group: MusicGroupIndex) {
+  ContextMenu.showContextMenu({
+    x: e.x,
+    y: e.y,
+    theme: utools.isDarkColors() ? 'mac dark' : 'mac',
+    items: [
+      {
+        label: "重命名",
+        onClick: () => editMusicGroup(group)
+      },
+      {
+        label: "删除",
+        onClick: () => MessageBoxUtil.alert(`是否删除歌单【${group.name}】？`, "删除跟单")
+          .then(() => {
+            useMusicGroupStore().deleteMusicGroup(group.id)
+              .then(() => MessageUtil.success("删除成功"))
+              .catch(e => MessageUtil.error("删除失败", e));
+          })
+      },
+    ]
+  });
 }
+
 
 </script>
 <style scoped lang="less">
@@ -71,7 +73,7 @@ function onContextMenu(group: MusicGroupIndex, value: DropdownOption) {
   &__add {
     width: 120px;
     height: 120px;
-    border-radius: 12px;
+    border-radius: var(--td-radius-default);
     border: 1px dashed var(--td-component-stroke);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

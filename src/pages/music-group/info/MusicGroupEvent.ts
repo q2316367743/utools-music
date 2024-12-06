@@ -6,9 +6,9 @@ import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {useDownloadStore, useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {VxeTableDefines} from "vxe-table/types/table";
 import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
 import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
+import ContextMenu from "@imengyu/vue3-context-menu";
 
 function renderMusicInstance(info: MusicGroupIndex, e: any) {
   if (info) {
@@ -55,15 +55,24 @@ export const buildMusicGroupMenuConfig = (info?: MusicGroupIndex): VxeTablePropT
   };
 };
 
+interface MenuEventProps {
+  e: MouseEvent,
+  row: any,
+  rowIndex: number
+}
 
-export function handleMenuClickEvent(params: VxeTableDefines.MenuClickEventParams<any>, info: MusicGroupIndex, onUpdate: () => void) {
-  const {menu, row, rowIndex} = params;
-  switch (menu.code) {
-    case 'next':
-      useMusicAppend.emit(renderMusicInstance(info, row));
-      break
-    case 'music-group':
-      musicGroupChoose([MusicGroupType.LOCAL])
+
+export function handleMenuClickEvent(params: MenuEventProps, info: MusicGroupIndex, onUpdate: () => void) {
+  const {e, row, rowIndex} = params;
+
+  const items = [
+    {
+      label: "下一首播放",
+      onClick: () => useMusicAppend.emit(renderMusicInstance(info, row))
+    },
+    {
+      label: "添加到歌单",
+      onClick: () => musicGroupChoose([MusicGroupType.LOCAL])
         .then(id => {
           if (id > 0) {
             useMusicGroupStore().appendMusicGroup(id, row)
@@ -71,20 +80,33 @@ export function handleMenuClickEvent(params: VxeTableDefines.MenuClickEventParam
               .catch(e => MessageUtil.error("添加失败", e));
           }
         })
-      break
-    case 'remove':
-      useMusicGroupStore().removeContentItem(info.id, rowIndex)
+    },
+    {
+      label: "从歌单中移除",
+      onClick: () => useMusicGroupStore().removeContentItem(info.id, rowIndex)
         .then(() => {
           MessageUtil.success("删除成功");
           onUpdate()
         })
-        .catch(e => MessageUtil.error("删除失败", e));
-      break;
-    case 'download':
-      const instance = renderMusicInstance(info, row);
-      instance.getInfo()
-        .then(useDownloadStore().emit)
-        .catch(e => MessageUtil.error("获取下载信息错误", e));
-      break;
+        .catch(e => MessageUtil.error("删除失败", e))
+    },
+  ];
+  if (info.type === MusicGroupType.WEB || info.type === MusicGroupType.MIX) {
+    items.push({
+      label: '下载', onClick: () => {
+        const instance = renderMusicInstance(info, row);
+        instance.getInfo()
+          .then(useDownloadStore().emit)
+          .catch(e => MessageUtil.error("获取下载信息错误", e));
+      }
+    })
   }
+
+  ContextMenu.showContextMenu({
+    x: e.x,
+    y: e.y,
+    theme: utools.isDarkColors() ? 'mac dark' : 'mac',
+    items
+  })
+
 }
