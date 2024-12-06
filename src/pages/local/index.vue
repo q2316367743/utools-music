@@ -2,7 +2,8 @@
   <div class="local-music">
     <div class="container">
       <div class="local-music__header">
-        <t-auto-complete :options style="width: 200px" placeholder="搜索本地音乐" v-model="keyword" :clearable="true"
+        <t-auto-complete :options="options" style="width: 200px" placeholder="搜索本地音乐" v-model="keyword"
+                         :clearable="true"
                          :highlight-keyword="true" :filterable="true">
           <template #suffix-icon>
             <search-icon/>
@@ -12,43 +13,53 @@
           <t-button size="small" v-if="checks.length > 0" @click="addMusicGroup">添加到歌单</t-button>
           <t-button size="small" shape="square" v-if="music" @click="setLocation(music)">
             <template #icon>
-              <location-icon />
+              <location-icon/>
             </template>
           </t-button>
           <music-scanner/>
         </t-space>
       </div>
-      <vxe-table :data="data" row-key :border="false" :height="maxHeight" empty-text="空空如也"
-                 :scroll-y="{enabled: true, gt: 0}" :menu-config="menuConfig" :sort-config="sortConfig"
-                 :row-config="{isCurrent: true, isHover: true, keyField: 'id'}" ref="table"
-                 @cell-dblclick="handleRowDblclick" @menu-click="menuClickEvent" @checkbox-change="onCheckboxChange"
-                 @checkbox-all="onCheckboxAll">
-        <vxe-column type="checkbox" width="40"></vxe-column>
-        <vxe-column sortable field="name" title="歌曲名" show-overflow="tooltip"/>
-        <vxe-column sortable field="artist" title="演唱者" show-overflow="tooltip"/>
-        <vxe-column sortable field="album" title="专辑" show-overflow="tooltip">
-          <template #default="{ row }">
-            {{ row.album || '-' }}
-          </template>
-        </vxe-column>
-        <vxe-column field="duration" title="时长" :width="70">
-          <template #default="{ row }">
-            {{ prettyDateTime(row.duration) }}
-          </template>
-        </vxe-column>
-        <vxe-column field="source" title="来源" :width="90" align="right">
-          <template #default="{ row }">
-            <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
-            <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
-          </template>
-        </vxe-column>
-      </vxe-table>
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+          <tr>
+            <th>
+              <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll"/>
+            </th>
+            <th @click="sortData('name')">歌曲名</th>
+            <th @click="sortData('artist')">演唱者</th>
+            <th @click="sortData('album')">专辑</th>
+            <th @click="sortData('duration')">时长</th>
+            <th @click="sortData('source')">来源</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(row, index) in data" :key="row.id"
+              @dblclick="handleRowDblclick(row)"
+              @contextmenu.prevent="handleContextMenu($event, row)"
+              :class="{ 'hover': hoveredIndex === index }"
+              @mouseover="hoveredIndex = index"
+              @mouseleave="hoveredIndex = null">
+            <td>
+              <input type="checkbox" :value="row.id" v-model="checks"/>
+            </td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.artist }}</td>
+            <td>{{ row.album || '-' }}</td>
+            <td>{{ prettyDateTime(row.duration) }}</td>
+            <td>
+              <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
+              <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <t-back-top container=".local-music .container .table-container" style="bottom: 24px;right: 24px"/>
     </div>
-    <t-back-top container=".local-music .container .vxe-table--body-wrapper" style="bottom: 24px;right: 24px"/>
   </div>
 </template>
 <script lang="tsx" setup>
-import {VxeTableEvents, VxeTableInstance, VxeTablePropTypes, VxeTableDefines} from "vxe-table";
 import {LocationIcon, SearchIcon} from 'tdesign-icons-vue-next';
 import {useFuse} from "@vueuse/integrations/useFuse";
 import {useMusicGroupStore, useMusicStore} from "@/store";
@@ -64,17 +75,18 @@ import {MusicGroupType} from "@/entity/MusicGroup";
 import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
 import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 import {MusicInstance} from "@/types/MusicInstance";
+import ContextMenu from '@imengyu/vue3-context-menu'
 
 const size = useWindowSize();
 
 const keyword = ref('');
 
 const activeRowKeys = ref<Array<number>>([])
-const checks = ref<Array<MusicItemView>>([]);
+const checks = ref<Array<number>>([]);
 
+const hoveredIndex = ref<number | null>(null);
 
 const musics = computed(() => useMusicStore().musics);
-const maxHeight = computed(() => size.height.value - 106);
 const options = computed(() => {
   const items = new Set<string>();
   musics.value.forEach(value => {
@@ -92,26 +104,32 @@ const {results} = useFuse<MusicItemView>(keyword, musics, {
     keys: ["name", "artist", "album"]
   }
 });
-const data = computed(() => results.value.map(e => e.item));
 
-
-const tableInstance = useTemplateRef<VxeTableInstance<MusicItemView>>('table')
-const sortConfig = ref<VxeTablePropTypes.SortConfig<MusicItemView>>({
-  multiple: true
+const sortState = reactive({
+  field: 'name',
+  direction: 'asc'
 });
-const menuConfig = reactive<VxeTablePropTypes.MenuConfig<MusicItemView>>({
-  className: 'local-music-menu',
-  body: {
-    options: [
-      [
-        {code: 'edit', name: '编辑'},
-        {code: 'next', name: '下一首播放'},
-        {code: 'music-group', name: '添加到歌单'},
-        {code: 'folder', name: '打开歌曲所在文件夹'}
-      ],
-    ]
-  },
-})
+
+const data = computed(() => {
+  let sortedResults = [...results.value.map(e => e.item)];
+  sortedResults.sort((a, b) => {
+    if (typeof a[sortState.field] === 'number' &&
+      typeof b[sortState.field] === 'number') {
+      if (a[sortState.field] < b[sortState.field]) return sortState.direction === 'asc' ? -1 : 1;
+      if (a[sortState.field] > b[sortState.field]) return sortState.direction === 'asc' ? 1 : -1;
+    } else {
+      if (`${a[sortState.field]}`.localeCompare(`${b[sortState.field]}`) < 0) return sortState.direction === 'asc' ? -1 : 1;
+      if (`${a[sortState.field]}`.localeCompare(`${b[sortState.field]}`) > 0) return sortState.direction === 'asc' ? 1 : -1;
+    }
+    return 0;
+  });
+  return sortedResults;
+});
+
+const checkAll = computed(() => musics.value.length === checks.value.length);
+
+const indeterminate = computed(() => !!(musics.value.length > checks.value.length && checks.value.length));
+
 
 watch(music, val => {
   if (val) {
@@ -119,25 +137,23 @@ watch(music, val => {
   }
 }, {immediate: true});
 
-function handleRowDblclick(context: { row: MusicItemView }) {
-  const {row} = context;
+function handleRowDblclick(row: MusicItemView) {
   const list = data.value;
   const index = data.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
     views: list.map(e => e.source === MusicItemSource.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e)),
     index: Math.max(index, 0)
   });
-  tableInstance.value?.clearCurrentColumn();
 }
 
-const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) => {
-  switch (menu.code) {
+function menuClickEvent(code: string, row: MusicItemView) {
+  switch (code) {
     case 'edit':
       openLocalMusicEditDialog(row);
       break;
     case 'next':
       useMusicAppend.emit(new MusicInstanceLocal(row));
-      break
+      break;
     case 'music-group':
       musicGroupChoose([MusicGroupType.LOCAL])
         .then(id => {
@@ -146,41 +162,78 @@ const menuClickEvent: VxeTableEvents.MenuClick<MusicItemView> = ({menu, row}) =>
               .then(() => MessageUtil.success("添加成功"))
               .catch(e => MessageUtil.error("添加失败", e));
           }
-        })
-      break
+        });
+      break;
     case 'folder':
-      utools.shellShowItemInFolder(row.url)
-      break
+      utools.shellShowItemInFolder(row.url);
+      break;
   }
 }
 
-function onCheckboxChange(e: VxeTableDefines.CheckboxChangeEventParams<MusicItemView>) {
-  checks.value = e.$table.getCheckboxRecords();
+function handleSelectAll(e: Event) {
+  console.log(e.target)
+  if ((e.target as HTMLInputElement).checked) {
+    checks.value = musics.value.map(e => e.id);
+  } else {
+    checks.value = [];
+  }
 }
 
-function onCheckboxAll(e: VxeTableDefines.CheckboxAllEventParams<MusicItemView>) {
-  checks.value = e.$table.getCheckboxRecords(true);
-}
 
 function addMusicGroup() {
   musicGroupChoose([MusicGroupType.LOCAL])
     .then(id => {
       if (id > 0) {
-        useMusicGroupStore().appendMusicGroup(id, ...checks.value)
+        useMusicGroupStore().appendMusicGroup(id,
+          ...musics.value.filter(e => checks.value.includes(e.id)))
           .then(() => MessageUtil.success("添加成功"))
           .catch(e => MessageUtil.error("添加失败", e))
           .finally(() => {
-            tableInstance.value?.clearCheckboxRow();
             checks.value = [];
           });
       }
     })
 }
 
+// TODO: 跳转到当前播放位置
 function setLocation(item: MusicInstance) {
-  tableInstance.value?.scrollToRow(item.self);
-  tableInstance.value?.setCurrentRow(item.self);
 }
+
+function sortData(field: string) {
+  if (sortState.field === field) {
+    sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortState.field = field;
+    sortState.direction = 'asc';
+  }
+}
+
+function handleContextMenu(e: MouseEvent, row: MusicItemView) {
+  ContextMenu.showContextMenu({
+    x: e.x,
+    y: e.y,
+    theme: utools.isDarkColors() ? 'mac dark' : 'mac',
+    items: [
+      {
+        label: "编辑",
+        onClick: () => menuClickEvent('edit', row)
+      },
+      {
+        label: "下一首播放",
+        onClick: () => menuClickEvent('next', row)
+      },
+      {
+        label: "添加到歌单",
+        onClick: () => menuClickEvent('music-group', row)
+      },
+      {
+        label: "打开歌曲所在文件夹",
+        onClick: () => menuClickEvent('folder', row)
+      },
+    ]
+  })
+}
+
 </script>
 <style scoped lang="less">
 .local-music {
@@ -207,6 +260,47 @@ function setLocation(item: MusicInstance) {
       align-items: center;
     }
 
+    .table-container {
+      height: calc(100% - 42px);
+      overflow-y: auto;
+      border: 1px solid var(--music-bg-color-3);
+
+      .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        thead {
+          background-color: var(--music-bg-color-6);
+          position: sticky;
+          top: 0;
+          z-index: 1;
+
+          th {
+            padding: 8px;
+            text-align: left;
+            cursor: pointer;
+            border-bottom: 1px solid var(--td-border-level-2-color);
+          }
+        }
+
+        tbody {
+          tr {
+            &.hover {
+              background-color: var(--music-bg-color-6);
+            }
+
+            td {
+              padding: 8px;
+              border-bottom: 1px solid var(--td-border-level-2-color);
+
+              &:last-child {
+                border-bottom: none;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 </style>

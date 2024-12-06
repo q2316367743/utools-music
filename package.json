@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@imengyu/vue3-context-menu": "^1.4.3",
     "@vueuse/core": "^10.11.1",
     "@vueuse/integrations": "^11.2.0",
     "axios": "^1.7.7",
