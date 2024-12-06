@@ -10,7 +10,7 @@
     <div class="player__bar">
       <div class="player__album">
         <div class="player__albumImg active-song">
-          <div class="cover" :style="{transform: `rotate(${rotation}deg)`}">
+          <div class="cover" :style="{transform: `rotate(${rotate}deg)`}">
             <img :src="DefaultCover" :alt="name"/>
             <img :src="cover" :alt="name"/>
           </div>
@@ -62,8 +62,6 @@ useColorMode({
   selector: 'html'
 });
 
-const rotation = ref(0);
-
 const cover = ref('');
 const name = ref('');
 const artist = ref('');
@@ -74,20 +72,25 @@ const controls = ref('pause');
 const duration1 = ref('');
 const duration2 = ref('');
 
+const rotate = ref(0);
+
+
 let raf = 0;
-const func = () => {
-  if (rotation.value >= 360) {
-    rotation.value = 0;
-  }
-  rotation.value += 1;
-  raf = requestAnimationFrame(func)
-};
+const rotateFunc = () => {
+  raf = requestAnimationFrame(() => {
+    if (rotate.value >= 360) {
+      rotate.value = 0;
+    }
+    rotate.value += 1;
+    rotateFunc();
+  })
+}
 
 watch(controls, val => {
   if (val === 'play') {
-    raf = requestAnimationFrame(func);
-  }else {
-    cancelAnimationFrame(raf)
+    rotateFunc();
+  } else {
+    cancelAnimationFrame(raf);
   }
 })
 
@@ -100,7 +103,7 @@ window.preload.receiveMsg(({type, value}) => {
   } else if (type === 'control') {
     controls.value = value;
   } else if (type === 'progress') {
-    percentage.value = (value.progress / value.total * 209).toFixed(0) + 'px';
+    percentage.value = (value.progress / value.total * 161).toFixed(0) + 'px';
     duration1.value = prettyDateTime(value.progress)
     duration2.value = prettyDateTime(value.total)
   }

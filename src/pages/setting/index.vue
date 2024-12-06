@@ -33,6 +33,12 @@
               </template>
               <t-radio value="1">样式一</t-radio>
             </t-popup>
+            <t-popup placement="top-left">
+              <template #content>
+                <t-image :src="Control12Image" style="width: 200px"/>
+              </template>
+              <t-radio value="2">样式二</t-radio>
+            </t-popup>
           </t-radio-group>
         </t-form-item>
       </t-tab-panel>
@@ -158,6 +164,7 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {SelectOption} from "tdesign-vue-next/es/select/type";
 import ControlImage from '@/assets/image/preview/control.png';
 import Control11Image from '@/assets/image/preview/control1.png';
+import Control12Image from '@/assets/image/preview/control2.png';
 
 const active = ref('guide');
 

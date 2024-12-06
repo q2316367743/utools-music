@@ -53,11 +53,11 @@ async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicI
       duration: 0
     }
     v.forEach(e => {
-      if (MUSIC_EXTNAME.includes(e.extname)) {
+      if (MUSIC_EXTNAME.includes(e.extname.toLowerCase())) {
         musicItem.url = e.path;
-      } else if (IMAGE_EXTNAME.includes(e.extname)) {
+      } else if (IMAGE_EXTNAME.includes(e.extname.toLowerCase())) {
         musicItem.cover = e.path;
-      } else if (LYRIC_EXTNAME.includes(e.extname)) {
+      } else if (LYRIC_EXTNAME.includes(e.extname.toLowerCase())) {
         musicItem.lyric = e.path;
       }
     });

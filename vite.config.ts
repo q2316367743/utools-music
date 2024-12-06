@@ -49,6 +49,7 @@ export default defineConfig({
         main: _resolve('index.html'),
         controls: _resolve('controls.html'),
         controls1: _resolve('controls1.html'),
+        controls2: _resolve('controls2.html'),
       },
     },
   },

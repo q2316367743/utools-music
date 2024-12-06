@@ -82,6 +82,7 @@ const options = computed(() => {
     items.add(value.artist);
     items.add(value.album);
   });
+  items.delete('');
   return Array.from(items);
 });
 
