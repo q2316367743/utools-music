@@ -1,6 +1,8 @@
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {audio, music, pre, next, played} from "@/components/MusicPlayer/MusicPlayer";
 import {globalSetting} from "@/store";
+import {LocalNameEnum} from "@/global/LocalNameEnum";
+import {getItem, setItem} from "@/utils/utools/DbStorageUtil";
 
 type MusicControl = 'play' | 'pause';
 
@@ -82,10 +84,21 @@ export class MusicControls {
 
   private createWindow(callback?: () => void) {
     const data = this.getControls();
+    let x: number | undefined = undefined;
+    let y: number | undefined = undefined;
+    try {
+      const pos = getItem<[number, number]>(LocalNameEnum.DATA_WINDOW_CONTROL_POS);
+      if (pos) {
+        x = pos[0];
+        y = pos[1];
+      }
+    } catch (e) {
+    }
 
     let ubWindow = utools.createBrowserWindow(
       utools.isDev() ? 'lyric/index.html' : `dist/${data.file}.html`,
       {
+        x, y,
         // @ts-ignore
         useContentSize: false,
         resizable: false,
@@ -120,6 +133,7 @@ export class MusicControls {
           });
           utools.hideMainWindow();
           utools.outPlugin(false);
+
         } catch (e) {
           MessageUtil.error("打开控制器失败", e);
         }
@@ -133,7 +147,10 @@ export class MusicControls {
       this.createWindow(callback);
     } else {
       try {
+        const [x, y] = this.ubWindow.getPosition();
+        setItem(LocalNameEnum.DATA_WINDOW_CONTROL_POS, [x, y])
         this.ubWindow.close();
+
       } catch (e) {
         // 报错了，创建
         this.createWindow(callback);

@@ -1,5 +1,6 @@
 import {buildGlobalSetting, buildNativeSetting} from "@/entity/GlobalSetting";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
+import {musicLyric} from "@/global/BeanFactory";
 
 export const globalSetting = useStorage(
   LocalNameEnum.KEY_GLOBAL_SETTING,
@@ -19,6 +20,11 @@ export const nativeSetting = useStorage(
     flush: "sync"
   }
 );
+
+watch([globalSetting, nativeSetting], () => {
+  // 更新歌词配置
+  musicLyric.updateConfig();
+})
 
 export const downloadFolder = useStorage(
   `${LocalNameEnum.KEY_DOWNLOAD_FOLDER}/${utools.getNativeId()}`,

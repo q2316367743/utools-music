@@ -71,4 +71,18 @@ export class MusicLyric {
     });
   }
 
+  // 更新配置
+  updateConfig() {
+    const {lyricBorderColor, lyricColor, lyricFontSize} = toRaw(globalSetting.value);
+    window.preload.ipcRenderer.sendLyric(Array.from(this.entityMap.keys()), {
+      type: 'config',
+      value: {
+        fontSize: lyricFontSize,
+        color: lyricColor,
+        borderColor: lyricBorderColor,
+        fontFamily: nativeSetting.value.lyricFontFamily
+      }
+    })
+ }
+
 }

@@ -46,16 +46,15 @@ export enum LocalNameEnum {
 
   KEY_DOWNLOAD_FOLDER = '/key/download-folder',
 
-  KEY_FONT_FAMILY = '/key/font-family',
-
-  KEY_BG_IMAGE = '/key/bg-image',
-
   KEY_VERSION = '/key/version',
 
   KEY_COLOR_MODE = '/key/color-mode',
 
   KEY_COLLAPSED = '/key/collapsed',
 
-  DATA_PLUGIN =  '/data/plugin'
+  DATA_PLUGIN =  '/data/plugin',
+
+  // 控制器窗口位置
+  DATA_WINDOW_CONTROL_POS = '/data/window/control/pos'
 
 }
