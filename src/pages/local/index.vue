@@ -19,33 +19,39 @@
           <music-scanner/>
         </t-space>
       </div>
-      <div class="table-container">
+      <div class="table-container" ref="table-container">
         <table class="custom-table">
           <thead>
           <tr>
             <th>
               <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll"/>
             </th>
-            <th @click="sortData('name')">歌曲名</th>
-            <th @click="sortData('artist')">演唱者</th>
-            <th @click="sortData('album')">专辑</th>
-            <th @click="sortData('duration')">时长</th>
-            <th @click="sortData('source')">来源</th>
+            <th>歌曲名</th>
+            <th>演唱者</th>
+            <th>专辑</th>
+            <th>时长</th>
+            <th>来源</th>
           </tr>
           </thead>
           <tbody>
           <tr v-for="(row, index) in data" :key="row.id"
               @dblclick="handleRowDblclick(row)"
               @contextmenu.prevent="handleContextMenu($event, row)"
-              :class="{ 'hover': hoveredIndex === index }"
+              :class="{ 'hover': hoveredIndex === index, active: index === currentIndex }"
               @mouseover="hoveredIndex = index"
               @mouseleave="hoveredIndex = null">
             <td>
               <input type="checkbox" :value="row.id" v-model="checks"/>
             </td>
-            <td><div class="ellipsis" :title="row.name">{{ row.name }}</div></td>
-            <td><div class="ellipsis" :title="row.artist">{{ row.artist }}</div></td>
-            <td><div class="ellipsis" :title="row.album || '-'">{{ row.album || '-' }}</div></td>
+            <td>
+              <div class="ellipsis" :title="row.name">{{ row.name }}</div>
+            </td>
+            <td>
+              <div class="ellipsis" :title="row.artist">{{ row.artist }}</div>
+            </td>
+            <td>
+              <div class="ellipsis" :title="row.album || '-'">{{ row.album || '-' }}</div>
+            </td>
             <td>{{ prettyDateTime(row.duration) }}</td>
             <td>
               <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
@@ -77,7 +83,7 @@ import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 import {MusicInstance} from "@/types/MusicInstance";
 import ContextMenu from '@imengyu/vue3-context-menu'
 
-const size = useWindowSize();
+const tableContainer = useTemplateRef<HTMLDivElement>('table-container');
 
 const keyword = ref('');
 
@@ -105,26 +111,8 @@ const {results} = useFuse<MusicItemView>(keyword, musics, {
   }
 });
 
-const sortState = reactive({
-  field: 'name',
-  direction: 'asc'
-});
 
-const data = computed(() => {
-  let sortedResults = [...results.value.map(e => e.item)];
-  sortedResults.sort((a, b) => {
-    if (typeof a[sortState.field] === 'number' &&
-      typeof b[sortState.field] === 'number') {
-      if (a[sortState.field] < b[sortState.field]) return sortState.direction === 'asc' ? -1 : 1;
-      if (a[sortState.field] > b[sortState.field]) return sortState.direction === 'asc' ? 1 : -1;
-    } else {
-      if (`${a[sortState.field]}`.localeCompare(`${b[sortState.field]}`) < 0) return sortState.direction === 'asc' ? -1 : 1;
-      if (`${a[sortState.field]}`.localeCompare(`${b[sortState.field]}`) > 0) return sortState.direction === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
-  return sortedResults;
-});
+const data = computed(() => results.value.map(e => e.item));
 
 const checkAll = computed(() => musics.value.length === checks.value.length);
 
@@ -195,16 +183,27 @@ function addMusicGroup() {
     })
 }
 
-// TODO: 跳转到当前播放位置
-function setLocation(item: MusicInstance) {
-}
+let timeout: ReturnType<typeof setTimeout> | null = null;
+const currentIndex = ref(-1);
 
-function sortData(field: string) {
-  if (sortState.field === field) {
-    sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortState.field = field;
-    sortState.direction = 'asc';
+function setLocation(item: MusicInstance) {
+  // 一个元素40
+  const index = data.value.findIndex(e => e.id === Number(item.id));
+  if (index >= 0) {
+    tableContainer.value?.scrollTo({
+      top: Math.max(index - 3, 0) * 40,
+      left: 0,
+      behavior: 'smooth'
+    });
+    currentIndex.value = index;
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    timeout = setTimeout(() => {
+      currentIndex.value = -1
+      timeout = null;
+    }, 3000);
   }
 }
 
@@ -285,24 +284,38 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
 
         tbody {
           tr {
+            border-bottom: 1px solid var(--td-border-level-2-color);
+
+            &.active {
+              animation: flashBackground 1s linear infinite;
+            }
+
             &.hover {
               background-color: var(--music-bg-color-6);
             }
 
+            &:last-child {
+              border-bottom: none;
+            }
+
             td {
               padding: 8px;
-              border-bottom: 1px solid var(--td-border-level-2-color);
               max-width: 150px;
-
-              &:last-child {
-                border-bottom: none;
-              }
             }
           }
         }
       }
 
     }
+  }
+}
+
+@keyframes flashBackground {
+  0%, 100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: var(--td-text-color-brand);
   }
 }
 </style>
