@@ -43,9 +43,9 @@
             <td>
               <input type="checkbox" :value="row.id" v-model="checks"/>
             </td>
-            <td>{{ row.name }}</td>
-            <td>{{ row.artist }}</td>
-            <td>{{ row.album || '-' }}</td>
+            <td><div class="ellipsis" :title="row.name">{{ row.name }}</div></td>
+            <td><div class="ellipsis" :title="row.artist">{{ row.artist }}</div></td>
+            <td><div class="ellipsis" :title="row.album || '-'">{{ row.album || '-' }}</div></td>
             <td>{{ prettyDateTime(row.duration) }}</td>
             <td>
               <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
@@ -292,6 +292,7 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
             td {
               padding: 8px;
               border-bottom: 1px solid var(--td-border-level-2-color);
+              max-width: 150px;
 
               &:last-child {
                 border-bottom: none;
@@ -300,6 +301,7 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
           }
         }
       }
+
     }
   }
 }
