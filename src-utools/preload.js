@@ -20,6 +20,7 @@ const {ipcRenderer} = require("electron");
 const axios = require('axios');
 const {getFonts} = require('font-list');
 const {createServer} = require('./src/server');
+const {downloadOneFile} = require("./src/download");
 
 /**
  * 获取一个文件
@@ -190,6 +191,6 @@ window.preload = {
     },
     customer: {
         openFile, downloadFileFromUrl, downloadFile,
-        createServer,
+        createServer, downloadOneFile
     }
 }

@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {MusicItem} from "@/entity/MusicItem";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import NotificationUtil from "@/utils/modal/NotificationUtil";
-import {DownloadItem} from "@/entity/DownloadItem";
+import {DownloadIngItem, DownloadItem} from "@/entity/DownloadItem";
 import {listByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {downloadFolder} from "@/store";
@@ -12,18 +12,18 @@ function sanitizeFileName(fileName: string): string {
   // 移除或替换不安全的文件名字符
   return fileName
     .replace(/[<>:"/\\|?*]/g, '_') // 替换 Windows 不允许的字符
-    .replace(/[^\x20-\x7E]/g, '')  // 移除非 ASCII 字符
     .trim();
 }
 
 export const useDownloadStore = defineStore('download', () => {
-  const items = ref(new Array<DownloadItem>());
+  const ings = ref(new Array<DownloadIngItem>());
+  const dones = ref(new Array<DownloadItem>());
   let rev: string | undefined = undefined;
 
   async function init() {
     const res = await listByAsync<DownloadItem>(LocalNameEnum.LIST_DOWNLOAD);
     // 刚创建，如果下载中，则变成失败
-    items.value = res.list.map(e => ({
+    dones.value = res.list.map(e => ({
       ...e,
       status: e.status === 1 ? 3 : e.status,
       msg: e.status === 1 ? '下载中断' : ''
@@ -36,30 +36,30 @@ export const useDownloadStore = defineStore('download', () => {
     .catch(err => NotificationUtil.error('下载列表初始化失败', "下载管理器", err));
 
   async function updateList() {
-    rev = await saveListByAsync(LocalNameEnum.LIST_DOWNLOAD, items.value, rev);
+    rev = await saveListByAsync(LocalNameEnum.LIST_DOWNLOAD, dones.value, rev);
   }
 
   async function emitWrap(item: MusicItem) {
     const {url, cover, lyric, name, artist} = item;
-    const downloadItem: DownloadItem = {
+    const downloadItem: DownloadIngItem = {
       id: Date.now(),
       name,
       artist,
       music: '',
-      status: 1,
       msg: '',
       url,
       cover,
-      lyric
+      lyric,
+      progress: 0,
+      total: 0,
     }
-    items.value.push(downloadItem);
-    await updateList();
+    ings.value.push(downloadItem);
     // 执行下载
     await download(downloadItem);
 
   }
 
-  async function download(item: DownloadItem) {
+  async function download(item: DownloadIngItem) {
     NotificationUtil.success("开始下载", '下载管理器');
 
     const {name, artist, url, cover, lyric} = item;
@@ -67,48 +67,53 @@ export const useDownloadStore = defineStore('download', () => {
     const extname = u.pathname.match(/\.[a-zA-Z]*$/);
     const basename = `${artist} - ${name}`;
 
-    // 修改转改为下载中
-    for (let i = 0; i < items.value.length; i++) {
-      const r = items.value[i];
-      if (r.id === item.id) {
-        items.value[i] = {
-          ...items.value[i],
-          status: 1,
+    // 下载歌曲
+    const fileName = `${basename}${extname ? extname[0] : '.mp3'}`;
+    console.log(fileName)
+    const mainPath = window.preload.path.join(downloadFolder.value, sanitizeFileName(fileName));
+    item.music = mainPath;
+    console.log(mainPath)
+    window.preload.customer.downloadOneFile({
+      url,
+      path: mainPath,
+      onProgress: (p, t) => {
+        let find = ings.value.find(e => e.id === item.id);
+        if (find) {
+          find.progress = p;
+          find.total = t;
         }
-        break;
-      }
-    }
-
-    try {
-      const fileName = `${basename}${extname ? extname[0] : '.mp3'}`;
-      const mainPath = await window.preload.customer.downloadFile(url, sanitizeFileName(fileName), downloadFolder.value);
-      for (let i = 0; i < items.value.length; i++) {
-        const r = items.value[i];
-        if (r.id === item.id) {
-          items.value[i] = {
-            ...items.value[i],
-            status: 2,
-            music: mainPath
+      },
+      onSuccess: () => {
+        console.log("下载完成", item)
+        // 成功了，从下载中移出，修改状态，并加入已完成列表，并更新列表数据
+        let index = ings.value.findIndex(e => e.id === item.id);
+        if (index > -1) {
+          let target = ings.value.splice(index, 1);
+          if (target[0]) {
+            dones.value.push({
+              ...target[0],
+              status: 2
+            });
+            updateList();
           }
-          break;
         }
-      }
-      await updateList();
-    } catch (e) {
-      for (let i = 0; i < items.value.length; i++) {
-        const r = items.value[i];
-        if (r.id === item.id) {
-          items.value[i] = {
-            ...items.value[i],
-            status: 3,
-            msg: `${(e as any).message || e}`
+      },
+      onError: (e) => {
+        // 成功了，从下载中移出，修改状态，并加入已完成列表，并更新列表数据
+        let index = ings.value.findIndex(e => e.id === item.id);
+        if (index > -1) {
+          let target = ings.value.splice(index, 1);
+          if (target[0]) {
+            dones.value.push({
+              ...target[0],
+              status: 3,
+              msg: `${(e as any).message || e}`
+            });
+            updateList();
           }
-          break;
         }
       }
-      await updateList();
-      return Promise.reject(e);
-    }
+    });
 
     // 下载完成
 
@@ -139,9 +144,9 @@ export const useDownloadStore = defineStore('download', () => {
   }
 
   async function remove(id: number) {
-    const index = items.value.findIndex(e => e.id === id);
+    const index = dones.value.findIndex(e => e.id === id);
     if (index > -1) {
-      items.value.splice(index, 1);
+      dones.value.splice(index, 1);
       await updateList();
     }
   }
@@ -211,18 +216,20 @@ export const useDownloadStore = defineStore('download', () => {
         msg: '',
         url,
         cover,
-        lyric
+        lyric,
+        progress: 0,
+        total: 0
       }
-      items.value.push(downloadItem);
+      dones.value.push(downloadItem);
       await updateList();
       try {
         // 开始下载
         await window.preload.customer.downloadFile(url, fileName, downloadFolder.value);
-        for (let i = 0; i < items.value.length; i++) {
-          const r = items.value[i];
+        for (let i = 0; i < dones.value.length; i++) {
+          const r = dones.value[i];
           if (r.id === downloadItem.id) {
-            items.value[i] = {
-              ...items.value[i],
+            dones.value[i] = {
+              ...dones.value[i],
               status: 2,
               music: musicPath
             }
@@ -231,11 +238,11 @@ export const useDownloadStore = defineStore('download', () => {
         }
         await updateList();
       } catch (e) {
-        for (let i = 0; i < items.value.length; i++) {
-          const r = items.value[i];
+        for (let i = 0; i < dones.value.length; i++) {
+          const r = dones.value[i];
           if (r.id === downloadItem.id) {
-            items.value[i] = {
-              ...items.value[i],
+            dones.value[i] = {
+              ...dones.value[i],
               status: 3,
               msg: `${(e as any).message || e}`
             }
@@ -266,7 +273,7 @@ export const useDownloadStore = defineStore('download', () => {
   }
 
   return {
-    items,
+    ings, dones,
     emit, remove, download, cache
   }
 })

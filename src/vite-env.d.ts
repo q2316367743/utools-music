@@ -10,6 +10,18 @@ interface OpenFileOption {
   securityScopedBookmarks?: boolean
 }
 
+declare interface DownloadFileConfig {
+  url: string;
+  path: string;
+  onProgress: (progress: number, total: number) => void,
+  onSuccess: () => void,
+  onError: (e: Error) => void
+}
+
+declare interface DownloadFileResult{
+  cancel: (remove?: boolean) => void;
+}
+
 interface StatsBase<T> {
   isFile(): boolean;
 
@@ -74,7 +86,13 @@ interface Window {
        * @param successCallback 成功回调
        * @param errorCallback 失败回调
        */
-      createServer(port: number, successCallback: () => void, errorCallback: (e: Error) => void): void
+      createServer(port: number, successCallback: () => void, errorCallback: (e: Error) => void): void,
+
+      /**
+       * 下载一个文件
+       * @param config 下载配置
+       */
+      downloadOneFile(config: DownloadFileConfig): DownloadFileResult;
     },
     fs: {
       existsSync(path: string): boolean;
