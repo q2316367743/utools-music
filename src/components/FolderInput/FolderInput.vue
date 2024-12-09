@@ -12,6 +12,10 @@ const props = defineProps({
   title: {
     type: String,
     default: () => ("请选择文件夹")
+  },
+  name: {
+    type: String as PropType<'music' | 'download'>,
+    default: 'music'
   }
 });
 

@@ -1,8 +1,8 @@
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {audio, music, pre, next, played} from "@/components/MusicPlayer/MusicPlayer";
 import {globalSetting} from "@/store";
-import {LocalNameEnum} from "@/global/LocalNameEnum";
-import {getItem, setItem} from "@/utils/utools/DbStorageUtil";
+import {isNotNull} from "@/utils/lang/FieldUtil";
+import {musicControlsDataX, musicControlsDataY} from "@/global/BeanFactory";
 
 type MusicControl = 'play' | 'pause';
 
@@ -87,10 +87,11 @@ export class MusicControls {
     let x: number | undefined = undefined;
     let y: number | undefined = undefined;
     try {
-      const pos = getItem<[number, number]>(LocalNameEnum.DATA_WINDOW_CONTROL_POS);
-      if (pos) {
-        x = pos[0];
-        y = pos[1];
+      if (isNotNull(musicControlsDataX.value)) {
+        x = musicControlsDataX.value!;
+      }
+      if (isNotNull(musicControlsDataY.value)) {
+        y = musicControlsDataY.value!
       }
     } catch (e) {
     }
@@ -148,9 +149,9 @@ export class MusicControls {
     } else {
       try {
         const [x, y] = this.ubWindow.getPosition();
-        setItem(LocalNameEnum.DATA_WINDOW_CONTROL_POS, [x, y])
+        musicControlsDataX.value = x;
+        musicControlsDataY.value = y;
         this.ubWindow.close();
-
       } catch (e) {
         // 报错了，创建
         this.createWindow(callback);

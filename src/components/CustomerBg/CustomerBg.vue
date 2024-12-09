@@ -7,6 +7,7 @@
 </template>
 <script lang="ts" setup>
 import {nativeSetting} from "@/store";
+import {isNull} from "@/utils/lang/FieldUtil";
 
 const show = computed(() => nativeSetting.value.bgType !== 'none');
 const imgSrc = computed(() => {
@@ -27,6 +28,10 @@ const bgStyle = computed(() => {
   }
   return {};
 });
+const bgBlur = computed(() => {
+  const number = isNull(nativeSetting.value.bgBlur) ? 5 : nativeSetting.value.bgBlur;
+  return `blur(${number}px)`;
+})
 </script>
 <style scoped lang="less">
 .customer-bg {
@@ -36,6 +41,7 @@ const bgStyle = computed(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  object-fit: cover;
 
   .customer-img {
     position: absolute;
@@ -43,8 +49,9 @@ const bgStyle = computed(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    filter: blur(10px);
+    filter: v-bind(bgBlur);
     transform: scale(1.1);
+    object-fit: cover;
   }
   .customer-img-mask {
     position: absolute;

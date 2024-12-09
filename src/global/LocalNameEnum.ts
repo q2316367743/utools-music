@@ -57,7 +57,10 @@ export enum LocalNameEnum {
 
   DATA_PLUGIN =  '/data/plugin',
 
-  // 控制器窗口位置
-  DATA_WINDOW_CONTROL_POS = '/data/window/control/pos'
+  // 控制器窗口位置X
+  DATA_WINDOW_CONTROL_POS_X = '/data/window/control/pos/x',
+
+  // 控制器窗口位置Y
+  DATA_WINDOW_CONTROL_POS_Y = '/data/window/control/pos/y'
 
 }

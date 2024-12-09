@@ -76,6 +76,8 @@ export interface NativeSetting {
   bgGradient: string;
   // 背景图片
   bgImage: string;
+  // 背景模糊像素
+  bgBlur: number;
 
   // 歌词字体
   lyricFontFamily: string;
@@ -88,6 +90,7 @@ export function buildNativeSetting(): NativeSetting {
     bgColor: '',
     bgGradient: '',
     bgImage: '',
+    bgBlur: 5,
     lyricFontFamily: ''
   }
 }
