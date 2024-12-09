@@ -21,7 +21,7 @@
               <td>{{ row.artist }}</td>
               <td>{{ prettyDate(row.id) }}</td>
               <td>
-                <t-button theme="primary" variant="text" :disabled="row.status !== 3" @click="retryDownload(row)">
+                <t-button theme="primary" variant="text" @click="retryDownload(row)">
                   重试
                 </t-button>
                 <t-popconfirm content="是否删除下载记录" @confirm="removeDownload(row.id)">
@@ -88,7 +88,7 @@
 <script lang="ts" setup>
 import {useDownloadStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {DownloadItem} from "@/entity/DownloadItem";
+import {DownloadIngItem, DownloadItem} from "@/entity/DownloadItem";
 import {prettyDate} from "@/utils/lang/FormatUtil";
 import {DeleteIcon, FolderIcon} from "tdesign-icons-vue-next";
 
@@ -119,7 +119,7 @@ const getStatusTheme = (status: number) => {
   return 'primary';
 };
 
-const retryDownload = (item: DownloadItem) => {
+const retryDownload = (item: DownloadIngItem) => {
   downloadStore.download(item);
 };
 

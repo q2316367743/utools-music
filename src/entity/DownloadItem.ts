@@ -13,7 +13,7 @@ export interface DownloadIngItem {
 }
 
 
-export interface DownloadItem extends DownloadIngItem{
+export interface DownloadItem extends DownloadIngItem {
   // 1下载中,2成功,3失败
-  status: 1|2|3;
+  status: 1 | 2 | 3;
 }
