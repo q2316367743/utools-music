@@ -16,6 +16,17 @@ export const getUpdateLogs = (newVersion: string, oldVersion: string): Array<Upd
 }
 
 const UPDATE_LOG: Array<UpdateLogGroup> = [{
+  version: '1.1.1',
+  logs: [
+    'feat: 新增文件夹视图，如果你的音乐是根据文件夹分类，这个功能会更方便',
+    'feat: 拓展名忽略大小写',
+    'feat: 控制器支持记忆位置，但是需要再插件内内关闭控制器才行，右键控制器关闭则无法记住位置',
+    'feat: 页面右下角文字改为图标',
+    'update: 重构本地音乐界面，更加美观',
+    'update: 重构歌单页面',
+    'update: 优化背景设置，增加模糊效果'
+  ]
+}, {
   version: '1.1.0',
   logs: [
     'feat: 本地音乐播放时，可以在本地音乐列表快速定位正在播放的歌曲',

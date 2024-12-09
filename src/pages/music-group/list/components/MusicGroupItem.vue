@@ -4,7 +4,7 @@
       <img :src="item.cover || MusicGroupImage" :alt="item.name"/>
     </div>
     <div class="mg-item__content">
-      <div class="mg-item__title ellipsis-2">
+      <div class="mg-item__title ellipsis">
         {{ item.name }}
       </div>
       <div class="mg-item__artist ellipsis">
@@ -30,7 +30,7 @@ defineProps({
 <style scoped lang="less">
 .mg-item {
   width: 120px;
-  height: 120px;
+  height: 140px;
   user-select: none;
   cursor: pointer;
   position: relative;

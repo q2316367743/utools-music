@@ -57,11 +57,12 @@ function handleContextMenu(e: MouseEvent, group: MusicGroupIndex) {
 </script>
 <style scoped lang="less">
 .music-group {
-  width: 100%;
-  height: 100%;
-  padding: 16px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  padding: 8px 0;
   background: transparent;
   overflow: auto;
+  margin-right: 0;
 
   &__content {
     display: grid;
@@ -72,7 +73,7 @@ function handleContextMenu(e: MouseEvent, group: MusicGroupIndex) {
 
   &__add {
     width: 120px;
-    height: 120px;
+    height: 140px;
     border-radius: var(--td-radius-default);
     border: 1px dashed var(--td-component-stroke);
     cursor: pointer;
