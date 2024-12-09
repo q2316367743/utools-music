@@ -195,7 +195,7 @@ function handleLyricClick(value: LyricLine) {
           top: 0;
           right: 0;
           bottom: 0;
-          padding: 10px;
+          padding: 15px;
           color: var(--td-text-color-link);
         }
 

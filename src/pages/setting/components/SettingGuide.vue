@@ -32,7 +32,7 @@
         </t-popup>
       </t-radio-group>
     </t-form-item>
-    <t-form-item label="播放器位置">
+    <t-form-item label="控制器位置" help="当无法控制器时，请清空这两个数据，再次打开控制器，将会显示在屏幕中央">
       <t-input-group style="align-items: center">
         <t-input-number v-model="musicControlsDataX" :clearable="true" :min="0" suffix="px" style="width: 150px"/>
         <close-icon style="margin: 0 8px"/>
