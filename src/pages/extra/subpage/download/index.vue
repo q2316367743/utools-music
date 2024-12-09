@@ -9,6 +9,7 @@
               <th>名称</th>
               <th>演唱者</th>
               <th>下载时间</th>
+              <th>进度</th>
               <th>操作</th>
             </tr>
             </thead>
@@ -21,11 +22,11 @@
               <td>{{ row.artist }}</td>
               <td>{{ prettyDate(row.id) }}</td>
               <td>
-                <t-button theme="primary" variant="text" @click="retryDownload(row)">
-                  重试
-                </t-button>
-                <t-popconfirm content="是否删除下载记录" @confirm="removeDownload(row.id)">
-                  <t-button theme="danger" variant="text">删除</t-button>
+                <t-progress :percentage="Math.floor((row.progress / row.total) * 100)" :color="{ from: '#84A9FF', to: '#0052D9' }" />
+              </td>
+              <td>
+                <t-popconfirm content="是否取消下载" @confirm="cancelDownload(row.id)">
+                  <t-button theme="danger" variant="text">取消下载</t-button>
                 </t-popconfirm>
               </td>
             </tr>
@@ -60,13 +61,20 @@
               </td>
               <td>
                 <t-space>
-                  <t-tooltip content="在文件夹中显示">
-                    <t-button theme="primary" variant="text" shape="square" @click="showInFolder(row)">
-                      <template #icon>
-                        <folder-icon/>
-                      </template>
-                    </t-button>
-                  </t-tooltip>
+                  <template v-if="row.status === 2">
+                    <t-tooltip content="在文件夹中显示">
+                      <t-button theme="primary" variant="text" shape="square" @click="showInFolder(row)">
+                        <template #icon>
+                          <folder-icon/>
+                        </template>
+                      </t-button>
+                    </t-tooltip>
+                  </template>
+                  <template v-else-if="row.status === 3">
+                    <t-tooltip :content="row.msg">
+                      <t-button theme="warning" variant="text" @click="retryDownload(row)">重试下载</t-button>
+                    </t-tooltip>
+                  </template>
                 </t-space>
                 <t-popconfirm content="是否删除下载记录" @confirm="removeDownload(row.id)">
                   <t-button theme="danger" variant="text" shape="square">
@@ -132,6 +140,12 @@ const removeDownload = (id: number) => {
 const showInFolder = (item: DownloadItem) => {
   utools.shellShowItemInFolder(item.music);
 }
+
+const cancelDownload = (id: number) => {
+  downloadStore.cancel(id)
+    .then(() => MessageUtil.success("取消成功"))
+    .catch(e => MessageUtil.error("取消失败", e));
+};
 </script>
 
 <style scoped lang="less">

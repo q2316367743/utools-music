@@ -20,6 +20,9 @@ export const useDownloadStore = defineStore('download', () => {
   const dones = ref(new Array<DownloadItem>());
   let rev: string | undefined = undefined;
 
+  // 存储下载任务的中止控制器
+  const abortControllers = new Map<number, DownloadFileResult>();
+
   async function init() {
     const res = await listByAsync<DownloadItem>(LocalNameEnum.LIST_DOWNLOAD);
     // 刚创建，如果下载中，则变成失败
@@ -62,78 +65,62 @@ export const useDownloadStore = defineStore('download', () => {
   async function download(item: DownloadIngItem) {
     NotificationUtil.success("开始下载", '下载管理器');
 
-    const {name, artist, url, cover, lyric} = item;
+
+    const {name, artist, url} = item;
     const u = new URL(url);
     const extname = u.pathname.match(/\.[a-zA-Z]*$/);
     const basename = `${artist} - ${name}`;
 
-    // 下载歌曲
-    const fileName = `${basename}${extname ? extname[0] : '.mp3'}`;
-    console.log(fileName)
-    const mainPath = window.preload.path.join(downloadFolder.value, sanitizeFileName(fileName));
-    item.music = mainPath;
-    console.log(mainPath)
-    window.preload.customer.downloadOneFile({
-      url,
-      path: mainPath,
-      onProgress: (p, t) => {
-        let find = ings.value.find(e => e.id === item.id);
-        if (find) {
-          find.progress = p;
-          find.total = t;
-        }
-      },
-      onSuccess: () => {
-        console.log("下载完成", item)
-        // 成功了，从下载中移出，修改状态，并加入已完成列表，并更新列表数据
-        let index = ings.value.findIndex(e => e.id === item.id);
-        if (index > -1) {
-          let target = ings.value.splice(index, 1);
-          if (target[0]) {
-            dones.value.push({
-              ...target[0],
-              status: 2
-            });
-            updateList();
-          }
-        }
-      },
-      onError: (e) => {
-        // 成功了，从下载中移出，修改状态，并加入已完成列表，并更新列表数据
-        let index = ings.value.findIndex(e => e.id === item.id);
-        if (index > -1) {
-          let target = ings.value.splice(index, 1);
-          if (target[0]) {
-            dones.value.push({
-              ...target[0],
-              status: 3,
-              msg: `${(e as any).message || e}`
-            });
-            updateList();
-          }
-        }
-      }
-    });
-
-    // 下载完成
-
     try {
-      if (isNotEmptyString(cover) && cover) {
-        const c = new URL(cover);
-        const coverExtname = c.pathname.match(/\.[a-zA-Z]*$/);
-        await window.preload.customer.downloadFile(cover, `${basename}${coverExtname ? coverExtname[0] : '.png'}`, downloadFolder.value)
-      }
+      const fileName = `${basename}${extname ? extname[0] : '.mp3'}`;
+      const mainPath = window.preload.path.join(downloadFolder.value, sanitizeFileName(fileName));
+      item.music = mainPath;
+      abortControllers.set(item.id, window.preload.customer.downloadOneFile({
+        url,
+        path: mainPath,
+        onProgress: (p, t) => {
+          let find = ings.value.find(e => e.id === item.id);
+          if (find) {
+            find.progress = p;
+            find.total = t;
+          }
+        },
+        onSuccess: () => {
+          let index = ings.value.findIndex(e => e.id === item.id);
+          if (index > -1) {
+            let target = ings.value.splice(index, 1);
+            if (target[0]) {
+              dones.value.push({
+                ...target[0],
+                status: 2
+              });
+              updateList();
+            }
+          }
+          abortControllers.delete(item.id);
+        },
+        onError: (e) => {
+          let index = ings.value.findIndex(e => e.id === item.id);
+          if (index > -1) {
+            let target = ings.value.splice(index, 1);
+            if (target[0]) {
+              dones.value.push({
+                ...target[0],
+                status: 3,
+                msg: `${(e as any).message || e}`
+              });
+              updateList();
+            }
+          }
+          abortControllers.delete(item.id);
+        }
+      }));
+
+
+      // 下载附件...
     } catch (e) {
-      NotificationUtil.error("封面下载失败", '下载管理器');
-    }
-    try {
-      if (isNotEmptyString(lyric) && lyric) {
-        const l = new URL(lyric);
-        const lyricExtname = l.pathname.match(/\.[a-zA-Z]*$/);
-        await window.preload.customer.downloadFile(lyric, `${basename}${lyricExtname ? lyricExtname[0] : '.lrc'}`, downloadFolder.value)
-      }
-    } catch (e) {
-      NotificationUtil.error("歌词下载失败", '下载管理器');
+      abortControllers.delete(item.id);
+      throw e;
     }
   }
 
@@ -272,8 +259,22 @@ export const useDownloadStore = defineStore('download', () => {
       .catch(e => NotificationUtil.error(`音乐【${music.name} - ${music.artist}】缓存失败`, '下载管理器', e));
   }
 
+  // 添加取消下载方法
+  async function cancel(id: number) {
+    const controller = abortControllers.get(id);
+    if (controller) {
+      controller.cancel();
+      abortControllers.delete(id);
+
+      const index = ings.value.findIndex(e => e.id === id);
+      if (index > -1) {
+        ings.value.splice(index, 1);
+      }
+    }
+  }
+
   return {
     ings, dones,
-    emit, remove, download, cache
+    emit, remove, download, cache, cancel
   }
 })
