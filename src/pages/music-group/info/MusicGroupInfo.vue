@@ -62,7 +62,7 @@
           </tbody>
         </table>
       </main>
-      <t-back-top container=".music-group-info" style="right: 16px;bottom: 16px;"/>
+      <t-back-top container=".music-group-info-wrapper" style="right: 16px;bottom: 16px;"/>
     </div>
     <div class="close">
       <t-button variant="text" shape="square" size="large" @click="handleClose">

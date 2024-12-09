@@ -239,7 +239,7 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
   })
 }
 
-const toFolder = () => router.push('/local/folder')
+const toFolder = () => router.push('/local/folder/list')
 </script>
 <style scoped lang="less">
 .local-music {

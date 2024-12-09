@@ -14,8 +14,12 @@ const router = createRouter({
     component: () => import('@/pages/local/index.vue')
   }, {
     name: "文件夹分组",
-    path: '/local/folder',
+    path: '/local/folder/list',
     component: () => import('@/pages/folder/index.vue')
+  }, {
+    name: "文件夹详情",
+    path: '/local/folder/info',
+    component: () => import('@/pages/folder/FolderInfo.vue')
   }, {
     name: "我的歌单",
     path: '/music-group/list',

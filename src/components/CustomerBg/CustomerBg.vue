@@ -43,6 +43,8 @@ const bgStyle = computed(() => {
     left: 0;
     width: 100%;
     height: 100%;
+    filter: blur(10px);
+    transform: scale(1.1);
   }
   .customer-img-mask {
     position: absolute;
@@ -51,7 +53,7 @@ const bgStyle = computed(() => {
     width: 100%;
     height: 100%;
     background: var(--music-bg-color-3);
-    filter: blur(5px);
+    opacity: 0.3;
   }
 }
 </style>
