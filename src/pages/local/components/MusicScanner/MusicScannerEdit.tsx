@@ -7,10 +7,10 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 
 function renderContent(form: Ref<Repository>) {
   return () => <Form layout="vertical">
-    <FormItem label={'仓库类型'}>
+    <FormItem label={'仓库类型'} help={form.value.type === RepositoryType.WEBDAV ? '实验性功能' : ''}>
       <RadioGroup v-model={form.value.type}>
         <Radio label={'本地'} value={RepositoryType.LOCAL}></Radio>
-        <Radio label={'WebDAV'} value={RepositoryType.WEBDAV} disabled={true}></Radio>
+        <Radio label={'WebDAV'} value={RepositoryType.WEBDAV}></Radio>
       </RadioGroup>
     </FormItem>
 
