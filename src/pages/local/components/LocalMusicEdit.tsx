@@ -21,10 +21,10 @@ export function openLocalMusicEditDialog(row: MusicItemView): void {
         <Input v-model={data.value.album} clearable={true} />
       </FormItem>
       <FormItem label={'封面'}>
-        <FileInput v-model={data.value.cover} title={'请选择封面图'}/>
+        <FileInput v-model={data.value.cover} title={'请选择封面图'} type={'image'}/>
       </FormItem>
       <FormItem label={'歌词'}>
-        <FileInput v-model={data.value.lyric} title={'请选择歌词'}/>
+        <FileInput v-model={data.value.lyric} title={'请选择歌词'} type={'lyric'}/>
       </FormItem>
       <FormItem label={'音乐'}>
         <FileInput v-model={data.value.url} title={'请选择音乐'}/>

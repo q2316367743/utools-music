@@ -5,7 +5,7 @@
   </t-input-group>
 </template>
 <script lang="ts" setup>
-import {IMAGE_EXTNAME, MUSIC_EXTNAME} from "@/global/Constant";
+import {IMAGE_EXTNAME, LYRIC_EXTNAME, MUSIC_EXTNAME} from "@/global/Constant";
 
 const modelValue = defineModel({
   type: String
@@ -16,7 +16,7 @@ const props = defineProps({
     default: () => ("请选择文件")
   },
   type: {
-    type: String as PropType<'' |'image'>,
+    type: String as PropType<'' |'image' | 'lyric'>,
     default: ''
   },
   placeholder: String
@@ -34,13 +34,25 @@ function handleClick() {
       name: '图片文件',
       extensions: IMAGE_EXTNAME.map(e => e.substring(1))
     }];
+  }else if (props.type === 'lyric') {
+    defaultPath = utools.getPath('music')
+    filters = [{
+      name: '图片文件',
+      extensions: LYRIC_EXTNAME.map(e => e.substring(1))
+    }];
   }
   const paths = utools.showOpenDialog({
     title: props.title,
     properties: ['openFile'],
     buttonLabel: '选择',
     defaultPath,
-    filters
+    filters: [
+      ...filters,
+      {
+        name: '所有文件',
+        extensions: ['*']
+      }
+    ]
   });
   if (paths && paths[0]) {
     modelValue.value = paths[0];
