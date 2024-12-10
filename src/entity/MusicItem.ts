@@ -4,7 +4,8 @@ import {stringToBase64} from "@/utils/file/CovertUtil";
 export enum MusicItemSource {
   LOCAL = 1,
   WEBDAV = 2,
-  WEB = 3
+  WEB = 3,
+  A_LIST = 4
 }
 
 export interface MusicItemMeta {
@@ -83,8 +84,8 @@ export interface MusicItemView extends MusicItem {
   repositoryName: string;
 }
 
-export function transferMusicItem(view: MusicItemView): MusicItem{
-  return  {
+export function transferMusicItem(view: MusicItemView): MusicItem {
+  return {
     id: view.id,
     name: view.name,
     artist: view.artist,

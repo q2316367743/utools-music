@@ -1,23 +1,25 @@
-import {buildRepository, Repository, RepositoryType} from "@/entity/Repository";
+import {buildRepository, Repository} from "@/entity/Repository";
 import {DialogPlugin, Form, FormItem, Input, Radio, RadioGroup} from "tdesign-vue-next";
 import FolderInput from "@/components/FolderInput/FolderInput.vue";
 import {isEmptyString} from "@/utils/lang/StringUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
+import {MusicItemSource} from "@/entity/MusicItem";
 
 
 function renderContent(form: Ref<Repository>) {
   return () => <Form layout="vertical">
-    <FormItem label={'仓库类型'} help={form.value.type === RepositoryType.WEBDAV ? '实验性功能' : ''}>
+    <FormItem label={'仓库类型'} help={form.value.type === MusicItemSource.WEBDAV ? '实验性功能' : ''}>
       <RadioGroup v-model={form.value.type}>
-        <Radio label={'本地'} value={RepositoryType.LOCAL}></Radio>
-        <Radio label={'WebDAV'} value={RepositoryType.WEBDAV}></Radio>
+        <Radio label={'本地'} value={MusicItemSource.LOCAL}></Radio>
+        <Radio label={'WebDAV'} value={MusicItemSource.WEBDAV}></Radio>
+        <Radio label={'AList'} value={MusicItemSource.A_LIST}></Radio>
       </RadioGroup>
     </FormItem>
 
-    {form.value.type === RepositoryType.LOCAL && <FormItem label={'文件路径'} name={'path'}>
+    {form.value.type === MusicItemSource.LOCAL && <FormItem label={'文件路径'} name={'path'}>
         <FolderInput v-model={form.value.path}/>
     </FormItem>}
-    {form.value.type === RepositoryType.WEBDAV && <>
+    {(form.value.type === MusicItemSource.WEBDAV || form.value.type === MusicItemSource.A_LIST) && <>
         <FormItem label={'服务器名'} name={'name'}>
             <Input v-model={form.value.name} clearable={true}></Input>
         </FormItem>
@@ -27,9 +29,9 @@ function renderContent(form: Ref<Repository>) {
         <FormItem label={'文件路径'} name={'path'}>
             <Input v-model={form.value.path} clearable={true}></Input>
         </FormItem>
-        <FormItem label={'用户名'} name={'username'}>
-            <Input v-model={form.value.username} clearable={true}></Input>
-        </FormItem>
+      {form.value.type === MusicItemSource.WEBDAV && <FormItem label={'用户名'} name={'username'}>
+          <Input v-model={form.value.username} clearable={true}></Input>
+      </FormItem>}
         <FormItem label={'密码'} name={'password'}>
             <Input v-model={form.value.password} clearable={true}></Input>
         </FormItem>
@@ -47,14 +49,14 @@ export function addRepository() {
         default: '新增'
       },
       onConfirm() {
-        if (form.value.type === RepositoryType.LOCAL) {
+        if (form.value.type === MusicItemSource.LOCAL) {
           // 本地
           if (isEmptyString(form.value.path)) {
             MessageUtil.error("请输入文件夹目录")
             return;
           }
           form.value.name = form.value.path;
-        } else if (form.value.type === RepositoryType.WEBDAV) {
+        } else if (form.value.type === MusicItemSource.WEBDAV) {
           if (isEmptyString(form.value.path)) {
             MessageUtil.error("请输入文件夹目录")
             return;

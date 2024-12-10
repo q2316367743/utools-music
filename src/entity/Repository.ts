@@ -1,13 +1,5 @@
-export enum RepositoryType {
-  /**
-   * 本地
-   */
-  LOCAL = 1,
-  /**
-   * WebDAV
-   */
-  WEBDAV = 2
-}
+import {MusicItemSource} from "@/entity/MusicItem";
+
 
 export interface RepositoryBase {
 
@@ -21,7 +13,7 @@ export interface RepositoryBase {
   /**
    * 仓库类型
    */
-  type: RepositoryType;
+  type: MusicItemSource;
 }
 
 export interface Repository extends RepositoryBase {
@@ -45,7 +37,7 @@ export function buildRepository(): Repository {
   return {
     id: Date.now(),
     name: '',
-    type: RepositoryType.LOCAL,
+    type: MusicItemSource.LOCAL,
     path: '',
     nativeId: utools.getNativeId(),
     url: '',

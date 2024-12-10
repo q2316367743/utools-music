@@ -17,8 +17,9 @@
              :class="{disabled: repo.nativeId !== nativeId}">
           <t-space>
             <t-tag size="small" theme="primary">
-              <span v-if="repo.type === RepositoryType.LOCAL">本地</span>
-              <span v-else-if="repo.type === RepositoryType.WEBDAV">WebDAV</span>
+              <span v-if="repo.type === MusicItemSource.LOCAL">本地</span>
+              <span v-else-if="repo.type === MusicItemSource.WEBDAV">WebDAV</span>
+              <span v-else-if="repo.type === MusicItemSource.A_LIST">AList</span>
             </t-tag>
             <t-tooltip v-if="repo.nativeId !== nativeId" content="此文件夹不是当前设备">
               <span class="ellipsis">{{ repo.name }}</span>
@@ -38,11 +39,12 @@
   </t-dialog>
 </template>
 <script lang="ts" setup>
-import {Repository, RepositoryType} from "@/entity/Repository";
+import {Repository} from "@/entity/Repository";
 import {listRepositories, saveRepositories, useMusicStore} from "@/store";
 import {addRepository} from "@/pages/local/components/MusicScanner/MusicScannerEdit";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {DeleteIcon} from 'tdesign-icons-vue-next';
+import {MusicItemSource} from "@/entity/MusicItem";
 
 const nativeId = utools.getNativeId();
 const visible = ref(false);

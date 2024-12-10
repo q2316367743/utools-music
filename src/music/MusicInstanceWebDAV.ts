@@ -1,14 +1,12 @@
-import {MusicItem, MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {MusicItem, MusicItemView} from "@/entity/MusicItem";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import {LyricContent} from "@/types/LyricLine";
 import {getForText} from "@/plugin/http";
 import {transferTextToLyric} from "@/plugin/music";
-import {MusicInstance} from "@/types/MusicInstance";
 import {Repository} from "@/entity/Repository";
-import {listRepositories} from "@/store";
 import {renderPreviewUrl} from "@/plugin/server";
 import {createClient} from "webdav";
-import {clone} from "radash";
+import {AbsMusicInstanceWeb} from "@/music/AbsMusicInstanceWeb";
 
 function renderUrl(url: string, repo: Repository): string {
   let client = createClient(repo.url, {
@@ -18,65 +16,10 @@ function renderUrl(url: string, repo: Repository): string {
   return renderPreviewUrl(client.getFileDownloadLink(url));
 }
 
-export class MusicInstanceWebDAV implements MusicInstance {
-
-  private readonly item: MusicItemView;
-  private repository: Repository | null = null;
+export class MusicInstanceWebDAV extends AbsMusicInstanceWeb {
 
   constructor(item: MusicItemView) {
-    this.item = clone(item);
-  }
-
-  get album(): string {
-    return this.item.album;
-  }
-
-  get artist(): string {
-    return this.item.artist;
-  }
-
-  get id(): string {
-    return String(this.item.id);
-  }
-
-  get name(): string {
-    return this.item.name;
-  }
-
-  get cover(): string {
-    return this.item.cover;
-  }
-
-  set cover(res: string) {
-    this.item.cover = res;
-  }
-
-  get source(): MusicItemSource {
-    return this.item.source;
-  }
-
-  get pluginId(): number {
-    return 0;
-  }
-
-  get self(): any {
-    return this.item;
-  }
-
-  private async getRepository(): Promise<Repository> {
-    if (!this.repository) {
-      const {list} = await listRepositories();
-      for (const res of list) {
-        if (res.id === this.item.repositoryId) {
-          this.repository = res;
-          break;
-        }
-      }
-    }
-    if (!this.repository) {
-      return Promise.reject(new Error(`Repository not found`));
-    }
-    return this.repository;
+    super(item);
   }
 
   async getInfo(): Promise<MusicItem> {

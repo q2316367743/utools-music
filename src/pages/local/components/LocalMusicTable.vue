@@ -35,6 +35,7 @@
       <td>
         <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
         <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
+        <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.A_LIST">AList</t-tag>
       </td>
     </tr>
     </tbody>
@@ -45,7 +46,6 @@ import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
-import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 import {openLocalMusicEditDialog} from "@/pages/local/components/LocalMusicEdit";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {MusicGroupType} from "@/entity/MusicGroup";

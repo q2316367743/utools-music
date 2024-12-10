@@ -1,0 +1,166 @@
+import {Repository} from "@/entity/Repository";
+import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {FileItem, parseFileToMusic, readFileList} from "@/utils/file/FileUtil";
+import {group} from "@/utils/lang/ArrayUtil";
+import {basenameWeb, copyProperties, extnameWeb, getFolder, parseMusicName} from "@/utils/lang/FieldUtil";
+import {IMAGE_EXTNAME, LYRIC_EXTNAME, MUSIC_EXTNAME} from "@/global/Constant";
+import {AuthType, createClient} from "webdav";
+import {FileStat} from "webdav/dist/node/types";
+import {getAxiosInstance} from "@/plugin/http";
+import {AListFsListContent, AListFsListData, AListResponse} from "@/types/AList";
+import {isNotEmptyString} from "@/utils/lang/StringUtil";
+
+const nativeId = utools.getNativeId();
+
+async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicItemSource): Promise<Array<MusicItem>> {
+  const musicItems = new Array<MusicItem>();
+  // 文件分组，用于处理封面和歌词
+  const fileMap = group(files, 'basename');
+  // 寻找合适的音乐
+  let start = Date.now();
+  for (const e of fileMap) {
+    const [k, v] = e;
+    const {name, artist} = parseMusicName(k);
+    const musicItem: MusicItem = {
+      id: start++,
+      name,
+      nativeId,
+      source,
+
+      url: '',
+      cover: '',
+      lyric: '',
+
+      album: '',
+      artist,
+      duration: 0
+    }
+    v.forEach(e => {
+      if (MUSIC_EXTNAME.includes(e.extname.toLowerCase())) {
+        musicItem.url = e.path;
+      } else if (IMAGE_EXTNAME.includes(e.extname.toLowerCase())) {
+        musicItem.cover = e.path;
+      } else if (LYRIC_EXTNAME.includes(e.extname.toLowerCase())) {
+        musicItem.lyric = e.path;
+      }
+    });
+    // 存在链接
+    if (isNotEmptyString(musicItem.url)) {
+      // 只有本地做元数据解析
+      if (source === MusicItemSource.LOCAL) {
+        try {
+          const meta = await parseFileToMusic(musicItem.url);
+          copyProperties(meta, musicItem);
+        } catch (e) {
+          console.error("元数据解析失败", e)
+        }
+        // 本地音乐
+        musicItem.dir = window.preload.path.dirname(musicItem.url);
+        // 从目录中获取文件夹名
+        musicItem.folder = getFolder(musicItem.dir);
+      }
+      musicItems.push(musicItem);
+    }
+  }
+  return musicItems;
+}
+
+/**
+ * 扫描本地音乐
+ * @param repo 本地仓库
+ */
+export async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
+  const files = await readFileList(repo.path);
+  return parseMusicItemFromFileItem(files, MusicItemSource.LOCAL);
+}
+
+
+function renderFileFromWebDAV(stat: FileStat): FileItem {
+  const basename = basenameWeb(stat.basename);
+  const extname = extnameWeb(stat.basename);
+  return {
+    name: stat.basename,
+    basename,
+    extname,
+    path: stat.filename
+  }
+}
+
+
+/**
+ * 扫描本地音乐
+ * @param repo 本地仓库
+ */
+export async function scanWebDAV(repo: Repository): Promise<Array<MusicItem>> {
+  const client = createClient(repo.url, {
+    username: repo.username,
+    password: repo.password,
+    authType: AuthType.Auto
+  });
+  let directoryContents = await client.getDirectoryContents(repo.path || '/');
+  let list: Array<FileStat>;
+  if (Array.isArray(directoryContents)) {
+    list = directoryContents
+  } else {
+    list = directoryContents.data;
+  }
+  const files = new Array<FileItem>();
+  for (const file of list) {
+    if (file.type === 'directory') {
+      continue;
+    }
+    files.push(renderFileFromWebDAV(file));
+  }
+  return parseMusicItemFromFileItem(files, MusicItemSource.WEBDAV);
+}
+
+function renderFileFromAList(e: AListFsListContent, repo: Repository): FileItem {
+  const basename = basenameWeb(e.name);
+  const extname = extnameWeb(e.name);
+  return {
+    name: e.name,
+    basename,
+    extname,
+    path: repo.path + '/' + e.name
+  }
+}
+
+/**
+ * 扫描AList
+ * @param repo 仓库配置
+ */
+export async function scanAList(repo: Repository): Promise<Array<MusicItem>> {
+  const ls = `${repo.url}/api/fs/list`;
+  let page = 1;
+  const list = new Array<AListFsListContent>();
+  while (true) {
+    const res = await getAxiosInstance().get<AListResponse<AListFsListData>>(ls, {
+      headers: {
+        'Authorization': repo.password
+      },
+      params: {
+        path: repo.path,
+        refresh: true,
+        page,
+        per_page: 50
+      }
+    });
+    const {data} = res;
+    const {content} = data.data;
+    content.forEach(e => {
+      if (e.is_dir) {
+        // 目录跳过
+        // TODO: 目前只处理一层
+        return;
+      }
+      list.push(e);
+    });
+    if (content.length < 50) {
+      break;
+    } else {
+      page++;
+    }
+  }
+
+  return parseMusicItemFromFileItem(list.map(e => renderFileFromAList(e, repo)), MusicItemSource.A_LIST);
+}
