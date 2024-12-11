@@ -16,43 +16,55 @@
         <table class="custom-table">
           <thead>
             <tr>
-              <th>
+              <th style="width: 40px;">
                 <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll" />
               </th>
               <th>歌曲名</th>
               <th>演唱者</th>
               <th>专辑</th>
-              <th>时长</th>
-              <th>来源</th>
+              <th style="width: 80px;">时长</th>
+              <th style="width: 48px;">来源</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="(row, index) in musicList" :key="row.id" @dblclick="handlePlay(row)"
-              @contextmenu.prevent="handleContextMenu($event, row)" :class="{ 'hover': hoveredIndex === index }"
-              @mouseover="hoveredIndex = index" @mouseleave="hoveredIndex = null">
-              <td>
-                <input type="checkbox" :value="row.id" v-model="checks" />
-              </td>
-              <td>
-                <div class="ellipsis" :title="row.name">{{ row.name }}</div>
-              </td>
-              <td>
-                <div class="ellipsis" :title="row.artist">{{ row.artist }}</div>
-              </td>
-              <td>
-                <div class="ellipsis" :title="row.album || '-'">{{ row.album || '-' }}</div>
-              </td>
-              <td>{{ prettyDateTime(row.duration) }}</td>
-              <td>
-                <t-tag size="small" theme="primary" v-if="row.source === MusicItemSourceEnum.LOCAL">本地</t-tag>
-                <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.WEBDAV">WebDAV</t-tag>
-              </td>
-            </tr>
-          </tbody>
         </table>
+
+        <RecycleScroller
+          class="scroller"
+          :items="musicList"
+          :item-size="41"
+          key-field="id"
+          v-slot="{ item: row, index }"
+        >
+          <tr
+            :key="row.id"
+            @dblclick="handlePlay(row)"
+            @contextmenu.prevent="handleContextMenu($event, row)"
+            :class="{ 'hover': hoveredIndex === index }"
+            @mouseover="hoveredIndex = index"
+            @mouseleave="hoveredIndex = null"
+          >
+            <td style="width: 40px;">
+              <input type="checkbox" :value="row.id" v-model="checks" />
+            </td>
+            <td>
+              <div class="ellipsis" :title="row.name">{{ row.name }}</div>
+            </td>
+            <td>
+              <div class="ellipsis" :title="row.artist">{{ row.artist }}</div>
+            </td>
+            <td>
+              <div class="ellipsis" :title="row.album || '-'">{{ row.album || '-' }}</div>
+            </td>
+            <td style="width: 80px;">{{ prettyDateTime(row.duration) }}</td>
+            <td style="width: 48px;text-align: right;">
+              <t-tag size="small" theme="primary" v-if="row.source === MusicItemSourceEnum.LOCAL">本地</t-tag>
+              <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.WEBDAV">WebDAV</t-tag>
+            </td>
+          </tr>
+        </RecycleScroller>
       </div>
     </div>
-    <t-back-top container=".folder-info .content .table-container" style="bottom: 24px;right: 24px"/>
+    <t-back-top container=".folder-info .content .table-container .scroller" style="bottom: 24px;right: 24px"/>
   </div>
 </template>
 
@@ -63,14 +75,14 @@ import { useMusicStore } from "@/store";
 import { prettyDateTime } from "@/utils/lang/FormatUtil";
 import { MusicItemView } from "@/entity/MusicItem";
 import { useMusicPlay } from "@/global/Event";
-import { MusicInstanceLocal } from "@/music/MusicInstanceLocal";
-import { MusicInstanceWebDAV } from "@/music/MusicInstanceWebDAV";
 import { musicGroupChoose } from "@/components/PluginManage/MusicGroupChoose";
 import { MusicGroupType } from "@/entity/MusicGroup";
 import { useMusicGroupStore } from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import ContextMenu from '@imengyu/vue3-context-menu'
 import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
+import { RecycleScroller } from 'vue-virtual-scroller'
+import {createMusicInstance} from "@/music/MusicUtil";
 
 const route = useRoute();
 const router = useRouter();
@@ -122,9 +134,7 @@ const goBack = () => {
 const handlePlay = (row: MusicItemView) => {
   const index = musicList.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
-    views: musicList.value.map(e =>
-      e.source === MusicItemSourceEnum.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e)
-    ),
+    views: musicList.value.map(e => createMusicInstance(e)),
     index: Math.max(index, 0)
   });
 };
@@ -195,19 +205,12 @@ const handleAddToPlaylist = (row: MusicItemView) => {
     overflow: hidden;
     padding: 8px;
 
-    .local-music__header {
-      margin-bottom: 8px;
-      padding-left: 8px;
-      padding-right: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
     .table-container {
       height: 100%;
-      overflow-y: auto;
+      overflow: hidden;
       border: 1px solid var(--music-bg-color-3);
+      display: flex;
+      flex-direction: column;
 
       .custom-table {
         width: 100%;
@@ -223,39 +226,48 @@ const handleAddToPlaylist = (row: MusicItemView) => {
             padding: 8px;
             text-align: left;
             border-bottom: 1px solid var(--td-border-level-2-color);
-
-            &:first-child {
-              width: 40px;
-              padding-left: 16px;
-            }
           }
         }
+      }
 
-        tbody {
-          tr {
-            border-bottom: 1px solid var(--td-border-level-2-color);
+      .scroller {
+        flex: 1;
+        overflow-x: hidden;
 
-            &.hover {
-              background-color: var(--music-bg-color-6);
+        :deep(tr) {
+          display: flex;
+          border-bottom: 1px solid var(--td-border-level-2-color);
+
+          &.hover {
+            background-color: var(--music-bg-color-6);
+          }
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          td {
+            padding: 8px;
+            flex: 1;
+            max-width: 150px;
+
+            .ellipsis {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            &:first-child {
+              flex: 0 0 40px;
+              padding-left: 16px;
+            }
+
+            &:nth-child(5) {
+              flex: 0 0 80px;
             }
 
             &:last-child {
-              border-bottom: none;
-            }
-
-            td {
-              padding: 8px;
-              max-width: 150px;
-
-              .ellipsis {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
-
-              &:first-child {
-                padding-left: 16px;
-              }
+              flex: 0 0 48px;
             }
           }
         }

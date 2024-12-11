@@ -34,7 +34,7 @@
       <t-paragraph>
         <t-space>
           <div class="about__label">更多</div>
-          <t-link theme="primary" @click="openFeedback">问题反馈</t-link>
+          <t-button size="small" theme="success" @click="openFeedback">问题反馈</t-button>
           <t-link theme="primary" @click="showLog">更新日志</t-link>
         </t-space>
       </t-paragraph>

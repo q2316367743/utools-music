@@ -39,16 +39,23 @@ function renderContent(form: Ref<Repository>) {
         <FormItem label={'文件路径'} name={'path'}>
             <Input v-model={form.value.path} clearable={true}></Input>
         </FormItem>
-      {form.value.type === MusicItemSourceEnum.WEBDAV && <FormItem label={'用户名'} name={'username'}>
-          <Input v-model={form.value.username} clearable={true}></Input>
-      </FormItem>}
       {form.value.type === MusicItemSourceEnum.WEBDAV ?
-        <FormItem label={'密码'} name={'password'}>
-          <Input v-model={form.value.password} clearable={true}></Input>
-        </FormItem> :
-        <FormItem label={'秘钥'} name={'password'}>
-          <Input v-model={form.value.password} clearable={true}></Input>
-        </FormItem>}
+        <>
+          <FormItem label={'用户名'} name={'username'}>
+            <Input v-model={form.value.username} clearable={true}></Input>
+          </FormItem>
+          <FormItem label={'密码'} name={'password'}>
+            <Input v-model={form.value.password} clearable={true}></Input>
+          </FormItem>
+        </>:
+        <>
+          <FormItem label={'秘钥'} name={'username'}>
+            <Input v-model={form.value.username} clearable={true}></Input>
+          </FormItem>
+          <FormItem label={'文件夹密码'} name={'password'} help={'如果文件夹没有密码，可不填'}>
+            <Input v-model={form.value.password} clearable={true}></Input>
+          </FormItem>
+      </>}
     </>}
   </Form>
 }

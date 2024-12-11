@@ -10,6 +10,7 @@ import ContextMenu from '@imengyu/vue3-context-menu'
 import 'tdesign-vue-next/es/style/index.css';
 import '@/assets/style/global.less';
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 // 额外引入图标库
 createApp(App)

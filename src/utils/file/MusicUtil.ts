@@ -191,10 +191,11 @@ export async function scanAList(repo: Repository): Promise<Array<MusicItem>> {
       '/api/fs/list', {
         baseURL: repo.url,
         headers: {
-          'Authorization': repo.password
+          'Authorization': repo.username
         },
         params: {
           path: repo.path,
+          password: repo.password,
           refresh: true,
           page,
           per_page: 50

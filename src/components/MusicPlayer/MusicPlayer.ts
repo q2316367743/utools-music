@@ -177,7 +177,10 @@ async function playWrapper() {
 }
 
 export function play() {
+  if (playLoading.value) return;
   playLoading.value = true;
+  currentTime.value = 0;
+  duration.value = 0
   playWrapper()
     .catch(e => {
       MessageUtil.error("获取音乐播放信息失败", e);

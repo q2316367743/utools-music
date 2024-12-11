@@ -25,9 +25,9 @@
         </t-space>
       </div>
       <div class="table-container" ref="table-container">
-        <local-music-table v-model="checks" :current-index="currentIndex" :musics :data/>
+        <local-music-table ref="musicTable" v-model="checks" :current-index="currentIndex" :musics :data/>
       </div>
-      <t-back-top container=".local-music .container .table-container" style="bottom: 24px;right: 24px"/>
+      <t-back-top container=".local-music .container .table-container .scroller" style="bottom: 24px;right: 24px"/>
     </div>
   </div>
 </template>
@@ -100,12 +100,13 @@ function addMusicGroup() {
 let timeout: ReturnType<typeof setTimeout> | null = null;
 const currentIndex = ref(-1);
 
+const musicTable = ref<InstanceType<typeof LocalMusicTable>>();
+
 function setLocation(item: MusicInstance) {
-  // 一个元素40
   const index = data.value.findIndex(e => e.id === Number(item.id));
   if (index >= 0) {
-    tableContainer.value?.scrollTo({
-      top: Math.max(index - 3, 0) * 40,
+    musicTable.value?.scrollTo({
+      top: Math.max(index - 3, 0) * 41,
       left: 0,
       behavior: 'smooth'
     });

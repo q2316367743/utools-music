@@ -1,59 +1,70 @@
 <template>
-  <table class="custom-table">
-    <thead>
-    <tr>
-      <th>
-        <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll"/>
-      </th>
-      <th>歌曲名</th>
-      <th>演唱者</th>
-      <th>专辑</th>
-      <th>时长</th>
-      <th>来源</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr v-for="(row, index) in data" :key="row.id"
-        @dblclick="handleRowDblclick(row)"
-        @contextmenu.prevent="handleContextMenu($event, row)"
-        :class="{ 'hover': hoveredIndex === index, active: index === currentIndex }"
-        @mouseover="hoveredIndex = index"
+  <div class="local-music-table">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll" />
+          </th>
+          <th>歌曲名</th>
+          <th>演唱者</th>
+          <th>专辑</th>
+          <th>时长</th>
+          <th style="width: 48px;">来源</th>
+        </tr>
+      </thead>
+    </table>
+
+    <RecycleScroller
+      ref="scroller"
+      class="scroller"
+      :items="data"
+      :item-size="41"
+      key-field="id"
+      v-slot="{ item: row, index }"
+    >
+      <tr :key="row.id" @dblclick="handleRowDblclick(row)" @contextmenu.prevent="handleContextMenu($event, row)"
+        :class="{ 'hover': hoveredIndex === index, active: index === currentIndex }" @mouseover="hoveredIndex = index"
         @mouseleave="hoveredIndex = null">
-      <td>
-        <input type="checkbox" :value="row.id" v-model="checks"/>
-      </td>
-      <td>
-        <div class="ellipsis" :title="row.name">{{ row.name }}</div>
-      </td>
-      <td>
-        <div class="ellipsis" :title="row.artist">{{ row.artist }}</div>
-      </td>
-      <td>
-        <div class="ellipsis" :title="row.album || '-'">{{ row.album || '-' }}</div>
-      </td>
-      <td>{{ prettyDateTime(row.duration) }}</td>
-      <td>
-        <t-tag size="small" theme="primary" v-if="row.source === MusicItemSourceEnum.LOCAL">本地</t-tag>
-        <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.WEBDAV">WebDAV</t-tag>
-        <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.A_LIST">AList</t-tag>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+        <td style="width: 40px;">
+          <input type="checkbox" :value="row.id" v-model="checks" />
+        </td>
+        <td>
+          <div class="ellipsis" :title="row.name">{{ row.name }}</div>
+        </td>
+        <td>
+          <div class="ellipsis" :title="row.artist">{{ row.artist }}</div>
+        </td>
+        <td>
+          <div class="ellipsis" :title="row.album || '-'">{{ row.album || '-' }}</div>
+        </td>
+        <td>{{ prettyDateTime(row.duration) }}</td>
+        <td style="width: 48px;text-align: right;">
+          <t-tag size="small" theme="primary" v-if="row.source === MusicItemSourceEnum.LOCAL">本地</t-tag>
+          <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.WEBDAV">WebDAV</t-tag>
+          <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.A_LIST">AList</t-tag>
+        </td>
+      </tr>
+    </RecycleScroller>
+    <t-back-top container=".local-music-table .scroller" style="bottom: 24px;right: 24px"/>
+  </div>
 </template>
+
 <script lang="ts" setup>
-import { MusicItemView} from "@/entity/MusicItem";
-import {prettyDateTime} from "@/utils/lang/FormatUtil";
-import {useMusicAppend, useMusicPlay} from "@/global/Event";
-import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
-import {openLocalMusicEditDialog} from "@/pages/local/components/LocalMusicEdit";
-import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
-import {MusicGroupType} from "@/entity/MusicGroup";
-import {useMusicGroupStore} from "@/store";
+import { MusicItemView } from "@/entity/MusicItem";
+import { prettyDateTime } from "@/utils/lang/FormatUtil";
+import { useMusicAppend, useMusicPlay } from "@/global/Event";
+import { MusicInstanceLocal } from "@/music/MusicInstanceLocal";
+import { openLocalMusicEditDialog } from "@/pages/local/components/LocalMusicEdit";
+import { musicGroupChoose } from "@/components/PluginManage/MusicGroupChoose";
+import { MusicGroupType } from "@/entity/MusicGroup";
+import { useMusicGroupStore } from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import ContextMenu from "@imengyu/vue3-context-menu";
-import {createMusicInstance} from "@/music/MusicUtil";
-import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
+import { createMusicInstance } from "@/music/MusicUtil";
+import { MusicItemSourceEnum } from "@/entity/MusicItemSourceEnum";
+import { RecycleScroller } from 'vue-virtual-scroller'
+import { BackTop as TBackTop } from 'tdesign-vue-next';
 
 const checks = defineModel({
   type: Object as PropType<Array<number>>,
@@ -80,6 +91,15 @@ const hoveredIndex = ref<number | null>(null);
 const checkAll = computed(() => props.musics.length === checks.value.length);
 
 const indeterminate = computed<boolean>(() => (props.musics.length > checks.value.length && checks.value.length > 0));
+
+const scroller = ref<InstanceType<typeof RecycleScroller>>();
+
+// 对外暴露滚动方法
+defineExpose({
+  scrollTo: (options: ScrollToOptions) => {
+    scroller.value?.$el.scrollTo(options);
+  }
+});
 
 function handleRowDblclick(row: MusicItemView) {
   const list = props.data;
@@ -149,7 +169,15 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
   })
 }
 </script>
+
 <style scoped lang="less">
+.local-music-table {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 .custom-table {
   width: 100%;
   border-collapse: collapse;
@@ -167,35 +195,55 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
       border-bottom: 1px solid var(--td-border-level-1-color);
     }
   }
+}
 
-  tbody {
-    tr {
-      border-bottom: 1px solid var(--td-border-level-1-color);
+.scroller {
+  flex: 1;
+  overflow-x: hidden;
 
-      &.active {
-        animation: flashBackground 1s linear infinite;
+  :deep(tr) {
+    display: flex;
+    border-bottom: 1px solid var(--td-border-level-1-color);
+
+    &.active {
+      animation: flashBackground 1s linear infinite;
+    }
+
+    &.hover {
+      background-color: var(--music-bg-color-6);
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    td {
+      padding: 8px;
+      flex: 1;
+      max-width: 150px;
+
+      &:first-child {
+        flex: 0 0 40px;
       }
 
-      &.hover {
-        background-color: var(--music-bg-color-6);
+      &:nth-child(5) {
+        flex: 0 0 80px;
       }
 
       &:last-child {
-        border-bottom: none;
-      }
-
-      td {
-        padding: 8px;
-        max-width: 150px;
+        flex: 0 0 80px;
       }
     }
   }
 }
 
 @keyframes flashBackground {
-  0%, 100% {
+
+  0%,
+  100% {
     background-color: transparent;
   }
+
   50% {
     background-color: var(--td-text-color-brand);
   }

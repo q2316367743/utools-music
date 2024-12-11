@@ -45,7 +45,7 @@ export interface GlobalSetting {
 
 export function buildGlobalSetting(): GlobalSetting {
   return {
-    globalControl: '0',
+    globalControl: '1',
     playError: GlobalSettingPlayErrorType.NEXT,
     playDownload: false,
     playQuality: "super",
