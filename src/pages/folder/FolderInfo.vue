@@ -44,8 +44,8 @@
               </td>
               <td>{{ prettyDateTime(row.duration) }}</td>
               <td>
-                <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
-                <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
+                <t-tag size="small" theme="primary" v-if="row.source === MusicItemSourceEnum.LOCAL">本地</t-tag>
+                <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.WEBDAV">WebDAV</t-tag>
               </td>
             </tr>
           </tbody>
@@ -61,7 +61,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ArrowLeftIcon } from "tdesign-icons-vue-next";
 import { useMusicStore } from "@/store";
 import { prettyDateTime } from "@/utils/lang/FormatUtil";
-import { MusicItemSource, MusicItemView } from "@/entity/MusicItem";
+import { MusicItemView } from "@/entity/MusicItem";
 import { useMusicPlay } from "@/global/Event";
 import { MusicInstanceLocal } from "@/music/MusicInstanceLocal";
 import { MusicInstanceWebDAV } from "@/music/MusicInstanceWebDAV";
@@ -70,6 +70,7 @@ import { MusicGroupType } from "@/entity/MusicGroup";
 import { useMusicGroupStore } from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import ContextMenu from '@imengyu/vue3-context-menu'
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 const route = useRoute();
 const router = useRouter();
@@ -122,7 +123,7 @@ const handlePlay = (row: MusicItemView) => {
   const index = musicList.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
     views: musicList.value.map(e =>
-      e.source === MusicItemSource.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e)
+      e.source === MusicItemSourceEnum.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e)
     ),
     index: Math.max(index, 0)
   });

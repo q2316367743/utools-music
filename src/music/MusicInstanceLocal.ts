@@ -1,4 +1,5 @@
-import {MusicItem, MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {clone} from "radash";
+import {MusicItem, MusicItemView} from "@/entity/MusicItem";
 import {IAudioMetadata, parseBuffer} from "music-metadata";
 import {readFile, readFileAsString} from "@/utils/file/FileUtil";
 import {isEmptyString, isNotEmptyString} from "@/utils/lang/StringUtil";
@@ -8,7 +9,7 @@ import {base64ToString} from "@/utils/file/CovertUtil";
 import {transferTextToLyric} from "@/plugin/music";
 import {MusicInstance} from "@/types/MusicInstance";
 import {isNotEmptyArray} from "@/utils/lang/FieldUtil";
-import {clone} from "radash";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 function renderCoverFromMeta(meta: IAudioMetadata, m: MusicItem) {
   if (isNotEmptyString(m.cover)) {
@@ -74,7 +75,7 @@ export class MusicInstanceLocal implements MusicInstance {
     this.item.cover = res;
   }
 
-  get source(): MusicItemSource {
+  get source(): MusicItemSourceEnum {
     return this.item.source;
   }
 

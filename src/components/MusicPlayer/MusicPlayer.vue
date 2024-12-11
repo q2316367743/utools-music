@@ -127,7 +127,7 @@ import {
   NextIcon,
   PauseIcon,
   PlayIcon,
-  PreviousIcon, TerminalWindowIcon, ViewListIcon
+  PreviousIcon, ViewListIcon
 } from 'tdesign-icons-vue-next';
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {
@@ -156,7 +156,7 @@ import {
 } from "@/components/MusicPlayer/MusicPlayer";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {isNull} from "@/utils/lang/FieldUtil";
-import {MusicItemSource} from "@/entity/MusicItem";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {useDownloadStore, useMusicGroupStore} from "@/store";
@@ -186,11 +186,13 @@ const source = computed(() => {
   }
   const {source} = music.value;
   switch (source) {
-    case MusicItemSource.LOCAL:
+    case MusicItemSourceEnum.LOCAL:
       return '本地';
-    case MusicItemSource.WEBDAV:
+    case MusicItemSourceEnum.WEBDAV:
       return 'WebDAV';
-    case MusicItemSource.WEB:
+    case MusicItemSourceEnum.A_LIST:
+      return 'AList';
+    case MusicItemSourceEnum.WEB:
       return '网络';
     default:
       return '';
@@ -200,7 +202,7 @@ const enableDownload = computed(() => {
   if (!music.value) {
     return false;
   }
-  return music.value.source === MusicItemSource.WEB;
+  return music.value.source === MusicItemSourceEnum.WEB;
 });
 
 function onLabel(h: any, props: { value: number }) {
@@ -217,7 +219,7 @@ function onAddMusicGroup() {
     return;
   }
   const current = music.value;
-  const isWeb = current.source === MusicItemSource.WEB;
+  const isWeb = current.source === MusicItemSourceEnum.WEB;
   musicGroupChoose(isWeb ? [MusicGroupType.MIX] : [MusicGroupType.LOCAL])
     .then(id => {
       if (id > 0) {

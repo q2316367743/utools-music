@@ -2,13 +2,12 @@ import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
 import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
 import {VxeTablePropTypes} from "vxe-table";
-import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {MusicItemView} from "@/entity/MusicItem";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {useDownloadStore, useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
-import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
-import {MusicInstanceWebDAV} from "@/music/MusicInstanceWebDAV";
 import ContextMenu from "@imengyu/vue3-context-menu";
+import {createMusicInstance} from "@/music/MusicUtil";
 
 function renderMusicInstance(info: MusicGroupIndex, e: any) {
   if (info) {
@@ -18,7 +17,7 @@ function renderMusicInstance(info: MusicGroupIndex, e: any) {
       return new MusicInstanceWeb(e, e.pluginId)
     }
   }
-  return e.source === MusicItemSource.LOCAL ? new MusicInstanceLocal(e) : new MusicInstanceWebDAV(e);
+  return createMusicInstance(e);
 }
 
 export function handleMusicGroupDblclick(info: MusicGroupIndex, rowIndex: number, data: Array<any>) {

@@ -1,5 +1,5 @@
 import {MusicPlayEvent} from "@/global/Event";
-import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {MusicItem} from "@/entity/MusicItem";
 import {getEffectiveNumber} from "@/utils/lang/FieldUtil";
 import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
@@ -12,6 +12,7 @@ import {MusicInstance} from "@/types/MusicInstance";
 import {matchMusicAttachment} from "@/components/MusicPlayer/MusicAttachment";
 import {useUtoolsDbStorage} from "@/hooks/UtoolsDbStorage";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 export const musics = ref(new Array<MusicInstance>());
 export const index = ref(0);
@@ -151,7 +152,7 @@ async function playWrapper() {
   if (/^https?:\/\//.test(instance.url)) {
     // 网络音乐
     exist = await headForExist(instance.url);
-    if (instance.source === MusicItemSource.WEB) {
+    if (instance.source === MusicItemSourceEnum.WEB) {
       // 如果支持缓存
       const {playDownload} = toRaw(globalSetting.value);
       if (playDownload) {

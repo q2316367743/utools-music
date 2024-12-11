@@ -1,12 +1,6 @@
 import {IMusicItem} from "@/types/PluginInstance";
 import {stringToBase64} from "@/utils/file/CovertUtil";
-
-export enum MusicItemSource {
-  LOCAL = 1,
-  WEBDAV = 2,
-  WEB = 3,
-  A_LIST = 4
-}
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 export interface MusicItemMeta {
 
@@ -67,7 +61,7 @@ export interface MusicItemExtra {
   /**
    * 来源
    */
-  source: MusicItemSource;
+  source: MusicItemSourceEnum;
 
 }
 
@@ -115,7 +109,7 @@ export function buildFromIMusicItem(item: IMusicItem, url: string): MusicItemVie
     duration: item.duration || 0,
     album: item.album || '',
     lyric,
-    source: MusicItemSource.WEB,
+    source: MusicItemSourceEnum.WEB,
     nativeId: utools.getNativeId(),
     repositoryName: '',
     repositoryId: 0

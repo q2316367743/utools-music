@@ -1,11 +1,12 @@
 import {IMusicItem} from "@/types/PluginInstance";
-import {buildFromIMusicItem, MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {buildFromIMusicItem, MusicItem} from "@/entity/MusicItem";
 import {globalSetting, usePluginStore} from "@/store";
 import {copyProperties} from "@/utils/lang/FieldUtil";
 import {LyricContent} from "@/types/LyricLine";
 import {transferTextToLyric} from "@/plugin/music";
 import {MusicInstance} from "@/types/MusicInstance";
 import {clone} from "radash";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 export class MusicInstanceWeb implements MusicInstance {
 
@@ -38,8 +39,8 @@ export class MusicInstanceWeb implements MusicInstance {
     return this.item.artwork || '';
   }
 
-  get source(): MusicItemSource {
-    return MusicItemSource.WEB;
+  get source(): MusicItemSourceEnum {
+    return MusicItemSourceEnum.WEB;
   }
 
   destroy(): Promise<void> {

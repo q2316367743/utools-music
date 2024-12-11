@@ -1,9 +1,10 @@
 import {Repository} from "@/entity/Repository";
-import {MusicItem, MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import {MusicItem, MusicItemView} from "@/entity/MusicItem";
 import {clone} from "radash";
 import {listRepositories} from "@/store";
 import {MusicInstance} from "@/types/MusicInstance";
 import {LyricContent} from "@/types/LyricLine";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 export abstract class AbsMusicInstanceWeb implements MusicInstance {
 
@@ -38,7 +39,7 @@ export abstract class AbsMusicInstanceWeb implements MusicInstance {
     this.item.cover = res;
   }
 
-  get source(): MusicItemSource {
+  get source(): MusicItemSourceEnum {
     return this.item.source;
   }
 

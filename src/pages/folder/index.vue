@@ -19,7 +19,7 @@
               <div class="cover">
                 <folder-icon size="86px"/>
               </div>
-              <div class="title">{{ item.folder }}</div>
+              <div class="title ellipsis">{{ item.folder }}</div>
             </div>
           </div>
         </t-tooltip>
@@ -136,6 +136,11 @@ const goBack = () => {
 
         span {
           font-size: 13px;
+        }
+        .title {
+          overflow-x: hidden;
+          width: 100px;
+          text-align: center;
         }
       }
     }

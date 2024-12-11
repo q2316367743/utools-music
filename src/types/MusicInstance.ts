@@ -1,5 +1,6 @@
-import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {MusicItem} from "@/entity/MusicItem";
 import {LyricContent} from "@/types/LyricLine";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 export interface MusicInstance {
   id: string;
@@ -27,7 +28,7 @@ export interface MusicInstance {
   /**
    * 来源
    */
-  source: MusicItemSource;
+  source: MusicItemSourceEnum;
 
   /**
    * 插件ID

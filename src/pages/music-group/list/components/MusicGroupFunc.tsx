@@ -4,7 +4,7 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {DialogPlugin, Form, FormItem, Input, Radio, RadioGroup, Table, TableCol, Tag} from "tdesign-vue-next";
 import {useMusicStore} from "@/store";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
-import {MusicItemSource} from "@/entity/MusicItem";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 import {saveOneByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {MusicGroupContent, MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
@@ -108,10 +108,12 @@ export function musicGroupAppend(defaultMusicItemIds: Array<number>, musicGroupI
     cell: (h, {row}) => {
       const {source} = row;
       let text = '';
-      if (source === MusicItemSource.LOCAL) {
+      if (source === MusicItemSourceEnum.LOCAL) {
         text = '本地';
-      } else if (source === MusicItemSource.WEBDAV) {
+      } else if (source === MusicItemSourceEnum.WEBDAV) {
         text = 'WebDAV';
+      } else if (source === MusicItemSourceEnum.A_LIST) {
+        text = 'AList';
       }
       return <Tag size="small" theme="primary">
         <span>{text}</span>

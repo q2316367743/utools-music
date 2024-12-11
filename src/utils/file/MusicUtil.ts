@@ -1,18 +1,67 @@
-import {Repository} from "@/entity/Repository";
-import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {Repository, RepositoryFileNameRuleEnum} from "@/entity/Repository";
+import {MusicItem} from "@/entity/MusicItem";
 import {FileItem, parseFileToMusic, readFileList} from "@/utils/file/FileUtil";
 import {group} from "@/utils/lang/ArrayUtil";
-import {basenameWeb, copyProperties, extnameWeb, getFolder, parseMusicName} from "@/utils/lang/FieldUtil";
+import {basenameWeb, copyProperties, dirnameWeb, extnameWeb, getFolder, getFolderWeb} from "@/utils/lang/FieldUtil";
 import {IMAGE_EXTNAME, LYRIC_EXTNAME, MUSIC_EXTNAME} from "@/global/Constant";
 import {AuthType, createClient} from "webdav";
 import {FileStat} from "webdav/dist/node/types";
 import {getAxiosInstance} from "@/plugin/http";
 import {AListFsListContent, AListFsListData, AListResponse} from "@/types/AList";
-import {isNotEmptyString} from "@/utils/lang/StringUtil";
+import {isEmptyString, isNotEmptyString} from "@/utils/lang/StringUtil";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 const nativeId = utools.getNativeId();
 
-async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicItemSource): Promise<Array<MusicItem>> {
+interface MusicInfo {
+  name: string,
+  artist: string
+}
+
+export function parseMusicName(basename: string, repo: Repository): MusicInfo {
+  if (isEmptyString(basename)) {
+    return {artist: '', name: ''}
+  }
+  const {fileNameRule = RepositoryFileNameRuleEnum.ARTIST_NAME} = repo;
+  if (fileNameRule === RepositoryFileNameRuleEnum.NAME_ARTIST) {
+    let strings = basename.split("-");
+    if (strings.length > 1) {
+      return {
+        name: strings[0].trim(),
+        artist: strings.slice(1).join("-").trim(),
+      }
+    }
+  } else if (fileNameRule === RepositoryFileNameRuleEnum.NAME) {
+    return {
+      name: basename,
+      artist: ''
+    }
+  } else {
+    let strings = basename.split("-");
+    if (strings.length > 1) {
+      return {
+        artist: strings[0].trim(),
+        name: strings.slice(1).join("-").trim(),
+      }
+    }
+  }
+  return {
+    artist: '',
+    name: basename,
+  }
+}
+
+/**
+ * 解析文件为音乐
+ * @param files 文件列表
+ * @param source 音乐来源
+ * @param repo 仓库
+ */
+async function parseMusicItemFromFileItem(
+  files: Array<FileItem>,
+  source: MusicItemSourceEnum,
+  repo: Repository
+): Promise<Array<MusicItem>> {
   const musicItems = new Array<MusicItem>();
   // 文件分组，用于处理封面和歌词
   const fileMap = group(files, 'basename');
@@ -20,7 +69,7 @@ async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicI
   let start = Date.now();
   for (const e of fileMap) {
     const [k, v] = e;
-    const {name, artist} = parseMusicName(k);
+    const {name, artist} = parseMusicName(k, repo);
     const musicItem: MusicItem = {
       id: start++,
       name,
@@ -47,7 +96,7 @@ async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicI
     // 存在链接
     if (isNotEmptyString(musicItem.url)) {
       // 只有本地做元数据解析
-      if (source === MusicItemSource.LOCAL) {
+      if (source === MusicItemSourceEnum.LOCAL) {
         try {
           const meta = await parseFileToMusic(musicItem.url);
           copyProperties(meta, musicItem);
@@ -58,7 +107,12 @@ async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicI
         musicItem.dir = window.preload.path.dirname(musicItem.url);
         // 从目录中获取文件夹名
         musicItem.folder = getFolder(musicItem.dir);
+      }else {
+        // 处理文件夹问题
+        musicItem.dir = dirnameWeb(musicItem.url);
+        musicItem.folder = getFolderWeb(musicItem.dir);
       }
+
       musicItems.push(musicItem);
     }
   }
@@ -71,7 +125,7 @@ async function parseMusicItemFromFileItem(files: Array<FileItem>, source: MusicI
  */
 export async function scanLocal(repo: Repository): Promise<Array<MusicItem>> {
   const files = await readFileList(repo.path);
-  return parseMusicItemFromFileItem(files, MusicItemSource.LOCAL);
+  return parseMusicItemFromFileItem(files, MusicItemSourceEnum.LOCAL, repo);
 }
 
 
@@ -111,7 +165,7 @@ export async function scanWebDAV(repo: Repository): Promise<Array<MusicItem>> {
     }
     files.push(renderFileFromWebDAV(file));
   }
-  return parseMusicItemFromFileItem(files, MusicItemSource.WEBDAV);
+  return parseMusicItemFromFileItem(files, MusicItemSourceEnum.WEBDAV, repo);
 }
 
 function renderFileFromAList(e: AListFsListContent, repo: Repository): FileItem {
@@ -162,5 +216,7 @@ export async function scanAList(repo: Repository): Promise<Array<MusicItem>> {
     }
   }
 
-  return parseMusicItemFromFileItem(list.map(e => renderFileFromAList(e, repo)), MusicItemSource.A_LIST);
+  return parseMusicItemFromFileItem(
+    list.map(e => renderFileFromAList(e, repo)),
+    MusicItemSourceEnum.A_LIST, repo);
 }

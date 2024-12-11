@@ -21,28 +21,6 @@ export function copyProperties<S extends Record<string, any>, T extends Record<s
   });
 }
 
-interface MusicInfo {
-  name: string,
-  artist: string
-}
-
-export function parseMusicName(basename: string): MusicInfo {
-  if (isEmptyString(basename)) {
-    return {artist: '', name: ''}
-  }
-  let strings = basename.split("-");
-  if (strings.length > 1) {
-    return {
-      artist: strings[0].trim(),
-      name: strings.slice(1).join("-").trim(),
-    }
-  }
-  return {
-    artist: '',
-    name: basename,
-  }
-}
-
 export function getEffectiveNumber(num: number, min: number, max: number): number {
   if (num < min) {
     return min;
@@ -111,6 +89,17 @@ export function basenameWeb(str: string): string {
     items.pop();
   }
   return items.join('.');
+}
+
+export function dirnameWeb(str: string): string {
+  if (isEmptyString(str)) {
+    return '';
+  }
+  return str.split('/').slice(0, -1).join('/');
+}
+
+export function getFolderWeb(dir: string) {
+  return dir.split('/').pop() || dir;
 }
 
 export function getFolder(dir: string): string {

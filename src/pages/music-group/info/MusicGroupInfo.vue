@@ -55,8 +55,9 @@
               <t-tag size="small" theme="primary" v-if="info?.type === MusicGroupType.MIX">
                 {{ subStr(pluginMap.get(row.pluginId)?.name || '未知', 4) }}
               </t-tag>
-              <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
-              <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
+              <t-tag size="small" theme="primary" v-if="row.source === MusicItemSourceEnum.LOCAL">本地</t-tag>
+              <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.WEBDAV">WebDAV</t-tag>
+              <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.A_LIST">AList</t-tag>
             </td>
           </tr>
           </tbody>
@@ -80,7 +81,7 @@ import {useMusicGroupStore, usePluginStore} from "@/store";
 import MusicGroupImage from "@/assets/image/music-group.png";
 import {CloseIcon, SearchIcon} from "tdesign-icons-vue-next";
 import {useFuse} from "@vueuse/integrations/useFuse";
-import {MusicItemSource} from "@/entity/MusicItem";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {
   handleMenuClickEvent, handleMusicGroupAll,

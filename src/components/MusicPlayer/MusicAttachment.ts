@@ -1,8 +1,9 @@
-import {MusicItem, MusicItemSource} from "@/entity/MusicItem";
+import {MusicItem} from "@/entity/MusicItem";
 import {isEmptyString} from "@/utils/lang/StringUtil";
 import {globalSetting, usePluginStore} from "@/store";
 import {type MusicInstance} from "@/types/MusicInstance";
 import {music} from "@/components/MusicPlayer/MusicPlayer";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 /**
  * 获取一共词图
@@ -52,7 +53,7 @@ async function getOneCover(item: MusicItem): Promise<string | undefined> {
  * 匹配词图，只要本地音乐才进行处理，缺啥匹配啥
  */
 export function matchMusicAttachment(item: MusicItem, musicInstance: MusicInstance) {
-  if (item.source !== MusicItemSource.LOCAL) {
+  if (item.source !== MusicItemSourceEnum.LOCAL) {
     return;
   }
   const {playAttachment} = globalSetting.value;

@@ -33,16 +33,16 @@
       </td>
       <td>{{ prettyDateTime(row.duration) }}</td>
       <td>
-        <t-tag size="small" theme="primary" v-if="row.source === MusicItemSource.LOCAL">本地</t-tag>
-        <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.WEBDAV">WebDAV</t-tag>
-        <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSource.A_LIST">AList</t-tag>
+        <t-tag size="small" theme="primary" v-if="row.source === MusicItemSourceEnum.LOCAL">本地</t-tag>
+        <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.WEBDAV">WebDAV</t-tag>
+        <t-tag size="small" theme="primary" v-else-if="row.source === MusicItemSourceEnum.A_LIST">AList</t-tag>
       </td>
     </tr>
     </tbody>
   </table>
 </template>
 <script lang="ts" setup>
-import {MusicItemSource, MusicItemView} from "@/entity/MusicItem";
+import { MusicItemView} from "@/entity/MusicItem";
 import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
@@ -53,6 +53,7 @@ import {useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import ContextMenu from "@imengyu/vue3-context-menu";
 import {createMusicInstance} from "@/music/MusicUtil";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 const checks = defineModel({
   type: Object as PropType<Array<number>>,
