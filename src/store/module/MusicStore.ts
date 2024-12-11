@@ -2,10 +2,12 @@ import {defineStore} from "pinia";
 import {MusicItem, MusicItemView} from "@/entity/MusicItem";
 import {listByAsync, removeOneByAsync, saveListByAsync} from "@/utils/utools/DbStorageUtil";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
-import {listUsableRepositories, scanRepository} from "@/store";
+import {listUsableRepositories, scanOneRepository, scanRepository} from "@/store";
 import {map} from "@/utils/lang/ArrayUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {copyProperties} from "@/utils/lang/FieldUtil";
+import {Repository} from "@/entity/Repository";
+import {KeyValue} from "@/types/KeyValue";
 
 export const useMusicStore = defineStore('music', () => {
   const musics = ref(new Array<MusicItemView>());
@@ -19,7 +21,7 @@ export const useMusicStore = defineStore('music', () => {
     // 获取全部存储
     let repos = await listUsableRepositories();
     for (const repo of repos) {
-      const musics  = await listByAsync<MusicItem>(`${LocalNameEnum.LIST_MUSIC}/${repo.id}`);
+      const musics = await listByAsync<MusicItem>(`${LocalNameEnum.LIST_MUSIC}/${repo.id}`);
       if (musics.list && musics.list.length > 0) {
         musicList.push(...musics.list.map(e => ({
           ...e,
@@ -37,6 +39,31 @@ export const useMusicStore = defineStore('music', () => {
     .then(() => console.log("音乐初始化成功"))
     .catch(err => MessageUtil.error('音乐初始化失败', err));
 
+  async function scanOneItems(item: KeyValue<Array<MusicItem> | null, number>) {
+    const {key, value} = item;
+    if (!!value) {
+      const docId = `${LocalNameEnum.LIST_MUSIC}/${key}`;
+      // 获取到旧的
+      const old = await listByAsync<MusicItem>(docId)
+      const oldRecords = old?.list || [];
+      const oldMap = map(oldRecords, 'url', (_e1, e2) => e2);
+      // 此处需要判断是需要更新还是需要新增还是需要删除
+      for (let i = 0; i < value.length; i++) {
+        const newItem = value[i];
+        let oldItem = oldMap.get(newItem.url);
+        if (oldItem) {
+          value[i] = {
+            ...newItem,
+            // 保持旧的ID
+            id: oldItem.id,
+          }
+        }
+      }
+      // 保存新的
+      await saveListByAsync(docId, value, old?.rev);
+    }
+  }
+
   /**
    * 重新扫描全部的音乐
    */
@@ -45,29 +72,21 @@ export const useMusicStore = defineStore('music', () => {
     const items = await scanRepository();
     // 刷新列表
     for (const item of items) {
-      const {key, value} = item;
-      if (!!value) {
-        const docId = `${LocalNameEnum.LIST_MUSIC}/${key}`;
-        // 获取到旧的
-        const old = await listByAsync<MusicItem>(docId)
-        const oldRecords = old?.list || [];
-        const oldMap = map(oldRecords, 'url', (_e1, e2) => e2);
-        // 此处需要判断是需要更新还是需要新增还是需要删除
-        for (let i = 0; i < value.length; i++) {
-          const newItem = value[i];
-          let oldItem = oldMap.get(newItem.url);
-          if (oldItem) {
-            value[i] = {
-              ...newItem,
-              // 保持旧的ID
-              id: oldItem.id,
-            }
-          }
-        }
-        // 保存新的
-        await saveListByAsync(docId, value, old?.rev);
-      }
+      await scanOneItems(item);
     }
+    // 重新初始化
+    await init();
+  }
+
+
+  /**
+   * 重新扫描全部的音乐
+   */
+  async function scanOne(repo: Repository) {
+    // 扫描音乐
+    const item = await scanOneRepository(repo);
+    // 刷新列表
+    await scanOneItems(item);
     // 重新初始化
     await init();
   }
@@ -98,7 +117,8 @@ export const useMusicStore = defineStore('music', () => {
 
   return {
     musics,
-    init, scan, removeMusic, updateById
+    init, scan, scanOne,
+    removeMusic, updateById
   }
 
 })

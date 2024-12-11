@@ -64,7 +64,6 @@ import ContextMenu from "@imengyu/vue3-context-menu";
 import { createMusicInstance } from "@/music/MusicUtil";
 import { MusicItemSourceEnum } from "@/entity/MusicItemSourceEnum";
 import { RecycleScroller } from 'vue-virtual-scroller'
-import { BackTop as TBackTop } from 'tdesign-vue-next';
 
 const checks = defineModel({
   type: Object as PropType<Array<number>>,

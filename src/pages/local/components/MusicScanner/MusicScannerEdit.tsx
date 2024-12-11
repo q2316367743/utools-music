@@ -4,7 +4,7 @@ import FolderInput from "@/components/FolderInput/FolderInput.vue";
 import {isEmptyString} from "@/utils/lang/StringUtil";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
-
+import {clone} from "radash";
 
 function renderContent(form: Ref<Repository>) {
   return () => <Form layout="vertical">
@@ -47,7 +47,7 @@ function renderContent(form: Ref<Repository>) {
           <FormItem label={'密码'} name={'password'}>
             <Input v-model={form.value.password} clearable={true}></Input>
           </FormItem>
-        </>:
+        </> :
         <>
           <FormItem label={'秘钥'} name={'username'}>
             <Input v-model={form.value.username} clearable={true}></Input>
@@ -55,19 +55,20 @@ function renderContent(form: Ref<Repository>) {
           <FormItem label={'文件夹密码'} name={'password'} help={'如果文件夹没有密码，可不填'}>
             <Input v-model={form.value.password} clearable={true}></Input>
           </FormItem>
-      </>}
+        </>}
     </>}
   </Form>
 }
 
-export function addRepository() {
+
+export function editRepository(res?: Repository) {
   return new Promise<Repository>(resolve => {
-    const form = ref(buildRepository());
+    const form = ref(res ? clone(res) : buildRepository());
     const instance = DialogPlugin({
-      header: '新增文件夹',
+      header: (res ? '编辑' : '修改') + '编辑文件夹',
       default: renderContent(form),
       confirmBtn: {
-        default: '新增'
+        default: res ? '编辑' : '保存'
       },
       width: 600,
       top: '5vh',

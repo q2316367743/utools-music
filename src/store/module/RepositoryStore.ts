@@ -17,7 +17,7 @@ export function listRepositories() {
 
 export async function listUsableRepositories() {
   const {list} = await listRepositories();
-  return  list.filter(l => {
+  return list.filter(l => {
     if (l.type === MusicItemSourceEnum.LOCAL || l.isNative) {
       return l.nativeId === nativeId;
     }
@@ -41,29 +41,37 @@ export function saveRepositories(val: Array<Repository>, rev?: string) {
 export async function scanRepository(): Promise<Array<KeyValue<Array<MusicItem> | null, number>>> {
   const list = await listUsableRepositories();
   const items = new Array<KeyValue<Array<MusicItem> | null, number>>();
-
   for (let repository of list) {
-    if (repository.type === MusicItemSourceEnum.LOCAL) {
-      const temp = await scanLocal(repository);
-      items.push({
-        key: repository.id,
-        value: temp
-      });
-    } else if (repository.type === MusicItemSourceEnum.WEBDAV) {
-      // WebDAV
-      const temp = await scanWebDAV(repository);
-      items.push({
-        key: repository.id,
-        value: temp
-      });
-    }else if (repository.type === MusicItemSourceEnum.A_LIST) {
-      // AList
-      const temp = await scanAList(repository);
-      items.push({
-        key: repository.id,
-        value: temp
-      });
-    }
+    items.push(await scanOneRepository(repository));
   }
   return items
+}
+
+
+/**
+ * 扫描全部仓库，并返回扫描到的音乐
+ */
+export async function scanOneRepository(repository: Repository): Promise<KeyValue<Array<MusicItem> | null, number>> {
+  if (repository.type === MusicItemSourceEnum.LOCAL) {
+    const temp = await scanLocal(repository);
+    return {
+      key: repository.id,
+      value: temp
+    };
+  } else if (repository.type === MusicItemSourceEnum.WEBDAV) {
+    // WebDAV
+    const temp = await scanWebDAV(repository);
+    return {
+      key: repository.id,
+      value: temp
+    };
+  } else if (repository.type === MusicItemSourceEnum.A_LIST) {
+    // AList
+    const temp = await scanAList(repository);
+    return {
+      key: repository.id,
+      value: temp
+    };
+  }
+  return Promise.reject(new Error("未知的仓库类型"))
 }

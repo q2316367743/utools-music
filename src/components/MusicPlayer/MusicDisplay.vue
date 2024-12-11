@@ -1,53 +1,63 @@
 <template>
-  <div class="music-display" :class="{show: displayVisible}">
+  <div class="music-display" :class="{ show: displayVisible }">
     <customer-bg />
     <t-layout class="music-display__container">
       <t-aside class="list" :width="listVisible ? '300px' : '0px'"
-               :style="{opacity: listVisible? 1 : 0, overflowX: 'hidden'}">
-        <div v-for="(m, i) in musics" :key="m.id" class="item" :class="{active: music?.id === m.id}"
-             @dblclick="switchIndex(i)">
-          <t-row :gutter="8">
-            <t-col :span="5">
-              <div class="name ellipsis" :title="m.name">{{ m.name }}</div>
-            </t-col>
-            <t-col :span="5">
-              <div class="artist ellipsis" :title="m.artist">{{ m.artist }}</div>
-            </t-col>
-            <t-col :span="2">
-              <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
-                <template #icon>
-                  <DeleteIcon/>
-                </template>
-              </t-button>
-            </t-col>
-          </t-row>
-        </div>
+               :style="{ opacity: listVisible ? 1 : 0, overflowX: 'hidden' }">
+        <RecycleScroller
+          class="scroller"
+          :items="musics"
+          :item-size="41"
+          key-field="id"
+          v-slot="{ item: m, index: i }"
+        >
+          <div class="item" :class="{ active: music?.id === m.id }"
+               @dblclick="switchIndex(i)">
+            <t-row :gutter="8">
+              <t-col :span="5">
+                <div class="name ellipsis" :title="m.name">{{ m.name }}</div>
+              </t-col>
+              <t-col :span="5">
+                <div class="artist ellipsis" :title="m.artist">{{ m.artist }}</div>
+              </t-col>
+              <t-col :span="2">
+                <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
+                  <template #icon>
+                    <DeleteIcon />
+                  </template>
+                </t-button>
+              </t-col>
+            </t-row>
+          </div>
+        </RecycleScroller>
       </t-aside>
       <t-content class="container">
         <div class="title">{{ name }}</div>
         <div class="subtitle">
-          <t-tag theme="primary">{{ artist }}</t-tag>
+          <t-tag theme="primary">
+            <div style="max-width: 50vw; overflow: hidden" class="ellipsis">{{ artist }}</div>
+          </t-tag>
           <span v-if="album"> - </span>
           <span v-if="album">{{ album }}</span>
         </div>
         <div class="lyric">
           <div class="lyric-empty" v-if="lyrics.length === 0 && music">
             <p>暂无歌词</p>
-            <music-lyric-search :icon="false"/>
+            <music-lyric-search :icon="false" />
           </div>
           <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
-               :class="{active: lyricIndex === i}" @click="handleLyricClick(lyric)">
+               :class="{ active: lyricIndex === i }" @click="handleLyricClick(lyric)">
             <span>{{ lyric.text }}</span>
-            <play-icon class="play" size="1.5rem"/>
+            <play-icon class="play" size="1.5rem" />
           </div>
         </div>
         <div class="close">
           <t-tooltip placement="bottom" content="搜索歌词" v-if="lyrics.length > 0">
-            <music-lyric-search :icon="true"/>
+            <music-lyric-search :icon="true" />
           </t-tooltip>
           <t-button theme="primary" variant="text" size="large" shape="circle" @click="switchDisplay">
             <template #icon>
-              <chevron-down-icon/>
+              <chevron-down-icon />
             </template>
           </t-button>
         </div>
@@ -55,6 +65,7 @@
     </t-layout>
   </div>
 </template>
+
 <script lang="ts" setup>
 import {
   audio,
@@ -65,11 +76,11 @@ import {
   removeIndex, switchCurrentTime, switchDisplay,
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
-import {DeleteIcon, PlayIcon, ChevronDownIcon} from 'tdesign-icons-vue-next';
-import {LyricLine} from "@/types/LyricLine";
+import { DeleteIcon, PlayIcon, ChevronDownIcon } from 'tdesign-icons-vue-next';
+import { LyricLine } from "@/types/LyricLine";
 import MusicLyricSearch from "@/components/MusicPlayer/MusicLyricSearch.vue";
-import {fontFamily} from "@/store";
-
+import { fontFamily } from "@/store";
+import { RecycleScroller } from 'vue-virtual-scroller';
 
 const name = computed(() => music.value?.name || '无歌曲');
 const artist = computed(() => music.value?.artist || '无演唱家');
@@ -81,8 +92,8 @@ function handleLyricClick(value: LyricLine) {
     audio.play();
   }
 }
-
 </script>
+
 <style scoped lang="less">
 .music-display {
   position: fixed;
@@ -115,6 +126,10 @@ function handleLyricClick(value: LyricLine) {
     border-right: 1px solid var(--td-border-level-1-color);
     overflow: auto;
     background-color: var(--music-bg-color-3);
+
+    .scroller {
+      height: 100%;
+    }
 
     .item {
       padding: 4px 8px;
@@ -231,6 +246,5 @@ function handleLyricClick(value: LyricLine) {
       display: flex;
     }
   }
-
 }
 </style>
