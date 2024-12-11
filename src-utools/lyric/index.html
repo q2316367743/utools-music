@@ -18,7 +18,7 @@
             right: 0;
             background-color: rgba(0, 0, 0, 0.01);
             transition: all 0.3s ease;
-            -webkit-app-region: no-drag;
+            -webkit-app-region: drag;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -56,9 +56,9 @@
                 })
         } else if (type === 'config') {
             const { fontSize, color, borderColor, fontFamily } = value;
-            // document.querySelectorAll('.container').forEach(e => {
-            //     e.style.border = `1px solid ${borderColor}`;
-            // });
+            document.querySelectorAll('.container').forEach(e => {
+                e.style.border = `1px solid ${borderColor}`;
+            });
             document.querySelectorAll('.lyric')
                 .forEach(e => {
                     e.style.fontSize = `${fontSize}px`;

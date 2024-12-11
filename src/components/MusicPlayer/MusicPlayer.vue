@@ -52,22 +52,22 @@
         <t-tooltip content="歌词">
           <t-button shape="circle" theme="primary" variant="text" @click="switchLyric">
             <template #icon>
-              <lyric-icon />
+              <lyric-icon/>
             </template>
           </t-button>
         </t-tooltip>
         <t-tooltip :content="loopText">
           <t-button shape="circle" theme="primary" variant="text" @click="loopControl">
             <template #icon>
-              <one-play-icon v-if="loop === 1" />
+              <one-play-icon v-if="loop === 1"/>
               <order-play-icon v-else-if="loop === 2"/>
-              <random-play-icon v-else-if="loop === 3" />
+              <random-play-icon v-else-if="loop === 3"/>
             </template>
           </t-button>
         </t-tooltip>
         <t-tooltip content="播放列表" placement="top-left">
           <t-button shape="circle" theme="primary" variant="text" @click="switchList">
-            <view-list-icon />
+            <view-list-icon/>
           </t-button>
         </t-tooltip>
       </div>
@@ -95,18 +95,23 @@
     </t-space>
     <t-drawer v-model:visible="listVisible" :header="`播放列表(${musics.length}首)`" attach=".main-container"
               :footer="false" size="400px">
-      <div class="music-player-list">
-        <div v-for="(m, i) in musics" :key="m.id" class="item" :class="{active: music?.id === m.id}"
-             @dblclick="switchIndex(i)">
+      <RecycleScroller
+        class="music-player-list"
+        :items="musics"
+        :item-size="41"
+        key-field="id"
+        v-slot="{ item, index }"
+      >
+        <div class="item" :class="{active: music?.id === item.id}" @dblclick="switchIndex(index)">
           <t-row :gutter="8">
             <t-col :span="5">
-              <div class="name ellipsis" :title="m.name">{{ m.name }}</div>
+              <div class="name ellipsis" :title="item.name">{{ item.name }}</div>
             </t-col>
             <t-col :span="5">
-              <div class="artist ellipsis" :title="m.artist">{{ m.artist }}</div>
+              <div class="artist ellipsis" :title="item.artist">{{ item.artist }}</div>
             </t-col>
             <t-col :span="2">
-              <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
+              <t-button variant="text" theme="danger" @click="removeIndex(index, item)">
                 <template #icon>
                   <delete-icon/>
                 </template>
@@ -114,7 +119,7 @@
             </t-col>
           </t-row>
         </div>
-      </div>
+      </RecycleScroller>
     </t-drawer>
   </div>
 </template>
@@ -165,6 +170,7 @@ import {MusicGroupType} from "@/entity/MusicGroup";
 import MinIcon from "@/components/icon/MinIcon.vue";
 import LyricIcon from "@/components/icon/LyricIcon.vue";
 import RandomPlayIcon from "@/components/icon/RandomPlayIcon.vue";
+import { RecycleScroller } from 'vue-virtual-scroller'
 
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');
@@ -260,4 +266,8 @@ onBeforeUnmount(() => {
 </script>
 <style scoped lang="less">
 @import './MusicPlayer.less';
+
+.music-player-list {
+  height: 100%;
+}
 </style>

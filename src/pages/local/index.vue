@@ -45,7 +45,6 @@ import {MusicInstance} from "@/types/MusicInstance";
 import LocalMusicTable from "@/pages/local/components/LocalMusicTable.vue";
 
 const router = useRouter();
-const tableContainer = useTemplateRef<HTMLDivElement>('table-container');
 
 const keyword = ref('');
 

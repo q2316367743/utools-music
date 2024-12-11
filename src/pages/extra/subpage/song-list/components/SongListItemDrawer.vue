@@ -160,7 +160,6 @@ function playAll() {
 }
 
 function collectionAll() {
-  console.log(props.item)
   useMusicGroupStore().postMusicGroup({
     pluginId: props.pluginId!,
     type: MusicGroupType.WEB,
