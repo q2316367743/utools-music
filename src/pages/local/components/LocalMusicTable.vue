@@ -164,13 +164,13 @@ function handleContextMenu(e: MouseEvent, row: MusicItemView) {
       padding: 8px;
       text-align: left;
       cursor: pointer;
-      border-bottom: 1px solid var(--td-border-level-2-color);
+      border-bottom: 1px solid var(--td-border-level-1-color);
     }
   }
 
   tbody {
     tr {
-      border-bottom: 1px solid var(--td-border-level-2-color);
+      border-bottom: 1px solid var(--td-border-level-1-color);
 
       &.active {
         animation: flashBackground 1s linear infinite;

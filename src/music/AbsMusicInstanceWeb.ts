@@ -11,7 +11,7 @@ export abstract class AbsMusicInstanceWeb implements MusicInstance {
   protected readonly item: MusicItemView;
   protected repository: Repository | null = null;
 
-  constructor(item: MusicItemView) {
+  protected constructor(item: MusicItemView) {
     this.item = clone(item);
   }
 

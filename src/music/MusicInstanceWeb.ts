@@ -7,7 +7,6 @@ import {transferTextToLyric} from "@/plugin/music";
 import {MusicInstance} from "@/types/MusicInstance";
 import {clone} from "radash";
 import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
-import {headForExist} from "@/plugin/http";
 import {toRaw} from "vue";
 
 export class MusicInstanceWeb implements MusicInstance {
@@ -133,10 +132,8 @@ export class MusicInstanceWeb implements MusicInstance {
   }
 
   usable(): Promise<boolean> {
-    if (!this.item.url) {
-      return Promise.resolve(false);
-    }
-    return headForExist(this.item.url);
+    // 由于部分音乐有频率限制，所以暂时去掉
+    return Promise.resolve(true);
   }
 
 }

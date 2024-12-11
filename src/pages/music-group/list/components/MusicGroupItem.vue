@@ -1,5 +1,5 @@
 <template>
-  <div class="mg-item" v-if="item">
+  <div class="mg-item" v-if="item" :title="item.name">
     <div class="mg-item__cover">
       <img :src="item.cover || MusicGroupImage" :alt="item.name"/>
     </div>
@@ -12,9 +12,9 @@
       </div>
     </div>
     <div class="mg-item__tag">
-      <t-tag v-if="item.type === MusicGroupType.WEB" theme="primary" variant="light-outline">Web</t-tag>
-      <t-tag v-else-if="item.type === MusicGroupType.MIX" theme="success" variant="light-outline">混合</t-tag>
-      <t-tag v-else theme="warning" variant="light-outline">本地</t-tag>
+      <t-tag v-if="item.type === MusicGroupType.WEB" theme="primary" >收藏</t-tag>
+      <t-tag v-else-if="item.type === MusicGroupType.MIX" theme="warning">网络</t-tag>
+      <t-tag v-else theme="success">本地</t-tag>
     </div>
   </div>
 </template>

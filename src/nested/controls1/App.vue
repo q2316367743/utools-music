@@ -15,6 +15,9 @@
             <img :src="cover" :alt="name"/>
           </div>
         </div>
+        <div class="player__albumMask" title="打开插件" @click="showMain">
+          <music-icon size="48px" color="#fff"/>
+        </div>
       </div>
       <div class="player__controls">
         <div class="player__prev" @click="preMusic">
@@ -54,7 +57,7 @@ import {prettyDateTime} from "@/utils/lang/FormatUtil";
 import {useColorMode} from "@/hooks/ColorMode";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import DefaultCover from '@/assets/image/default-cover.png'
-import {PauseIcon, PlayIcon} from "tdesign-icons-vue-next";
+import {MusicIcon, PauseIcon, PlayIcon} from "tdesign-icons-vue-next";
 
 useColorMode({
   key: LocalNameEnum.KEY_COLOR_MODE,
@@ -119,6 +122,8 @@ function play() {
 
 const preMusic = () => window.preload.sendMsg('pre');
 const nextMusic = () => window.preload.sendMsg('next');
+
+const showMain = () => utools.redirect(['音乐播放器', '音乐播放器'])
 </script>
 <style lang="less">
 </style>
