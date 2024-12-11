@@ -12,17 +12,17 @@ export class MusicInstanceAList extends AbsMusicInstanceWeb {
   }
 
   private async getUrl(repo: Repository, url: string): Promise<string> {
-    const getUrl = `${repo.url}/api/fs/get`;
-    const res = await getAxiosInstance().get<AListResponse<AListFsGetData>>(getUrl, {
-      headers: {
-        'Authorization': repo.password
-      },
-      params: {
-        path: url,
-        password: ''
-      }
-    });
-    console.log(url, res)
+    const res = await getAxiosInstance().get<AListResponse<AListFsGetData>>(
+      '/api/fs/get', {
+        baseURL: repo.url,
+        headers: {
+          'Authorization': repo.password
+        },
+        params: {
+          path: url,
+          password: ''
+        }
+      });
 
     return res.data.data.raw_url;
   }
@@ -33,10 +33,9 @@ export class MusicInstanceAList extends AbsMusicInstanceWeb {
 
     this.item.url = await this.getUrl(repo, this.item.url);
     if (this.item.cover) {
+      // 封面，
       this.item.cover = await this.getUrl(repo, this.item.cover);
     }
-    // this.item.cover = this.item.cover
-    // TODO: 封面，
     // TODO: 缓存
     return this.item;
   }
@@ -45,5 +44,9 @@ export class MusicInstanceAList extends AbsMusicInstanceWeb {
     return Promise.resolve([]);
   }
 
+  usable(): Promise<boolean> {
+    // 在获取详情时已经验证过了
+    return Promise.resolve(true);
+  }
 
 }

@@ -1,7 +1,7 @@
 import {MusicItem, MusicItemView} from "@/entity/MusicItem";
 import {isNotEmptyString} from "@/utils/lang/StringUtil";
 import {LyricContent} from "@/types/LyricLine";
-import {getForText} from "@/plugin/http";
+import {getForText, headForExist} from "@/plugin/http";
 import {transferTextToLyric} from "@/plugin/music";
 import {Repository} from "@/entity/Repository";
 import {renderPreviewUrl} from "@/plugin/server";
@@ -60,6 +60,13 @@ export class MusicInstanceWebDAV extends AbsMusicInstanceWeb {
 
   destroy(): Promise<void> {
     return Promise.resolve();
+  }
+
+  usable(): Promise<boolean> {
+    if (!this.item.url) {
+      return Promise.resolve(false);
+    }
+    return headForExist(this.item.url);
   }
 
 }

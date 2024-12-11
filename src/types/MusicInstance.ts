@@ -55,4 +55,9 @@ export interface MusicInstance {
    */
   destroy: () => Promise<void>;
 
+  /**
+   * 链接是否可用
+   */
+  usable: () => Promise<boolean>;
+
 }

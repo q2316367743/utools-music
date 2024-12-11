@@ -5,14 +5,12 @@ import {random} from "radash";
 import {LyricContent, LyricLine} from "@/types/LyricLine";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {musicControls, musicLyric} from "@/global/BeanFactory";
-import {headForExist} from "@/plugin/http";
-import {globalSetting, useDownloadStore} from "@/store";
+import {globalSetting} from "@/store";
 import {GlobalSettingPlayErrorType} from "@/entity/GlobalSetting";
 import {MusicInstance} from "@/types/MusicInstance";
 import {matchMusicAttachment} from "@/components/MusicPlayer/MusicAttachment";
 import {useUtoolsDbStorage} from "@/hooks/UtoolsDbStorage";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
-import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
 
 export const musics = ref(new Array<MusicInstance>());
 export const index = ref(0);
@@ -148,22 +146,7 @@ async function playWrapper() {
   const oldIndex = index.value;
   music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
   const instance = await music.value.getInfo();
-  let exist: boolean;
-  if (/^https?:\/\//.test(instance.url)) {
-    // 网络音乐
-    exist = await headForExist(instance.url);
-    if (instance.source === MusicItemSourceEnum.WEB) {
-      // 如果支持缓存
-      const {playDownload} = toRaw(globalSetting.value);
-      if (playDownload) {
-        // 下载
-        useDownloadStore().cache(instance);
-      }
-    }
-  } else {
-    // 本地音乐，判断URL是否存在
-    exist = window.preload.fs.existsSync(instance.url);
-  }
+  let exist = await music.value.usable();
   if (!exist) {
     return onError(instance);
   }

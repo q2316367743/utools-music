@@ -74,4 +74,6 @@ export abstract class AbsMusicInstanceWeb implements MusicInstance {
   abstract getInfo(): Promise<MusicItem>;
 
   abstract getLyric(): Promise<Array<LyricContent>>;
+
+  abstract usable(): Promise<boolean>;
 }

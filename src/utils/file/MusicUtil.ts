@@ -107,7 +107,7 @@ async function parseMusicItemFromFileItem(
         musicItem.dir = window.preload.path.dirname(musicItem.url);
         // 从目录中获取文件夹名
         musicItem.folder = getFolder(musicItem.dir);
-      }else {
+      } else {
         // 处理文件夹问题
         musicItem.dir = dirnameWeb(musicItem.url);
         musicItem.folder = getFolderWeb(musicItem.dir);
@@ -184,21 +184,22 @@ function renderFileFromAList(e: AListFsListContent, repo: Repository): FileItem 
  * @param repo 仓库配置
  */
 export async function scanAList(repo: Repository): Promise<Array<MusicItem>> {
-  const ls = `${repo.url}/api/fs/list`;
   let page = 1;
   const list = new Array<AListFsListContent>();
   while (true) {
-    const res = await getAxiosInstance().get<AListResponse<AListFsListData>>(ls, {
-      headers: {
-        'Authorization': repo.password
-      },
-      params: {
-        path: repo.path,
-        refresh: true,
-        page,
-        per_page: 50
-      }
-    });
+    const res = await getAxiosInstance().get<AListResponse<AListFsListData>>(
+      '/api/fs/list', {
+        baseURL: repo.url,
+        headers: {
+          'Authorization': repo.password
+        },
+        params: {
+          path: repo.path,
+          refresh: true,
+          page,
+          per_page: 50
+        }
+      });
     const {data} = res;
     const {content} = data.data;
     content.forEach(e => {

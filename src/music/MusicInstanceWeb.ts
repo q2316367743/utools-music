@@ -7,6 +7,8 @@ import {transferTextToLyric} from "@/plugin/music";
 import {MusicInstance} from "@/types/MusicInstance";
 import {clone} from "radash";
 import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
+import {headForExist} from "@/plugin/http";
+import {toRaw} from "vue";
 
 export class MusicInstanceWeb implements MusicInstance {
 
@@ -128,6 +130,13 @@ export class MusicInstanceWeb implements MusicInstance {
     }
 
     return items;
+  }
+
+  usable(): Promise<boolean> {
+    if (!this.item.url) {
+      return Promise.resolve(false);
+    }
+    return headForExist(this.item.url);
   }
 
 }

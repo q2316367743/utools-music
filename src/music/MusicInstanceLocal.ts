@@ -145,4 +145,8 @@ export class MusicInstanceLocal implements MusicInstance {
     return Promise.resolve();
   }
 
+  async usable(): Promise<boolean> {
+    return window.preload.fs.existsSync(this.item.url);
+  }
+
 }
