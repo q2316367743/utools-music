@@ -72,6 +72,16 @@ const props = defineProps({
   }
 });
 
+useEventListener(document, "keydown", e => {
+  if (e.code === 'Escape') {
+    if (visible.value) {
+      e.preventDefault();
+      e.stopPropagation();
+      visible.value = false;
+    }
+  }
+});
+
 const page = ref(1);
 const isBottom = ref(false);
 const sheet = ref<IMusicSheetItem>();

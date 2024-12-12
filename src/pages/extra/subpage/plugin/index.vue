@@ -34,16 +34,13 @@
       </t-space>
     </div>
     <div class="container">
-      <t-base-table :data :columns :bordered="false" :height="maxHeight" row-key="id"
-                    :hover="true" size="small" :scroll="{ type: 'virtual', rowHeight: 39 }"/>
+      <plugin-table :data="data" :height="maxHeight" />
     </div>
-    <t-back-top container=".plugin-manage .t-table__content" style="bottom: 24px;right: 24px"/>
   </div>
 </template>
 <script lang="ts" setup>
 import {usePluginStore} from "@/store";
-import {BaseTableCol} from "tdesign-vue-next";
-import {installFromLocal, installFromUrl} from "@/pages/extra/subpage/plugin/func";
+import {installFromLocal, installFromUrl} from "./func";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import MessageBoxUtil from "@/utils/modal/MessageBoxUtil";
 import {SearchIcon} from 'tdesign-icons-vue-next';
@@ -51,19 +48,16 @@ import {
   openPluginSubscribeDialog,
   updatePluginSubscribe,
   updatePluginSubscribeLoading
-} from "@/pages/extra/subpage/plugin/subscribe";
-import {buildPluginTableColumns} from "@/pages/extra/subpage/plugin/table";
+} from "./subscribe";
 import {useFuse} from "@vueuse/integrations/useFuse";
+import PluginTable from "./components/PluginTable.vue";
 
 const size = useWindowSize();
-
 const installLoading = ref(false);
-const operatorLoading = ref(false);
-
-const keyword = ref('')
+const keyword = ref('');
 const plugins = computed(() => usePluginStore().plugins);
 const maxHeight = computed(() => size.height.value - 100);
-const columns: Array<BaseTableCol> = buildPluginTableColumns(operatorLoading);
+
 const {results} = useFuse(keyword, plugins, {
   matchAllWhenSearchEmpty: true,
   fuseOptions: {
@@ -74,8 +68,8 @@ const {results} = useFuse(keyword, plugins, {
     }]
   }
 });
-const data = computed(() =>  results.value.map(e => e.item));
 
+const data = computed(() => results.value.map(e => e.item));
 
 function installFromLocalWrap() {
   installLoading.value = true;

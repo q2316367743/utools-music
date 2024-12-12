@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <customer-bg />
+    <customer-bg/>
     <t-layout class="main-container">
       <menu-side class="main-side"></menu-side>
       <t-content class="main-content-wrapper">
@@ -17,7 +17,7 @@
     <div class="main-player">
       <music-player/>
     </div>
-    <music-list-drawer />
+    <music-list-drawer/>
   </div>
 </template>
 <script lang="ts" setup>
