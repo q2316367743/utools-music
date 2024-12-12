@@ -93,41 +93,12 @@
         </template>
       </t-button>
     </t-space>
-    <t-drawer v-model:visible="listVisible" :header="`播放列表(${musics.length}首)`" attach=".main-container"
-              :footer="false" size="400px">
-      <RecycleScroller
-        class="music-player-list"
-        :items="musics"
-        :item-size="41"
-        key-field="id"
-        v-slot="{ item, index }"
-      >
-        <div class="item" :class="{active: music?.id === item.id}" @dblclick="switchIndex(index)">
-          <t-row :gutter="8">
-            <t-col :span="5">
-              <div class="name ellipsis" :title="item.name">{{ item.name }}</div>
-            </t-col>
-            <t-col :span="5">
-              <div class="artist ellipsis" :title="item.artist">{{ item.artist }}</div>
-            </t-col>
-            <t-col :span="2">
-              <t-button variant="text" theme="danger" @click="removeIndex(index, item)">
-                <template #icon>
-                  <delete-icon/>
-                </template>
-              </t-button>
-            </t-col>
-          </t-row>
-        </div>
-      </RecycleScroller>
-    </t-drawer>
   </div>
 </template>
 <script lang="ts" setup>
 import {
   ChevronDownDoubleIcon,
   ChevronUpDoubleIcon,
-  DeleteIcon,
   DownloadIcon, FolderAdd1Icon,
   NextIcon,
   PauseIcon,
@@ -140,21 +111,18 @@ import {
   currentTime,
   displayVisible,
   duration, initPlayer,
-  listVisible,
   loop,
   loopControl,
   music,
-  musics,
   next,
   onMusicAppend,
   onMusicPlay,
   played,
   playLoading,
   pre,
-  removeIndex, switchControls,
+  switchControls,
   switchCurrentTime,
   switchDisplay,
-  switchIndex,
   switchList,
   switchLyric,
   volume
@@ -170,7 +138,6 @@ import {MusicGroupType} from "@/entity/MusicGroup";
 import MinIcon from "@/components/icon/MinIcon.vue";
 import LyricIcon from "@/components/icon/LyricIcon.vue";
 import RandomPlayIcon from "@/components/icon/RandomPlayIcon.vue";
-import { RecycleScroller } from 'vue-virtual-scroller'
 
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');
@@ -267,8 +234,4 @@ onBeforeUnmount(() => {
 </script>
 <style scoped lang="less">
 @import './MusicPlayer.less';
-
-.music-player-list {
-  height: 100%;
-}
 </style>

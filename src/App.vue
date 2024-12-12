@@ -17,6 +17,7 @@
     <div class="main-player">
       <music-player/>
     </div>
+    <music-list-drawer />
   </div>
 </template>
 <script lang="ts" setup>
@@ -30,6 +31,7 @@ import MenuSide from "@/components/MenuSide/MenuSide.vue";
 import {versionCheck} from "@/components/UpdateLog";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import CustomerBg from "@/components/CustomerBg/CustomerBg.vue";
+import MusicListDrawer from "@/components/MusicPlayer/MusicListDrawer.vue";
 
 const route = useRoute();
 const router = useRouter();

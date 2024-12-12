@@ -2,8 +2,8 @@
   <div class="music-display" :class="{ show: displayVisible }">
     <customer-bg/>
     <t-layout class="music-display__container">
-      <t-aside class="list" :width="listVisible ? '300px' : '0px'"
-               :style="{ opacity: listVisible ? 1 : 0, overflowX: 'hidden' }">
+      <t-aside class="list" :width="visible ? '300px' : '0px'"
+               :style="{ opacity: visible ? 1 : 0, overflowX: 'hidden' }">
         <RecycleScroller
           ref="scroller"
           class="scroller"
@@ -95,6 +95,12 @@ const scroller = ref<InstanceType<typeof RecycleScroller>>();
 const name = computed(() => music.value?.name || '无歌曲');
 const artist = computed(() => music.value?.artist || '无演唱家');
 const album = computed(() => music.value?.album || '');
+const visible = computed(() => {
+  if (displayVisible.value) {
+    return listVisible.value
+  }
+  return false;
+});
 
 function handleLyricClick(value: LyricLine) {
   switchCurrentTime(value.start + 1);
@@ -113,6 +119,12 @@ function scrollToCurrentMusic() {
     });
   }
 }
+
+watch(visible, val => {
+  if (val) {
+    setTimeout(() => scrollToCurrentMusic(), 200);
+  }
+});
 </script>
 
 <style scoped lang="less">
