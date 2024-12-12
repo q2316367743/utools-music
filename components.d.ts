@@ -14,6 +14,7 @@ declare module 'vue' {
     MenuSide: typeof import('./src/components/MenuSide/MenuSide.vue')['default']
     MinIcon: typeof import('./src/components/icon/MinIcon.vue')['default']
     MusicDisplay: typeof import('./src/components/MusicPlayer/MusicDisplay.vue')['default']
+    MusicDisplayCanvas: typeof import('./src/components/MusicPlayer/MusicDisplayCanvas.vue')['default']
     MusicListDrawer: typeof import('./src/components/MusicPlayer/MusicListDrawer.vue')['default']
     MusicLyricSearch: typeof import('./src/components/MusicPlayer/MusicLyricSearch.vue')['default']
     MusicPlayer: typeof import('./src/components/MusicPlayer/MusicPlayer.vue')['default']

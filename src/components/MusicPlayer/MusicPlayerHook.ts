@@ -1,6 +1,16 @@
 import {getEffectiveNumber} from "@/utils/lang/FieldUtil";
 import {buildMusicInstance} from "@/music/MusicUtil";
-import {audio, index, music, musics, next, onError, pre} from "@/components/MusicPlayer/MusicPlayer";
+import {
+  audio,
+  index,
+  lyricGroups,
+  lyricIndex, lyrics,
+  music,
+  musics,
+  next,
+  onError,
+  pre
+} from "@/components/MusicPlayer/MusicPlayer";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import {MusicInstance} from "@/types/MusicInstance";
 import {readFile} from "@/utils/file/FileUtil";
@@ -17,30 +27,35 @@ async function initMusicList() {
     return onError(instance);
   }
   audio.src = instance.url;
+  await initLyric(music.value);
   await changeMediaSession(music.value);
 }
 
 export async function changeMediaSession(instance: MusicInstance) {
   if (!('mediaSession' in navigator)) return;
-  
+
   const artwork = [];
-  if (instance.cover) {
-    if (/^https?:\/\//.test(instance.cover) || /^blob:/.test(instance.cover)) {
-      artwork.push({src: instance.cover, sizes: '96x96', type: 'image/png'})
-      artwork.push({src: instance.cover, sizes: '128x128', type: 'image/png'})
-      artwork.push({src: instance.cover, sizes: '192x192', type: 'image/png'})
-      artwork.push({src: instance.cover, sizes: '256x256', type: 'image/png'})
-    } else {
-      const data = await readFile(instance.cover);
-      const blob = new Blob([data], {type: 'image/png'});
-      const url = URL.createObjectURL(blob);
-      artwork.push({src: url, sizes: '96x96', type: 'image/png'})
-      artwork.push({src: url, sizes: '128x128', type: 'image/png'})
-      artwork.push({src: url, sizes: '192x192', type: 'image/png'})
-      artwork.push({src: url, sizes: '256x256', type: 'image/png'})
+  try {
+    if (instance.cover) {
+      if (/^https?:\/\//.test(instance.cover) || /^blob:/.test(instance.cover)) {
+        artwork.push({src: instance.cover, sizes: '96x96', type: 'image/png'})
+        artwork.push({src: instance.cover, sizes: '128x128', type: 'image/png'})
+        artwork.push({src: instance.cover, sizes: '192x192', type: 'image/png'})
+        artwork.push({src: instance.cover, sizes: '256x256', type: 'image/png'})
+      } else {
+        const data = await readFile(instance.cover);
+        const blob = new Blob([data], {type: 'image/png'});
+        const url = URL.createObjectURL(blob);
+        artwork.push({src: url, sizes: '96x96', type: 'image/png'})
+        artwork.push({src: url, sizes: '128x128', type: 'image/png'})
+        artwork.push({src: url, sizes: '192x192', type: 'image/png'})
+        artwork.push({src: url, sizes: '256x256', type: 'image/png'})
+      }
     }
+  } catch (e) {
+    console.error("获取封面失败", e);
   }
-  
+
   navigator.mediaSession.metadata = new MediaMetadata({
     title: instance.name,
     artist: instance.artist,
@@ -51,7 +66,7 @@ export async function changeMediaSession(instance: MusicInstance) {
 
 async function initMediaSession() {
   if (!('mediaSession' in navigator)) return;
-  
+
   if (musics.value.length > 0 && index.value > -1 && index.value < musics.value.length) {
     const listItem = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
     const instance = buildMusicInstance(listItem);
@@ -62,16 +77,16 @@ async function initMediaSession() {
     audio.play();
     navigator.mediaSession.playbackState = 'playing';
   });
-  
+
   navigator.mediaSession.setActionHandler('pause', () => {
     audio.pause();
     navigator.mediaSession.playbackState = 'paused';
   });
-  
+
   navigator.mediaSession.setActionHandler('previoustrack', () => {
     pre();
   });
-  
+
   navigator.mediaSession.setActionHandler('nexttrack', () => {
     next();
   });
@@ -79,10 +94,22 @@ async function initMediaSession() {
   audio.addEventListener('play', () => {
     navigator.mediaSession.playbackState = 'playing';
   });
-  
+
   audio.addEventListener('pause', () => {
     navigator.mediaSession.playbackState = 'paused';
   });
+}
+
+export async function initLyric(instance: MusicInstance) {
+  try {
+    lyricGroups.value = await instance.getLyric();
+    lyricIndex.value = 0
+    if (lyricGroups.value.length > 0) {
+      lyrics.value = lyricGroups.value[0].lines;
+    }
+  } catch (e) {
+    MessageUtil.warning("获取歌词失败", e);
+  }
 }
 
 export function initPlayer() {

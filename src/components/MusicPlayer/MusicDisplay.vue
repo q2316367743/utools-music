@@ -1,6 +1,7 @@
 <template>
   <div class="music-display" :class="{ show: displayVisible }">
     <customer-bg/>
+    <music-display-canvas />
     <t-layout class="music-display__container">
       <t-aside class="list" :width="visible ? '300px' : '0px'"
                :style="{ opacity: visible ? 1 : 0, overflowX: 'hidden' }">

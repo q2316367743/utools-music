@@ -207,7 +207,7 @@ const handleAddToPlaylist = (row: MusicItemView) => {
   .content {
     flex: 1;
     overflow: hidden;
-    padding: 8px;
+    padding: 8px 8px 0;
 
     .table-container {
       height: 100%;

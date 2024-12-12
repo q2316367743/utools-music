@@ -12,7 +12,7 @@ import {matchMusicAttachment} from "@/components/MusicPlayer/MusicAttachment";
 import {useUtoolsDbStorage} from "@/hooks/UtoolsDbStorage";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {buildMusicInstance, MusicListItem} from "@/music/MusicUtil";
-import {changeMediaSession} from "@/components/MusicPlayer/MusicPlayerHook";
+import {changeMediaSession, initLyric} from "@/components/MusicPlayer/MusicPlayerHook";
 
 export const musics = useUtoolsDbStorage(LocalNameEnum.DATA_MUSIC_PLAY_LIST, new Array<MusicListItem>());
 export const index = useUtoolsDbStorage(LocalNameEnum.DATA_MUSIC_PLAY_INDEX, -1);
@@ -65,7 +65,7 @@ audio.addEventListener('timeupdate', () => {
     navigator.mediaSession.setPositionState({
       duration: Math.floor(audio.duration),
       playbackRate: audio.playbackRate,
-      position: audio.currentTime,
+      position: Math.floor(audio.currentTime),
     });
   }
   // 歌词处理
@@ -166,7 +166,7 @@ async function playWrapper() {
     // 索引变了，代表用户没有等待
     return;
   }
-  changeMediaSession(music.value);
+  changeMediaSession(music.value).then(() => console.debug("变更MediaSession")).catch(console.error);
   audio.src = instance.url;
   lyricGroups.value = []
   lyrics.value = [];
@@ -175,15 +175,7 @@ async function playWrapper() {
   audio.play()
     .then(() => console.log('播放成功'))
     .catch(e => MessageUtil.error("播放失败", e));
-  try {
-    lyricGroups.value = await music.value.getLyric();
-    lyricIndex.value = 0
-    if (lyricGroups.value.length > 0) {
-      lyrics.value = lyricGroups.value[0].lines;
-    }
-  } catch (e) {
-    MessageUtil.warning("获取歌词失败", e);
-  }
+  await initLyric(music.value);
   // 播放成功，清空
   errorCount.value = 0;
   matchMusicAttachment(instance, music.value);
