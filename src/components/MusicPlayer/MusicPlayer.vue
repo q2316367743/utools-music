@@ -17,7 +17,7 @@
           <span class="artist">{{ artist }}</span>
         </div>
         <t-space class="duration">
-          <div>{{ prettyDateTime(currentTime) }} / {{ prettyDateTime(duration) }}</div>
+          <div>{{ prettyDateTime(currentTime, true) }} / {{ prettyDateTime(duration, true) }}</div>
           <t-tag theme="primary" size="small" v-if="isNotEmptyString(source)">{{ source }}</t-tag>
           <t-button size="small" variant="text" theme="primary" v-if="enableDownload" @click="onDownload">
             <template #icon>
@@ -139,7 +139,7 @@ import {
   audioControl,
   currentTime,
   displayVisible,
-  duration,
+  duration, initPlayer,
   listVisible,
   loop,
   loopControl,
@@ -258,6 +258,7 @@ function onDownload() {
 onMounted(() => {
   useMusicPlay.on(onMusicPlay);
   useMusicAppend.on(onMusicAppend);
+  initPlayer()
 });
 onBeforeUnmount(() => {
   useMusicPlay.off(onMusicPlay);

@@ -11,9 +11,10 @@ import {MusicInstance} from "@/types/MusicInstance";
 import {matchMusicAttachment} from "@/components/MusicPlayer/MusicAttachment";
 import {useUtoolsDbStorage} from "@/hooks/UtoolsDbStorage";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
+import {buildMusicInstance, MusicListItem} from "@/music/MusicUtil";
 
-export const musics = ref(new Array<MusicInstance>());
-export const index = ref(0);
+export const musics = useUtoolsDbStorage(LocalNameEnum.DATA_MUSIC_PLAY_LIST, new Array<MusicListItem>());
+export const index = useUtoolsDbStorage(LocalNameEnum.DATA_MUSIC_PLAY_INDEX, -1);
 export const music = ref<MusicInstance>();
 // 1: 单，2：顺，3：随
 export const loop = ref(2);
@@ -144,7 +145,8 @@ async function playWrapper() {
   audio.pause()
   currentTime.value = 0;
   const oldIndex = index.value;
-  music.value = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
+  const listItem = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
+  music.value = buildMusicInstance(listItem);
   const instance = await music.value.getInfo();
   let exist = await music.value.usable();
   if (!exist) {
@@ -259,7 +261,7 @@ export function onMusicPlay(e: MusicPlayEvent) {
   rePlay();
 }
 
-export function onMusicAppend(e: MusicInstance) {
+export function onMusicAppend(e: MusicListItem) {
   if (musics.value.length === 0) {
     // 没有，直接覆盖
     musics.value = [e];
@@ -301,4 +303,18 @@ export function switchControls() {
 
 export function switchCurrentTime(currentTime: number) {
   audio.currentTime = currentTime;
+}
+
+export async function initPlayer() {
+  if (index.value ===-1) {
+    return;
+  }
+  const listItem = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
+  music.value = buildMusicInstance(listItem);
+  const instance = await music.value.getInfo();
+  let exist = await music.value.usable();
+  if (!exist) {
+    return onError(instance);
+  }
+  audio.src = instance.url;
 }

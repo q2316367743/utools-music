@@ -61,6 +61,12 @@ export enum LocalNameEnum {
   DATA_WINDOW_CONTROL_POS_X = '/data/window/control/pos/x',
 
   // 控制器窗口位置Y
-  DATA_WINDOW_CONTROL_POS_Y = '/data/window/control/pos/y'
+  DATA_WINDOW_CONTROL_POS_Y = '/data/window/control/pos/y',
+
+  DATA_MUSIC_PLAY_LIST = '/data/music/play/list',
+
+  DATA_MUSIC_PLAY_INDEX = '/data/music/play/index',
+
+  DATA_MUSIC_PLAY_DURATION = '/data/music/play/duration',
 
 }

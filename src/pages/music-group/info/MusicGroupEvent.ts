@@ -1,23 +1,22 @@
 import {useMusicAppend, useMusicPlay} from "@/global/Event";
 import {MusicGroupIndex, MusicGroupType} from "@/entity/MusicGroup";
-import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
 import {VxeTablePropTypes} from "vxe-table";
 import {MusicItemView} from "@/entity/MusicItem";
 import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
 import {useDownloadStore, useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import ContextMenu from "@imengyu/vue3-context-menu";
-import {createMusicInstance} from "@/music/MusicUtil";
+import {buildMusicInstance, createMusicListItemByLocal, createMusicListItemByWeb} from "@/music/MusicUtil";
 
 function renderMusicInstance(info: MusicGroupIndex, e: any) {
   if (info) {
     if (info.type === MusicGroupType.WEB) {
-      return new MusicInstanceWeb(e, info.pluginId)
+      return createMusicListItemByWeb(e, info.pluginId)
     } else if (info.type === MusicGroupType.MIX) {
-      return new MusicInstanceWeb(e, e.pluginId)
+      return createMusicListItemByWeb(e, e.pluginId)
     }
   }
-  return createMusicInstance(e);
+  return createMusicListItemByLocal(e);
 }
 
 export function handleMusicGroupDblclick(info: MusicGroupIndex, rowIndex: number, data: Array<any>) {
@@ -94,7 +93,7 @@ export function handleMenuClickEvent(params: MenuEventProps, info: MusicGroupInd
     items.push({
       label: '下载', onClick: () => {
         const instance = renderMusicInstance(info, row);
-        instance.getInfo()
+        buildMusicInstance(instance).getInfo()
           .then(useDownloadStore().emit)
           .catch(e => MessageUtil.error("获取下载信息错误", e));
       }

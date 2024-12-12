@@ -45,9 +45,9 @@ import MessageUtil from "@/utils/modal/MessageUtil";
 import {useMusicPlay} from "@/global/Event";
 import {MusicIcon, SearchIcon} from "tdesign-icons-vue-next";
 import {useFuse} from "@vueuse/integrations/useFuse";
-import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
 import {MusicGroupType} from "@/entity/MusicGroup";
 import {isEmptyString} from "@/utils/lang/StringUtil";
+import {createMusicListItemByWeb} from "@/music/MusicUtil";
 
 const visible = defineModel({
   type: Boolean
@@ -131,7 +131,7 @@ async function handleRowDblclickWrap(context: RowEventContext<TableRowData>) {
   // 此处获取音频详情
   useMusicPlay.emit({
     index: 0,
-    views: [new MusicInstanceWeb(musicItem, props.pluginId!)]
+    views: [createMusicListItemByWeb(musicItem, props.pluginId!)]
   })
 }
 
@@ -145,7 +145,7 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
 function playAll() {
   useMusicPlay.emit({
     index: 0,
-    views: data.value.map(e => new MusicInstanceWeb(e, props.pluginId!))
+    views: data.value.map(e => createMusicListItemByWeb(e, props.pluginId!))
   })
 }
 

@@ -4,7 +4,7 @@
       <div class="left">
         <t-button theme="primary" variant="text" shape="circle" @click="goBack">
           <template #icon>
-            <arrow-left-icon />
+            <arrow-left-icon/>
           </template>
         </t-button>
         <div class="title">{{ dir }}</div>
@@ -15,16 +15,16 @@
       <div class="table-container" ref="tableContainer">
         <table class="custom-table">
           <thead>
-            <tr>
-              <th style="width: 40px;">
-                <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll" />
-              </th>
-              <th>歌曲名</th>
-              <th>演唱者</th>
-              <th>专辑</th>
-              <th style="width: 80px;">时长</th>
-              <th style="width: 48px;">来源</th>
-            </tr>
+          <tr>
+            <th style="width: 40px;">
+              <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll"/>
+            </th>
+            <th>歌曲名</th>
+            <th>演唱者</th>
+            <th>专辑</th>
+            <th style="width: 80px;">时长</th>
+            <th style="width: 48px;">来源</th>
+          </tr>
           </thead>
         </table>
 
@@ -44,7 +44,7 @@
             @mouseleave="hoveredIndex = null"
           >
             <td style="width: 40px;">
-              <input type="checkbox" :value="row.id" v-model="checks" />
+              <input type="checkbox" :value="row.id" v-model="checks"/>
             </td>
             <td>
               <div class="ellipsis" :title="row.name">{{ row.name }}</div>
@@ -69,20 +69,20 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeftIcon } from "tdesign-icons-vue-next";
-import { useMusicStore } from "@/store";
-import { prettyDateTime } from "@/utils/lang/FormatUtil";
-import { MusicItemView } from "@/entity/MusicItem";
-import { useMusicPlay } from "@/global/Event";
-import { musicGroupChoose } from "@/components/PluginManage/MusicGroupChoose";
-import { MusicGroupType } from "@/entity/MusicGroup";
-import { useMusicGroupStore } from "@/store";
+import {useRoute, useRouter} from 'vue-router';
+import {ArrowLeftIcon} from "tdesign-icons-vue-next";
+import {useMusicStore} from "@/store";
+import {prettyDateTime} from "@/utils/lang/FormatUtil";
+import {MusicItemView} from "@/entity/MusicItem";
+import {useMusicPlay} from "@/global/Event";
+import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
+import {MusicGroupType} from "@/entity/MusicGroup";
+import {useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import ContextMenu from '@imengyu/vue3-context-menu'
 import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
-import { RecycleScroller } from 'vue-virtual-scroller'
-import {createMusicInstance} from "@/music/MusicUtil";
+import {RecycleScroller} from 'vue-virtual-scroller'
+import {createMusicListItemByLocal} from "@/music/MusicUtil";
 
 const route = useRoute();
 const router = useRouter();
@@ -134,7 +134,7 @@ const goBack = () => {
 const handlePlay = (row: MusicItemView) => {
   const index = musicList.value.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
-    views: musicList.value.map(e => createMusicInstance(e)),
+    views: musicList.value.map(e => createMusicListItemByLocal(e)),
     index: Math.max(index, 0)
   });
 };
@@ -187,6 +187,7 @@ const handleAddToPlaylist = (row: MusicItemView) => {
     border-bottom: 1px solid var(--td-border-level-1-color);
     height: 56px;
     box-sizing: border-box;
+
     .left {
       display: flex;
       align-items: center;

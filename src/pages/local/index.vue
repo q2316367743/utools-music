@@ -73,8 +73,6 @@ const {results} = useFuse<MusicItemView>(keyword, musics, {
 
 const data = computed(() => results.value.map(e => e.item));
 
-
-
 watch(music, val => {
   if (val) {
     activeRowKeys.value = [Number(val.id)];

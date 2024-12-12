@@ -2,16 +2,16 @@
   <div class="local-music-table">
     <table class="custom-table">
       <thead>
-        <tr>
-          <th style="width: 40px;">
-            <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll" />
-          </th>
-          <th>歌曲名</th>
-          <th>演唱者</th>
-          <th>专辑</th>
-          <th>时长</th>
-          <th style="width: 48px;">来源</th>
-        </tr>
+      <tr>
+        <th style="width: 40px;">
+          <input type="checkbox" :checked="checkAll" :indeterminate="indeterminate" @change="handleSelectAll"/>
+        </th>
+        <th>歌曲名</th>
+        <th>演唱者</th>
+        <th>专辑</th>
+        <th>时长</th>
+        <th style="width: 48px;">来源</th>
+      </tr>
       </thead>
     </table>
 
@@ -24,10 +24,10 @@
       v-slot="{ item: row, index }"
     >
       <tr :key="row.id" @dblclick="handleRowDblclick(row)" @contextmenu.prevent="handleContextMenu($event, row)"
-        :class="{ 'hover': hoveredIndex === index, active: index === currentIndex }" @mouseover="hoveredIndex = index"
-        @mouseleave="hoveredIndex = null">
+          :class="{ 'hover': hoveredIndex === index, active: index === currentIndex }" @mouseover="hoveredIndex = index"
+          @mouseleave="hoveredIndex = null">
         <td style="width: 40px;">
-          <input type="checkbox" :value="row.id" v-model="checks" />
+          <input type="checkbox" :value="row.id" v-model="checks"/>
         </td>
         <td>
           <div class="ellipsis" :title="row.name">{{ row.name }}</div>
@@ -51,19 +51,18 @@
 </template>
 
 <script lang="ts" setup>
-import { MusicItemView } from "@/entity/MusicItem";
-import { prettyDateTime } from "@/utils/lang/FormatUtil";
-import { useMusicAppend, useMusicPlay } from "@/global/Event";
-import { MusicInstanceLocal } from "@/music/MusicInstanceLocal";
-import { openLocalMusicEditDialog } from "@/pages/local/components/LocalMusicEdit";
-import { musicGroupChoose } from "@/components/PluginManage/MusicGroupChoose";
-import { MusicGroupType } from "@/entity/MusicGroup";
-import { useMusicGroupStore } from "@/store";
+import {MusicItemView} from "@/entity/MusicItem";
+import {prettyDateTime} from "@/utils/lang/FormatUtil";
+import {useMusicAppend, useMusicPlay} from "@/global/Event";
+import {openLocalMusicEditDialog} from "@/pages/local/components/LocalMusicEdit";
+import {musicGroupChoose} from "@/components/PluginManage/MusicGroupChoose";
+import {MusicGroupType} from "@/entity/MusicGroup";
+import {useMusicGroupStore} from "@/store";
 import MessageUtil from "@/utils/modal/MessageUtil";
 import ContextMenu from "@imengyu/vue3-context-menu";
-import { createMusicInstance } from "@/music/MusicUtil";
-import { MusicItemSourceEnum } from "@/entity/MusicItemSourceEnum";
-import { RecycleScroller } from 'vue-virtual-scroller'
+import {createMusicListItemByLocal} from "@/music/MusicUtil";
+import {MusicItemSourceEnum} from "@/entity/MusicItemSourceEnum";
+import {RecycleScroller} from 'vue-virtual-scroller'
 
 const checks = defineModel({
   type: Object as PropType<Array<number>>,
@@ -104,7 +103,7 @@ function handleRowDblclick(row: MusicItemView) {
   const list = props.data;
   const index = props.data.findIndex(e => e.url === row.url);
   useMusicPlay.emit({
-    views: list.map(e => createMusicInstance(e)),
+    views: list.map(e => createMusicListItemByLocal(e)),
     index: Math.max(index, 0)
   });
 }
@@ -115,7 +114,7 @@ function menuClickEvent(code: string, row: MusicItemView) {
       openLocalMusicEditDialog(row);
       break;
     case 'next':
-      useMusicAppend.emit(new MusicInstanceLocal(row));
+      useMusicAppend.emit(createMusicListItemByLocal(row));
       break;
     case 'music-group':
       musicGroupChoose([MusicGroupType.LOCAL])

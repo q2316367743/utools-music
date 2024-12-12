@@ -36,7 +36,7 @@ import {buildFromIMusicItem} from "@/entity/MusicItem";
 import {PluginInstanceView} from "@/entity/PluginEntity";
 import {getMusicItemFromPlugin} from "@/plugin/music";
 import {isEmptyString} from "@/utils/lang/StringUtil";
-import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
+import {createMusicListItemByWeb} from "@/music/MusicUtil";
 
 interface IMusicItemWrap extends IMusicItem {
   keyword: string;
@@ -162,7 +162,7 @@ async function handleRowDblclickWrap(context: RowEventContext<TableRowData>) {
   // 此处获取音频详情
   useMusicPlay.emit({
     index: Math.max(data.value.findIndex(e => e.id === musicItem.id), 0),
-    views: data.value.map(e => new MusicInstanceWeb(e, e.pluginId))
+    views: data.value.map(e => createMusicListItemByWeb(e, e.pluginId))
   })
 }
 
@@ -176,7 +176,7 @@ function handleRowDblclick(context: RowEventContext<TableRowData>) {
 
 async function handleNextPlayWrap(context: BaseTableCellParams<TableRowData>) {
   let musicItem = context.row as IMusicItemWrap;
-  useMusicAppend.emit(new MusicInstanceWeb(musicItem, musicItem.pluginId))
+  useMusicAppend.emit(createMusicListItemByWeb(musicItem, musicItem.pluginId))
 }
 
 function handleNextPlay(context: BaseTableCellParams<TableRowData>) {

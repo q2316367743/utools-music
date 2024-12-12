@@ -1,10 +1,11 @@
 <template>
   <div class="music-display" :class="{ show: displayVisible }">
-    <customer-bg />
+    <customer-bg/>
     <t-layout class="music-display__container">
       <t-aside class="list" :width="listVisible ? '300px' : '0px'"
                :style="{ opacity: listVisible ? 1 : 0, overflowX: 'hidden' }">
         <RecycleScroller
+          ref="scroller"
           class="scroller"
           :items="musics"
           :item-size="41"
@@ -23,13 +24,20 @@
               <t-col :span="2">
                 <t-button variant="text" theme="danger" @click="removeIndex(i, m)">
                   <template #icon>
-                    <DeleteIcon />
+                    <DeleteIcon/>
                   </template>
                 </t-button>
               </t-col>
             </t-row>
           </div>
         </RecycleScroller>
+        <div class="location">
+          <t-button variant="text" theme="primary" shape="circle" @click="scrollToCurrentMusic">
+            <template #icon>
+              <location-icon/>
+            </template>
+          </t-button>
+        </div>
       </t-aside>
       <t-content class="container">
         <div class="title">{{ name }}</div>
@@ -43,21 +51,21 @@
         <div class="lyric">
           <div class="lyric-empty" v-if="lyrics.length === 0 && music">
             <p>暂无歌词</p>
-            <music-lyric-search :icon="false" />
+            <music-lyric-search :icon="false"/>
           </div>
           <div class="lyric-line" v-for="(lyric, i) in lyrics" :key="lyric.start"
                :class="{ active: lyricIndex === i }" @click="handleLyricClick(lyric)">
             <span>{{ lyric.text }}</span>
-            <play-icon class="play" size="1.5rem" />
+            <play-icon class="play" size="1.5rem"/>
           </div>
         </div>
         <div class="close">
           <t-tooltip placement="bottom" content="搜索歌词" v-if="lyrics.length > 0">
-            <music-lyric-search :icon="true" />
+            <music-lyric-search :icon="true"/>
           </t-tooltip>
           <t-button theme="primary" variant="text" size="large" shape="circle" @click="switchDisplay">
             <template #icon>
-              <chevron-down-icon />
+              <chevron-down-icon/>
             </template>
           </t-button>
         </div>
@@ -76,11 +84,13 @@ import {
   removeIndex, switchCurrentTime, switchDisplay,
   switchIndex
 } from "@/components/MusicPlayer/MusicPlayer";
-import { DeleteIcon, PlayIcon, ChevronDownIcon } from 'tdesign-icons-vue-next';
-import { LyricLine } from "@/types/LyricLine";
+import {DeleteIcon, PlayIcon, ChevronDownIcon, LocationIcon} from 'tdesign-icons-vue-next';
+import {LyricLine} from "@/types/LyricLine";
 import MusicLyricSearch from "@/components/MusicPlayer/MusicLyricSearch.vue";
-import { fontFamily } from "@/store";
-import { RecycleScroller } from 'vue-virtual-scroller';
+import {fontFamily} from "@/store";
+import {RecycleScroller} from 'vue-virtual-scroller';
+
+const scroller = ref<InstanceType<typeof RecycleScroller>>();
 
 const name = computed(() => music.value?.name || '无歌曲');
 const artist = computed(() => music.value?.artist || '无演唱家');
@@ -90,6 +100,17 @@ function handleLyricClick(value: LyricLine) {
   switchCurrentTime(value.start + 1);
   if (!played.value) {
     audio.play();
+  }
+}
+
+function scrollToCurrentMusic() {
+  const index = musics.value.findIndex(e => e.id === music.value?.id);
+  if (index >= 0) {
+    scroller.value?.$el.scrollTo({
+      top: Math.max(index - 3, 0) * 41,
+      left: 0,
+      behavior: 'smooth'
+    });
   }
 }
 </script>
@@ -108,6 +129,14 @@ function handleLyricClick(value: LyricLine) {
     left: 0;
     right: 0;
     bottom: 60px;
+
+    .list {
+      .location {
+        position: absolute;
+        right: 48px;
+        bottom: 48px;
+      }
+    }
   }
 
   transition: top 0.5s;

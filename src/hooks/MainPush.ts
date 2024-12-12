@@ -3,8 +3,7 @@ import Fuse from "fuse.js";
 import {isEmptyArray} from "@/utils/lang/FieldUtil";
 import {useMusicPlay} from "@/global/Event";
 import {MusicGroupType} from "@/entity/MusicGroup";
-import {MusicInstanceLocal} from "@/music/MusicInstanceLocal";
-import {MusicInstanceWeb} from "@/music/MusicInstanceWeb";
+import {createMusicListItemByLocal, createMusicListItemByWeb} from "@/music/MusicUtil";
 
 interface MainPushResultItem {
   icon?: string,
@@ -65,12 +64,12 @@ export function useMainPush(): MainPushResult<string> {
           if (find) {
             if (find.type === MusicGroupType.WEB) {
               useMusicPlay.emit({
-                views: items.map(e => new MusicInstanceWeb(e, find.pluginId!)),
+                views: items.map(e => createMusicListItemByWeb(e, find.pluginId!)),
                 index: 0
               });
             } else {
               useMusicPlay.emit({
-                views: items.map(e => new MusicInstanceLocal(e)),
+                views: items.map(e => createMusicListItemByLocal(e)),
                 index: 0
               });
             }
