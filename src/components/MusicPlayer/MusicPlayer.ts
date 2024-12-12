@@ -12,6 +12,7 @@ import {matchMusicAttachment} from "@/components/MusicPlayer/MusicAttachment";
 import {useUtoolsDbStorage} from "@/hooks/UtoolsDbStorage";
 import {LocalNameEnum} from "@/global/LocalNameEnum";
 import {buildMusicInstance, MusicListItem} from "@/music/MusicUtil";
+import {changeMediaSession} from "@/components/MusicPlayer/MusicPlayerHook";
 
 export const musics = useUtoolsDbStorage(LocalNameEnum.DATA_MUSIC_PLAY_LIST, new Array<MusicListItem>());
 export const index = useUtoolsDbStorage(LocalNameEnum.DATA_MUSIC_PLAY_INDEX, -1);
@@ -59,17 +60,26 @@ audio.addEventListener('canplay', () => {
 });
 audio.addEventListener('timeupdate', () => {
   currentTime.value = audio.currentTime;
-  musicControls.sendProgress(audio.currentTime, audio.duration)
+  musicControls.sendProgress(audio.currentTime, audio.duration);
+  if (!isNaN(audio.duration)) {
+    navigator.mediaSession.setPositionState({
+      duration: Math.floor(audio.duration),
+      playbackRate: audio.playbackRate,
+      position: audio.currentTime,
+    });
+  }
   // 歌词处理
   sendLyricWrap()
 });
 audio.addEventListener('playing', () => {
   played.value = true;
   musicControls.sendControl('play');
+  navigator.mediaSession.playbackState = 'playing';
 });
 audio.addEventListener('pause', () => {
   played.value = false;
   musicControls.sendControl('pause');
+  navigator.mediaSession.playbackState = 'paused';
 });
 audio.addEventListener('ended', () => {
   played.value = false;
@@ -119,7 +129,7 @@ export function loopControl() {
   }
 }
 
-function onError(m: MusicItem) {
+export function onError(m: MusicItem) {
   errorCount.value += 1;
   if (errorCount.value > 4) {
     MessageUtil.warning("已经超过4次播放错误，播放暂停。")
@@ -156,6 +166,7 @@ async function playWrapper() {
     // 索引变了，代表用户没有等待
     return;
   }
+  changeMediaSession(music.value);
   audio.src = instance.url;
   lyricGroups.value = []
   lyrics.value = [];
@@ -303,18 +314,4 @@ export function switchControls() {
 
 export function switchCurrentTime(currentTime: number) {
   audio.currentTime = currentTime;
-}
-
-export async function initPlayer() {
-  if (index.value ===-1) {
-    return;
-  }
-  const listItem = musics.value[getEffectiveNumber(index.value, 0, musics.value.length)];
-  music.value = buildMusicInstance(listItem);
-  const instance = await music.value.getInfo();
-  let exist = await music.value.usable();
-  if (!exist) {
-    return onError(instance);
-  }
-  audio.src = instance.url;
 }

@@ -29,7 +29,7 @@ const buildPathPayload = (path: string, name?: string) => ({
 
 function sendEvent(payload: Record<string, any>) {
     if (utools.isDev()) {
-        console.log('Umami payload:', payload);
+        console.debug('Umami payload:', payload);
         return;
     }
     fetch(`${Constants.umami.url}/api/send`, {

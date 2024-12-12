@@ -110,7 +110,7 @@ import {
   audioControl,
   currentTime,
   displayVisible,
-  duration, initPlayer,
+  duration,
   loop,
   loopControl,
   music,
@@ -138,6 +138,7 @@ import {MusicGroupType} from "@/entity/MusicGroup";
 import MinIcon from "@/components/icon/MinIcon.vue";
 import LyricIcon from "@/components/icon/LyricIcon.vue";
 import RandomPlayIcon from "@/components/icon/RandomPlayIcon.vue";
+import {initPlayer} from "@/components/MusicPlayer/MusicPlayerHook";
 
 const disabled = computed(() => isNull(music.value));
 const name = computed(() => music.value?.name || '无歌曲');

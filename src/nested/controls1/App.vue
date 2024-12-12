@@ -123,7 +123,7 @@ function play() {
 const preMusic = () => window.preload.sendMsg('pre');
 const nextMusic = () => window.preload.sendMsg('next');
 
-const showMain = () => utools.redirect(['音乐播放器', '音乐播放器'])
+const showMain = () => utools.redirect(['音乐播放器', '音乐播放器'], '')
 </script>
 <style lang="less">
 </style>

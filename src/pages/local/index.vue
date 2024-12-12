@@ -2,13 +2,16 @@
   <div class="local-music">
     <div class="container">
       <div class="local-music__header">
-        <t-auto-complete :options="options" style="width: 200px" placeholder="搜索本地音乐" v-model="keyword"
-                         :clearable="true"
-                         :highlight-keyword="true" :filterable="true">
-          <template #suffix-icon>
-            <search-icon/>
-          </template>
-        </t-auto-complete>
+        <t-space size="small" style="align-items: center;">
+          <t-auto-complete :options="options" style="width: 200px" placeholder="搜索本地音乐" v-model="keyword"
+                           :clearable="true" :popup-props="{overlayInnerStyle: {maxWidth: '50vw'}}"
+                           :highlight-keyword="true" :filterable="true">
+            <template #suffix-icon>
+              <search-icon/>
+            </template>
+          </t-auto-complete>
+          <t-tag variant="outline">共{{ musics.length }}首歌曲</t-tag>
+        </t-space>
         <t-space size="small">
           <t-button size="small" v-if="checks.length > 0" @click="addMusicGroup">添加到歌单</t-button>
           <t-button size="small" shape="square" v-if="music" @click="setLocation(music)">

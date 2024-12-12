@@ -10,7 +10,7 @@ import {Repository} from "@/entity/Repository";
 import {KeyValue} from "@/types/KeyValue";
 
 export const useMusicStore = defineStore('music', () => {
-  const musics = ref(new Array<MusicItemView>());
+  const musics = shallowRef(new Array<MusicItemView>());
 
   /**
    * 初始化全部的音乐

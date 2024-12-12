@@ -1,14 +1,17 @@
 <template>
   <div class="folder-info">
     <header class="page-header">
-      <div class="left">
+      <t-space size="small" class="left">
         <t-button theme="primary" variant="text" shape="circle" @click="goBack">
           <template #icon>
             <arrow-left-icon/>
           </template>
         </t-button>
-        <div class="title">{{ dir }}</div>
-      </div>
+        <div class="title">
+          <div class="ellipsis">{{ dir }}</div>
+        </div>
+        <t-tag variant="outline">共{{musics.length}}首歌曲</t-tag>
+      </t-space>
       <t-button size="small" v-if="checks.length > 0" @click="addMusicGroup">添加到歌单</t-button>
     </header>
     <div class="content">
@@ -189,7 +192,6 @@ const handleAddToPlaylist = (row: MusicItemView) => {
     box-sizing: border-box;
 
     .left {
-      display: flex;
       align-items: center;
     }
   }
@@ -199,6 +201,7 @@ const handleAddToPlaylist = (row: MusicItemView) => {
     font-weight: bold;
     color: var(--td-text-color-primary);
     margin-left: 8px;
+    max-width: 70vw;
   }
 
   .content {
